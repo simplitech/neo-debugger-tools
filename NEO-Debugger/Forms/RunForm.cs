@@ -361,6 +361,7 @@ namespace Neo.Debugger.Forms
                         }
 
                         inputGrid.Rows[j].Cells[1].Value = val;
+                        inputGrid.Rows[j].Cells[1].Style.ForeColor = Color.Black;
                     }
 
                     break;
