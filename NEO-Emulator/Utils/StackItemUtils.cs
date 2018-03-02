@@ -15,6 +15,13 @@ namespace Neo.Emulator.Utils
         {
             if (item is ICollection)
             {
+                var bytes = item.GetByteArray();
+                if (bytes != null && bytes.Length == 20)
+                {
+                    var signatureHash = new UInt160(bytes);
+                    return Crypto.Default.ToAddress(signatureHash);
+                }
+
                 var s = new StringBuilder();
                 var items = (ICollection)item;
 
@@ -31,15 +38,17 @@ namespace Neo.Emulator.Utils
                     i++;
                 }
                 s.Append(']');
+
+
                 return s.ToString();
             }
 
-            if (item is Neo.VM.Types.Boolean)
+            if (item is Neo.VM.Types.Boolean && hintType == null)
             {
                 return item.GetBoolean().ToString();
             }
 
-            if (item is Neo.VM.Types.Integer)
+            if (item is Neo.VM.Types.Integer && hintType == null)
             {
                 return item.GetBigInteger().ToString();
             }
@@ -59,16 +68,10 @@ namespace Neo.Emulator.Utils
 
             }
             
-            if (data == null)
+            if ((data == null || data.Length == 0) && hintType == null)
             {
-                return "[Null]";
+                return "Null";
             }
-
-            if (data == null || data.Length == 0)
-            {
-                return "False";
-            }
-
 
             return FormattingUtils.OutputData(data, addQuotes, hintType);
         }
@@ -98,7 +101,7 @@ namespace Neo.Emulator.Utils
         {
             if (data == null)
             {
-                return "[Null]";
+                return "Null";
             }
 
             byte[] separator = { Convert.ToByte(';') };
@@ -220,7 +223,7 @@ namespace Neo.Emulator.Utils
 
                         case "boolean":
                             {
-                                return (data.Length > 0 & data[0] != 0) ? "True" : "False";
+                                return (data != null && data.Length > 0 && data[0] != 0) ? "True" : "False";
                             }
 
                         case "integer":
