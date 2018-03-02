@@ -128,6 +128,13 @@
         NEWARRAY = 0xC5, //用作引用類型
         NEWSTRUCT = 0xC6, //用作值類型
 
+        APPEND = 0xC8,
+        REVERSE = 0xC9,
+        REMOVE = 0xCA,
+
+        HASKEY = 0xCB,
+        KEYS = 0xCC,
+        VALUES = 0xCD,
 
         // Exceptions
         THROW = 0xF0,

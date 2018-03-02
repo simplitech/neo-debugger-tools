@@ -280,6 +280,7 @@
     <Compile Include="VM\Types\ByteArray.cs" />
     <Compile Include="VM\Types\Integer.cs" />
     <Compile Include="VM\Types\InteropInterface.cs" />
+    <Compile Include="VM\Types\Map.cs" />
     <Compile Include="VM\Types\Struct.cs" />
     <Compile Include="VM\VMState.cs" />
   </ItemGroup>
