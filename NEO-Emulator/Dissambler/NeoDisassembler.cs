@@ -271,14 +271,14 @@ namespace Neo.Emulator.Dissambler
                 {
                     while (reader.BaseStream.Position != reader.BaseStream.Length)
                     {
-                        var opcode = (OpCode)reader.ReadByte();
-
                         var entry = new DisassembleEntry();
                         output.Add(entry);
 
-                        entry.startOfs = (int)reader.BaseStream.Position;
+                        var opcode = (OpCode)reader.ReadByte();
+
                         entry.opcode = opcode;
                         entry.name = opcode.ToString();
+                        entry.startOfs = (int)reader.BaseStream.Position;
 
                         entry.comment = hints.ContainsKey(opcode) ? hints[opcode] : "";
 

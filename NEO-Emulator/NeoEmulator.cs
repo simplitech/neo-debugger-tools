@@ -217,7 +217,7 @@ namespace Neo.Emulator
                 engine.LoadScript(sb.ToArray());
             }
 
-            engine.Reset();
+            //engine.Reset();
 
             lastState = new DebuggerState(DebuggerState.State.Reset, 0);
             currentTransaction = null;
@@ -235,6 +235,30 @@ namespace Neo.Emulator
             }
         }
 
+        public bool GetRunningState()
+        {
+            return !engine.State.HasFlag(VMState.HALT) && !engine.State.HasFlag(VMState.FAULT) && !engine.State.HasFlag(VMState.BREAK);
+        }
+
+        private bool ExecuteSingleStep()
+        {
+            if (this.lastState.state == DebuggerState.State.Reset)
+            {
+                engine.State = VMState.NONE;
+            }
+
+            var shouldContinue = GetRunningState();
+            if (shouldContinue)
+            {
+                engine.StepInto();
+                return GetRunningState();
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
         /// <summary>
         /// executes a single instruction in the current script, and returns the last script offset
         /// </summary>
@@ -245,7 +269,7 @@ namespace Neo.Emulator
                 return lastState;
             }
 
-            engine.ExecuteSingleStep();
+            ExecuteSingleStep();
 
             try
             {
@@ -304,7 +328,7 @@ namespace Neo.Emulator
             if (engine.State.HasFlag(VMState.BREAK))
             {
                 lastState = new DebuggerState(DebuggerState.State.Break, lastOffset);
-                engine.Reset();
+                //engine.Reset();
                 return lastState;
             }
 

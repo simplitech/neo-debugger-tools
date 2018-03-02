@@ -376,7 +376,7 @@ namespace Neo.Debugger.Utils
                     case DebugMode.Assembly:
                         {
                             var line = _avmAsm.ResolveLine(ofs);
-                            return line + 2;
+                            return line + 1;
                         }
 
                     default:

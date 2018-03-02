@@ -1,6 +1,7 @@
 ﻿using Neo.Cryptography;
 using Neo.VM;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
@@ -12,20 +13,22 @@ namespace Neo.Emulator.Utils
     {
         public static string StackItemAsString(StackItem item, bool addQuotes = false)
         {
-            if (item.IsArray)
+            if (item is ICollection)
             {
                 var s = new StringBuilder();
-                var items = item.GetArray();
+                var items = (ICollection)item;
 
                 s.Append('[');
-                for (int i = 0; i < items.Length; i++)
+                int i = 0;
+                foreach (StackItem element in items)
                 {
-                    var element = items[i];
                     if (i > 0)
                     {
                         s.Append(',');
                     }
                     s.Append(StackItemAsString(element));
+
+                    i++;
                 }
                 s.Append(']');
                 return s.ToString();
@@ -46,7 +49,16 @@ namespace Neo.Emulator.Utils
                 return "{InteropInterface}";
             }
 
-            var data = item.GetByteArray();
+            byte[] data = null;
+            
+            try {
+                data = item.GetByteArray();
+            }
+            catch
+            {
+
+            }
+            
 
             if (data == null)
             {

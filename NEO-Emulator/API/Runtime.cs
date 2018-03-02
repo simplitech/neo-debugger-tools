@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using Neo.Cryptography;
+using System.Collections;
 
 namespace Neo.Emulator.API
 {
@@ -103,15 +104,15 @@ namespace Neo.Emulator.API
             //params object[] state
             var something = engine.EvaluationStack.Pop();
 
-            if (something.IsArray)
+            if (something is ICollection)
             {
                 var sb = new StringBuilder();
 
-                var items = something.GetArray();
+                var items = (ICollection)something;
 
                 int index = 0;
 
-                foreach (var item in items)
+                foreach (StackItem item in items)
                 {
                     if (index > 0)
                     {
