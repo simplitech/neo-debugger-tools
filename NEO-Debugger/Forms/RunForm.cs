@@ -150,8 +150,7 @@ namespace Neo.Debugger.Forms
                             }
                             else if (Util.IsValidWallet(s))
                             {
-                                var bytes = s.Base58CheckDecode();
-                                var scriptHash = bytes.Skip(1).Take(20).ToArray();
+                                var scriptHash = Emulator.Helper.AddressToScriptHash(s);
                                 s = Util.BytesToString(scriptHash);
                             }
                             else
@@ -261,7 +260,6 @@ namespace Neo.Debugger.Forms
                     }
                 }
             }
-
 
             uint timestamp;
             if (!uint.TryParse(timestampBox.Text, out timestamp))
@@ -390,11 +388,6 @@ namespace Neo.Debugger.Forms
                     break;
                 }
             }
-        }
-
-        private void assetComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            assetAmount.Enabled = assetComboBox.SelectedIndex > 0;
         }
 
         private void inputGrid_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -596,6 +589,11 @@ namespace Neo.Debugger.Forms
             lockDate = true;
             timestampBox.Text = Emulator.Helper.ToTimestamp(dateTimePicker1.Value).ToString();
             lockDate = false;
+        }
+
+        private void assetComboBox_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            assetAmount.Enabled = assetComboBox.SelectedIndex > 0;
         }
     }
 }

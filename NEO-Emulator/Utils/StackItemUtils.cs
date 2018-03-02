@@ -213,7 +213,8 @@ namespace Neo.Emulator.Utils
 
                         if (data.Length == 20)
                         {
-                            var signatureHash = Crypto.Default.ToScriptHash(data);
+                            //var signatureHash = Crypto.Default.ToScriptHash(data);
+                            var signatureHash = new UInt160(data);
                             return Crypto.Default.ToAddress(signatureHash);
                         }
 

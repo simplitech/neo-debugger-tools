@@ -83,5 +83,13 @@ namespace Neo.Debugger.Forms
             keyDataGrid.Rows.Add(new object[] { "Private Key (WIF, hex)", keyPair.WIF });
             keyDataGrid.Rows.Add(new object[] { "Private Key (RAW, bytes)", ToByteArray(keyPair.PrivateKey) });
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var bytes = new byte[32];
+            var rnd = new Random();
+            rnd.NextBytes(bytes);
+            keyBox.Text = bytes.ToHexString();
+        }
     }
 }

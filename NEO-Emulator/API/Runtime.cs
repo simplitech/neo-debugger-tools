@@ -23,6 +23,16 @@ namespace Neo.Emulator.API
             return true;
         }
 
+        [Syscall("Neo.Runtime.GetTime")]
+        public static bool GetTime(ExecutionEngine engine)
+        {
+            var emulator = engine.GetEmulator();
+            uint result = emulator.timestamp;
+
+            engine.EvaluationStack.Push(result);
+            return true;
+        }
+
         [Syscall("Neo.Runtime.CheckWitness", 0.2)]
         public static bool CheckWitness(ExecutionEngine engine)
         {

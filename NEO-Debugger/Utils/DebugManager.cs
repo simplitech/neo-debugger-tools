@@ -519,12 +519,13 @@ namespace Neo.Debugger.Utils
             _emulator.checkWitnessMode = debugParams.WitnessMode;
             _emulator.currentTrigger = debugParams.TriggerType;
             _emulator.timestamp = debugParams.Timestamp;
-            _emulator.Reset(debugParams.ArgList);
             if (debugParams.Transaction.Count > 0)
             {
                 var transaction = debugParams.Transaction.First();
                 _emulator.SetTransaction(transaction.Key, transaction.Value);
             }
+
+            _emulator.Reset(debugParams.ArgList);
             Reset();
             return true;
         }

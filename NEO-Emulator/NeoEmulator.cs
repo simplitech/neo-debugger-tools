@@ -352,7 +352,9 @@ namespace Neo.Emulator
         {
             var key = Runtime.invokerKeys;
 
-            var hash = key != null ? key.PublicKeyHash : new UInt160(new byte[20]);
+            var bytes = key != null ? Helper.AddressToScriptHash(key.address) : new byte[20];
+
+            var hash = new UInt160(bytes);
 
             var output = new TransactionOutput(assetID, amount, hash);
             
