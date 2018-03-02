@@ -20,10 +20,10 @@ namespace Neo.Debugger.Forms
         private ABI _abi;
         private TestSuite _testSuite;
         private string currentContractName = "";
-        private string lastContractName = "";
         private bool editMode = false;
         private int editRow;
-        private AVMFunction currentMethod;
+
+        public AVMFunction currentMethod { get; private set; }
 
         private DebugParameters _debugParameters;
         public DebugParameters DebugParameters
@@ -37,7 +37,7 @@ namespace Neo.Debugger.Forms
         private string _defaultPrivateKey;
         private Dictionary<string, string> _defaultParams;
 
-        public RunForm(ABI abi, TestSuite tests, string contractName, string defaultPrivateKey, Dictionary<string,string> defaultParams)
+        public RunForm(ABI abi, TestSuite tests, string contractName, string defaultPrivateKey, Dictionary<string,string> defaultParams, string defaultFunction)
         {
             InitializeComponent();
             _testSuite = tests;
@@ -59,7 +59,28 @@ namespace Neo.Debugger.Forms
             assetComboBox.SelectedIndex = 0;
 
             triggerComboBox.SelectedIndex = 0;
-            witnessComboBox.SelectedIndex = 0; 
+            witnessComboBox.SelectedIndex = 0;
+
+            paramsList.Items.Clear();
+
+            foreach (var f in _abi.functions.Values)
+            {
+                paramsList.Items.Add(f.name);
+            }
+
+            if (string.IsNullOrEmpty(defaultFunction))
+            {
+                defaultFunction = _abi.entryPoint.name;
+            }
+            
+            int mainItem = paramsList.FindString(defaultFunction);
+            if (mainItem >= 0) paramsList.SetSelected(mainItem, true);
+            
+            testCasesList.Items.Clear();
+            foreach (var entry in _testSuite.cases.Keys)
+            {
+                testCasesList.Items.Add(entry);
+            }
         }
 
         private bool InitInvoke()
@@ -305,34 +326,6 @@ namespace Neo.Debugger.Forms
             }
 
             privateKeyInput.Text = _defaultPrivateKey;
-
-            ReloadContract();
-        }
-
-        private void ReloadContract()
-        {
-            if (currentContractName == lastContractName)
-            {
-                return;
-            }
-
-            lastContractName = currentContractName;
-
-            paramsList.Items.Clear();
-
-            foreach (var f in _abi.functions.Values)
-            {
-                paramsList.Items.Add(f.name);
-            }
-
-            int mainItem = paramsList.FindString(_abi.entryPoint.name);
-            if (mainItem >= 0) paramsList.SetSelected(mainItem, true);
-
-            testCasesList.Items.Clear();
-            foreach (var entry in _testSuite.cases.Keys)
-            {
-                testCasesList.Items.Add(entry);
-            }
         }
 
         private void ResetTabs()

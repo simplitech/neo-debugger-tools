@@ -188,11 +188,16 @@ namespace Neo.Debugger.Forms
         private bool GetDebugParameters()
         {
             //Run form with defaults from settings if available
-            RunForm runForm = new RunForm(_debugger.ABI, _debugger.Tests, _debugger.ContractName, _settings.lastPrivateKey, _settings.lastParams);
+            RunForm runForm = new RunForm(_debugger.ABI, _debugger.Tests, _debugger.ContractName, _settings.lastPrivateKey, _settings.lastParams, _settings.lastFunction);
             var result = runForm.ShowDialog();
             var debugParams = runForm.DebugParameters;
             if (result != DialogResult.OK)
                 return false;
+
+            if (runForm.currentMethod != null)
+            {
+                _settings.lastFunction = runForm.currentMethod.name;
+            }
 
             _debugger.SetDebugParameters(debugParams);
             return true;
