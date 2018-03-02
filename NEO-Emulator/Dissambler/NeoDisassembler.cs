@@ -17,6 +17,12 @@ namespace Neo.Emulator.Dissambler
         public string comment;
     }
 
+    public struct DisassembleLocation
+    {
+        public string fileName;
+        public int line;
+    }
+
     public class DisassembleException : Exception
     {
         public DisassembleException(string msg) : base(msg)

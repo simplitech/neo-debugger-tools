@@ -259,17 +259,7 @@ namespace Neo.Debugger.Utils
                 Log("Old map file format found.  Please recompile your avm with the latest compiler.");
                 return false;
             }
-            else if (!File.Exists(_mapFilePath))
-            {
-                Log($"Could not find {_mapFilePath}");
-                return false;
-            }
-            else if (!File.Exists(_abiFilePath))
-            {
-                Log($"Error: {_abiFilePath} was not found. Please recompile your AVM with the latest compiler.");
-                return false;
-            }
-                
+
             _debugContent = new Dictionary<DebugMode, string>();
             _mode = DebugMode.Assembly;
             _language = SourceLanguage.Other;
@@ -286,13 +276,30 @@ namespace Neo.Debugger.Utils
                 return false;
             }
 
-            _aBI = new ABI(_abiFilePath);
+            if (File.Exists(_abiFilePath))
+            {
+                _aBI = new ABI(_abiFilePath);
+            }
+            else
+            {
+                Log($"Warning: {_abiFilePath} was not found. Please recompile your AVM with the latest compiler.");
+            }
 
             //We always should have the assembly content
             _debugContent[DebugMode.Assembly] = _avmAsm.ToString();
 
             //Let's see if we have source code we can map
-            _map.LoadFromFile(_mapFilePath, _contractByteCode);
+            if (File.Exists(_mapFilePath))
+            {
+                _map.LoadFromFile(_mapFilePath, _contractByteCode);
+            }
+            else
+            {
+                _map = null;
+                Log($"Warning: Could not find {_mapFilePath}");
+                //return false;
+            }
+
             if (_map != null && _map.Entries.Any())
             {
                 var srcFile = _map.Entries.FirstOrDefault().url;

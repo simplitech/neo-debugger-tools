@@ -131,8 +131,8 @@ namespace Neo.Emulator.API
             //returns byte[]
 
             var obj = engine.EvaluationStack.Pop();
-            var item = (VM.Types.ByteArray) engine.EvaluationStack.Pop();
-
+            var item = engine.EvaluationStack.Pop();
+            
             var key = item.GetByteArray();
 
             var storage = ((VM.Types.InteropInterface)obj).GetInterface<Storage>();

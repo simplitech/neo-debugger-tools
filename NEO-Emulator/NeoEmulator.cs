@@ -125,10 +125,32 @@ namespace Neo.Emulator
 
         private static void EmitObject(ScriptBuilder sb, object item)
         {
+            if (item is byte[])
+            {
+                var arr = (byte[])item;
+
+                for (int index = arr.Length - 1; index >= 0; index--)
+                {
+                    sb.EmitPush(arr[index]);
+                }
+
+                sb.EmitPush(arr.Length);
+                sb.Emit(OpCode.PACK);
+            }
+            else
             if (item is List<object>)
             {
                 var list = (List<object>)item;
-                sb.Emit((OpCode)((int)OpCode.PUSHT + list.Count - 1));
+
+                for (int index = 0; index < list.Count; index++)
+                {
+                    EmitObject(sb, list[index]);
+                }              
+
+                sb.EmitPush(list.Count);
+                sb.Emit(OpCode.PACK);
+
+                /*sb.Emit((OpCode)((int)OpCode.PUSHT + list.Count - 1));
                 sb.Emit(OpCode.NEWARRAY);
 
                 for (int index = 0; index < list.Count; index++)
@@ -137,7 +159,7 @@ namespace Neo.Emulator
                     sb.EmitPush(new BigInteger(index));
                     EmitObject(sb, list[index]);
                     sb.Emit(OpCode.SETITEM);
-                }
+                }*/
             }
             else
             if (item == null)
@@ -153,11 +175,6 @@ namespace Neo.Emulator
             if (item is bool)
             {
                 sb.EmitPush((bool)item);
-            }
-            else
-            if (item is byte[])
-            {
-                sb.EmitPush((byte[])item);
             }
             else
             if (item is BigInteger)
@@ -214,7 +231,9 @@ namespace Neo.Emulator
                     EmitObject(sb, item);
                 }
 
-                engine.LoadScript(sb.ToArray());
+                var loaderScript = sb.ToArray();
+                //System.IO.File.WriteAllBytes("loader.avm", loaderScript);
+                engine.LoadScript(loaderScript);
             }
 
             //engine.Reset();
@@ -400,12 +419,38 @@ namespace Neo.Emulator
         {
             if (item.HasChildren)
             {
-                var list = new List<object>();
+                bool isByteArray = true;
+
                 foreach (var child in item.Children)
                 {
-                    list.Add(ConvertArgument(child));
+                    byte n;
+                    if (string.IsNullOrEmpty(child.Value) || !byte.TryParse(child.Value, out n))
+                    {
+                        isByteArray = false;
+                        break;
+                    }
                 }
-                return list;
+
+                if (isByteArray)
+                {
+                    var arr = new byte[item.ChildCount];
+                    int index = 0;
+                    foreach (var child in item.Children)
+                    {
+                        arr[index] = byte.Parse(child.Value);
+                        index++;
+                   }
+                    return arr;
+                }
+                else
+                {
+                    var list = new List<object>();
+                    foreach (var child in item.Children)
+                    {
+                        list.Add(ConvertArgument(child));
+                    }
+                    return list;
+                }
             }
 
             BigInteger intVal;

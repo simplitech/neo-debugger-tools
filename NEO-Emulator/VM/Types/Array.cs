@@ -66,7 +66,29 @@ namespace Neo.VM.Types
 
         public override byte[] GetByteArray()
         {
-            throw new NotSupportedException();
+            var bytes = new byte[_array.Count];
+            int index = 0;
+            foreach (var item in _array)
+            {
+                var val = _array[index];
+
+                try
+                {
+                    var arr = val.GetByteArray();
+                    if (arr.Length == 0)
+                    {
+                        return null;
+                    }
+
+                    bytes[index] = arr[0];
+                    index++;
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+            return bytes;
         }
 
         IEnumerator IEnumerable.GetEnumerator()

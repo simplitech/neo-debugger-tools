@@ -179,6 +179,8 @@ namespace Neo.Debugger.Forms
                                 ShowArgumentError(f, index, val);
                                 return false;
                             }
+
+                            val = $"[{s}]";
                         }
                         else
                         {
