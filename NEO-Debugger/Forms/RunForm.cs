@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Windows.Forms;
 
@@ -146,9 +147,8 @@ namespace Neo.Debugger.Forms
                         else if (Util.IsValidWallet(s))
                         {
                             var bytes = s.Base58CheckDecode();
-                            var scriptHash = Crypto.Default.ToScriptHash(bytes);
-                            bytes = scriptHash.ToArray();
-                            s = Util.BytesToString(bytes);
+                            var scriptHash = bytes.Skip(1).Take(20).ToArray();
+                            s = Util.BytesToString(scriptHash);
                         }
                         else
                         {
