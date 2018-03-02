@@ -328,7 +328,7 @@ namespace Neo.Emulator
             if (engine.State.HasFlag(VMState.BREAK))
             {
                 lastState = new DebuggerState(DebuggerState.State.Break, lastOffset);
-                //engine.Reset();
+                engine.State = VMState.NONE;
                 return lastState;
             }
 

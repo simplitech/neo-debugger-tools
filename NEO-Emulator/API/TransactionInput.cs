@@ -35,7 +35,7 @@ namespace Neo.Emulator.API
         public bool GetPrevHash(ExecutionEngine engine)
         {
             var obj = engine.EvaluationStack.Pop();
-            var input = obj.GetInterface<TransactionInput>();
+            var input = ((VM.Types.InteropInterface)obj).GetInterface<TransactionInput>();
 
             if (input == null)
                 return false;
@@ -48,7 +48,7 @@ namespace Neo.Emulator.API
         public static bool GetPrevIndex(ExecutionEngine engine)
         {
             var obj = engine.EvaluationStack.Pop();
-            var input = obj.GetInterface<TransactionInput>();
+            var input = ((VM.Types.InteropInterface)obj).GetInterface<TransactionInput>();
 
             if (input == null)
                 return false;

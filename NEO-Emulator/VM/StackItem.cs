@@ -100,10 +100,5 @@ namespace Neo.VM
             return new Array(value);
         }
 
-        public virtual T GetInterface<T>() where T : class, IInteropInterface
-        {
-            throw new NotSupportedException();
-        }
-
     }
 }
