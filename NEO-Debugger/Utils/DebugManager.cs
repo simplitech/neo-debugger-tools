@@ -276,7 +276,16 @@ namespace Neo.Debugger.Utils
             _contractName = Path.GetFileNameWithoutExtension(_avmFilePath);
             _contractByteCode = File.ReadAllBytes(_avmFilePath);
             _map = new NeoMapFile();
-            _avmAsm = NeoDisassembler.Disassemble(_contractByteCode);
+            try
+            {
+                _avmAsm = NeoDisassembler.Disassemble(_contractByteCode);
+            }
+            catch (DisassembleException e)
+            {
+                Log($"Disassembler Error: {e.Message}");
+                return false;
+            }
+
             _aBI = new ABI(_abiFilePath);
 
             //We always should have the assembly content

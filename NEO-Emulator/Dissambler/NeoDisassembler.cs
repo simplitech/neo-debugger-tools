@@ -17,6 +17,14 @@ namespace Neo.Emulator.Dissambler
         public string comment;
     }
 
+    public class DisassembleException : Exception
+    {
+        public DisassembleException(string msg) : base(msg)
+        {
+
+        }
+    }
+
     public class AVMDisassemble
     {
         private List<DisassembleEntry> _lines;
@@ -459,8 +467,8 @@ namespace Neo.Emulator.Dissambler
                                 {
                                     if (!Enum.IsDefined(typeof(OpCode), opcode))
                                     {
-                                            entry.name = "???";
-                                            entry.comment = "Invalid opcode!!";
+                                            var s = ((byte)opcode).ToString();
+                                            throw new DisassembleException("Invalid opcode " + s);
                                     }
 
                                     break;
