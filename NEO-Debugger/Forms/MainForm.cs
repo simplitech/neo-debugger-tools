@@ -804,7 +804,10 @@ namespace Neo.Debugger.Forms
                     {
                         var val = _debugger.Emulator.GetOutput();
                         var gasStr = string.Format("{0:N4}", _debugger.Emulator.GetUsedGas());
-                        MessageBox.Show("Execution finished.\nGAS cost: " + gasStr + "\nResult: " + FormattingUtils.StackItemAsString(val));
+
+                        string hintType = !string.IsNullOrEmpty(_settings.lastFunction) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(_settings.lastFunction) ? _debugger.ABI.functions[_settings.lastFunction].returnType : null;
+
+                        MessageBox.Show("Execution finished.\nGAS cost: " + gasStr + "\nResult: " + FormattingUtils.StackItemAsString(val, false, hintType));
                         break;
                     }
 

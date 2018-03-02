@@ -11,7 +11,7 @@ namespace Neo.Emulator.Utils
 {
     public static class FormattingUtils
     {
-        public static string StackItemAsString(StackItem item, bool addQuotes = false)
+        public static string StackItemAsString(StackItem item, bool addQuotes = false, string hintType = null)
         {
             if (item is ICollection)
             {
@@ -59,7 +59,6 @@ namespace Neo.Emulator.Utils
 
             }
             
-
             if (data == null)
             {
                 return "[Null]";
@@ -71,7 +70,7 @@ namespace Neo.Emulator.Utils
             }
 
 
-            return FormattingUtils.OutputData(data, addQuotes);
+            return FormattingUtils.OutputData(data, addQuotes, hintType);
         }
 
         public static string OutputLine(string col1, string col2, string col3)
@@ -95,7 +94,7 @@ namespace Neo.Emulator.Utils
             Void = 255
         };
 
-        public static string OutputData(byte[] data, bool addQuotes, bool preferInts = false)
+        public static string OutputData(byte[] data, bool addQuotes, string hintType = null)
         {
             if (data == null)
             {
@@ -210,22 +209,38 @@ namespace Neo.Emulator.Utils
             }
             else
             {
+                if (hintType != null)
+                {
+                    switch (hintType.ToLower())
+                    {
+                        case "string":
+                            {
+                                return System.Text.Encoding.UTF8.GetString(data);
+                            }
+
+                        case "boolean":
+                            {
+                                return (data.Length > 0 & data[0] != 0) ? "True" : "False";
+                            }
+
+                        case "integer":
+                            {
+                                return new BigInteger(data).ToString();
+                            }
+                    }
+                }
+
                 for (int i = 0; i < dataLen; i++)
                 {
                     var c = (char)data[i];
+
+
                     var isValidText = char.IsLetterOrDigit(c) || char.IsPunctuation(c) || char.IsWhiteSpace(c) 
                                                               || "!@#$%^&*()-=_+[]{}|;':,./<>?".Contains(c.ToString());
                     if (!isValidText)
                     {
-                        if (preferInts)
-                        {
-                            var val = new BigInteger(data);
-                            return val.ToString();
-                        }
-
                         if (data.Length == 20)
                         {
-                            //var signatureHash = Crypto.Default.ToScriptHash(data);
                             var signatureHash = new UInt160(data);
                             return Crypto.Default.ToAddress(signatureHash);
                         }
@@ -233,6 +248,7 @@ namespace Neo.Emulator.Utils
                         return OutputHex(data);
                     }
                 }
+
             }
 
             var result = System.Text.Encoding.ASCII.GetString(data);
