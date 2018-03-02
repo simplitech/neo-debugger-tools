@@ -28,5 +28,7 @@ namespace Neo.Debugger.Models
         public string PrivateKey { get; set; }
 
         public DataNode ArgList { get; set; }
+
+        public uint Timestamp { get; set; }
     }
 }

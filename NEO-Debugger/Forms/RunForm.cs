@@ -139,16 +139,26 @@ namespace Neo.Debugger.Forms
                         {
                             val = s;
                         }
-                        else if (Util.IsHex(s))
+                        else
+                        if (s.StartsWith("\"") && s.EndsWith("\""))
                         {
-                            var bytes = s.HexToBytes();
-                            s = Util.BytesToString(bytes);
-                        }
-                        else if (Util.IsValidWallet(s))
-                        {
-                            var bytes = s.Base58CheckDecode();
-                            var scriptHash = bytes.Skip(1).Take(20).ToArray();
-                            s = Util.BytesToString(scriptHash);
+                            s = s.Substring(1, s.Length - 2);
+                            if (Util.IsHex(s))
+                            {
+                                var bytes = s.HexToBytes();
+                                s = Util.BytesToString(bytes);
+                            }
+                            else if (Util.IsValidWallet(s))
+                            {
+                                var bytes = s.Base58CheckDecode();
+                                var scriptHash = bytes.Skip(1).Take(20).ToArray();
+                                s = Util.BytesToString(scriptHash);
+                            }
+                            else
+                            {
+                                ShowArgumentError(f, index, val);
+                                return false;
+                            }
                         }
                         else
                         {
@@ -252,6 +262,18 @@ namespace Neo.Debugger.Forms
                 }
             }
 
+
+            uint timestamp;
+            if (!uint.TryParse(timestampBox.Text, out timestamp))
+            {
+                MessageBox.Show("Invalid timestamp");
+                return false;
+            }
+            else
+            {
+                _debugParameters.Timestamp = timestamp;
+            }
+
             return true;
         }
 
@@ -264,6 +286,7 @@ namespace Neo.Debugger.Forms
             inputGrid.AllowUserToAddRows = false;
 
             assetAmount.Enabled = assetComboBox.SelectedIndex > 0;
+            timestampBox.Text = Emulator.Helper.ToTimestamp(DateTime.UtcNow).ToString();
 
             if (Runtime.invokerKeys == null && File.Exists("last.key"))
             {
@@ -555,5 +578,24 @@ namespace Neo.Debugger.Forms
 
         #endregion
 
+        private bool lockDate;
+
+        private void timestampBox_TextChanged(object sender, EventArgs e)
+        {
+            if (lockDate) return;
+
+            uint timestamp;
+            if (uint.TryParse(timestampBox.Text, out timestamp))
+            {
+                dateTimePicker1.Value = Emulator.Helper.ToDateTime(timestamp);
+            }
+        }
+
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+            lockDate = true;
+            timestampBox.Text = Emulator.Helper.ToTimestamp(dateTimePicker1.Value).ToString();
+            lockDate = false;
+        }
     }
 }

@@ -86,6 +86,7 @@ namespace Neo.Emulator
 
         public CheckWitnessMode checkWitnessMode = CheckWitnessMode.Default;
         public TriggerType currentTrigger = TriggerType.Application;
+        public uint timestamp = DateTime.Now.ToTimestamp();
 
         private double _usedGas;
 

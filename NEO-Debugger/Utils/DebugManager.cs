@@ -518,6 +518,7 @@ namespace Neo.Debugger.Utils
             //Set the emulator context
             _emulator.checkWitnessMode = debugParams.WitnessMode;
             _emulator.currentTrigger = debugParams.TriggerType;
+            _emulator.timestamp = debugParams.Timestamp;
             _emulator.Reset(debugParams.ArgList);
             if (debugParams.Transaction.Count > 0)
             {
