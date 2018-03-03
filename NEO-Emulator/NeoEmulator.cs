@@ -84,6 +84,8 @@ namespace Neo.Emulator
         public Address currentAddress { get; private set; }
         public Transaction currentTransaction { get; private set; }
 
+        private UInt160 currentHash;
+
         public CheckWitnessMode checkWitnessMode = CheckWitnessMode.Default;
         public TriggerType currentTrigger = TriggerType.Application;
         public uint timestamp = DateTime.Now.ToTimestamp();
@@ -206,6 +208,14 @@ namespace Neo.Emulator
             currentTransaction.emulator = this;
             engine = new ExecutionEngine(currentTransaction, Crypto.Default, null, interop);
             engine.LoadScript(contractBytes);
+
+            foreach (var output in currentTransaction.outputs)
+            {
+                if (output.hash == this.currentHash)
+                {
+                    output.hash = new UInt160(engine.CurrentContext.ScriptHash);
+                }
+            }
 
             foreach (var pos in _breakpoints)
             {
@@ -397,13 +407,16 @@ namespace Neo.Emulator
 
             var bytes = key != null ? Helper.AddressToScriptHash(key.address) : new byte[20];
 
-            var hash = new UInt160(bytes);
+            var src_hash = new UInt160(bytes);
+            var dst_hash = new UInt160(Helper.AddressToScriptHash(this.currentAddress.keys.address));
+            this.currentHash = dst_hash;
 
-            var output = new TransactionOutput(assetID, amount, hash);
-            
+            var total_amount = 10000;
+           
             var tx = new Transaction(blockchain.currentBlock);
-            tx.outputs = new List<TransactionOutput>();
-            tx.outputs.Add(output);
+            //tx.inputs.Add(new TransactionInput(-1, src_hash));
+            tx.outputs.Add(new TransactionOutput(assetID, amount, dst_hash));
+            tx.outputs.Add(new TransactionOutput(assetID, total_amount - amount, src_hash));
 
             uint index = blockchain.currentHeight + 1;
             var block = new Block(index, DateTime.Now.ToTimestamp());

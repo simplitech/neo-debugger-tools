@@ -336,27 +336,22 @@ namespace Neo.Debugger.Utils
 
         public bool LoadContract()
         {
-            if (_contractAddress != null)
-            {
-                //Set the executing address for the emulator
-                _emulator.SetExecutingAddress(_contractAddress);
-                return true;
-            }
-                
-
             if (String.IsNullOrEmpty(_contractName) || _contractByteCode == null || _contractByteCode.Length == 0)
             {
                 return false;
             }
 
-            var address = _emulator.blockchain.DeployContract(_contractName, _contractByteCode);
-            Log($"Deployed contract {_contractName} on virtual blockchain.");
-            if (!address.byteCode.SequenceEqual(_contractByteCode))
+            var address = _emulator.blockchain.FindAddressByName(_contractName);
+            if (address == null)
+            {
+                address = _emulator.blockchain.DeployContract(_contractName, _contractByteCode);
+                Log($"Deployed contract {_contractName} on virtual blockchain at address {address.keys.address}.");
+            }
+            else
             {
                 address.byteCode = _contractByteCode;
-                Log($"Deployed contract {_contractName} on virtual blockchain and updated bytecode.");
+                Log($"Updated bytecode for {_contractName} on virtual blockchain.");
             }
-
 
             _emulator.SetExecutingAddress(_contractAddress);
             return true;
