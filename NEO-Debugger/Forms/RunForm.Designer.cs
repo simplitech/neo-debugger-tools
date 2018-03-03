@@ -42,6 +42,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.runTabs = new System.Windows.Forms.TabControl();
             this.methodTab = new System.Windows.Forms.TabPage();
+            this.label6 = new System.Windows.Forms.Label();
+            this.testCasesList = new System.Windows.Forms.ListBox();
             this.transactionPage = new System.Windows.Forms.TabPage();
             this.privateKeyInput = new System.Windows.Forms.TextBox();
             this.assetComboBox = new System.Windows.Forms.ComboBox();
@@ -50,8 +52,9 @@
             this.witnessComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.triggerComboBox = new System.Windows.Forms.ComboBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.testCasesList = new System.Windows.Forms.ListBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.timestampBox = new System.Windows.Forms.TextBox();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             ((System.ComponentModel.ISupportInitialize)(this.inputGrid)).BeginInit();
             this.runTabs.SuspendLayout();
             this.methodTab.SuspendLayout();
@@ -205,6 +208,24 @@
             this.methodTab.Text = "Method";
             this.methodTab.UseVisualStyleBackColor = true;
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(218, 12);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(59, 13);
+            this.label6.TabIndex = 18;
+            this.label6.Text = "Test cases";
+            // 
+            // testCasesList
+            // 
+            this.testCasesList.FormattingEnabled = true;
+            this.testCasesList.Location = new System.Drawing.Point(221, 28);
+            this.testCasesList.Name = "testCasesList";
+            this.testCasesList.Size = new System.Drawing.Size(221, 147);
+            this.testCasesList.TabIndex = 17;
+            this.testCasesList.SelectedIndexChanged += new System.EventHandler(this.testCasesList_SelectedIndexChanged);
+            // 
             // transactionPage
             // 
             this.transactionPage.Controls.Add(this.privateKeyInput);
@@ -237,10 +258,13 @@
             this.assetComboBox.Name = "assetComboBox";
             this.assetComboBox.Size = new System.Drawing.Size(106, 21);
             this.assetComboBox.TabIndex = 20;
-            this.assetComboBox.SelectedIndexChanged += assetComboBox_SelectedIndexChanged;
+            this.assetComboBox.SelectedIndexChanged += new System.EventHandler(this.assetComboBox_SelectedIndexChanged_1);
             // 
             // optionsPage
             // 
+            this.optionsPage.Controls.Add(this.dateTimePicker1);
+            this.optionsPage.Controls.Add(this.timestampBox);
+            this.optionsPage.Controls.Add(this.label7);
             this.optionsPage.Controls.Add(this.label5);
             this.optionsPage.Controls.Add(this.witnessComboBox);
             this.optionsPage.Controls.Add(this.label1);
@@ -296,23 +320,30 @@
             this.triggerComboBox.Size = new System.Drawing.Size(121, 21);
             this.triggerComboBox.TabIndex = 0;
             // 
-            // label6
+            // label7
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(218, 12);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(59, 13);
-            this.label6.TabIndex = 18;
-            this.label6.Text = "Test cases";
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(6, 95);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(58, 13);
+            this.label7.TabIndex = 4;
+            this.label7.Text = "Timestamp";
             // 
-            // testCasesList
+            // timestampBox
             // 
-            this.testCasesList.FormattingEnabled = true;
-            this.testCasesList.Location = new System.Drawing.Point(221, 28);
-            this.testCasesList.Name = "testCasesList";
-            this.testCasesList.Size = new System.Drawing.Size(221, 147);
-            this.testCasesList.TabIndex = 17;
-            this.testCasesList.SelectedIndexChanged += new System.EventHandler(this.testCasesList_SelectedIndexChanged);
+            this.timestampBox.Location = new System.Drawing.Point(99, 92);
+            this.timestampBox.Name = "timestampBox";
+            this.timestampBox.Size = new System.Drawing.Size(121, 20);
+            this.timestampBox.TabIndex = 5;
+            this.timestampBox.TextChanged += new System.EventHandler(this.timestampBox_TextChanged);
+            // 
+            // dateTimePicker1
+            // 
+            this.dateTimePicker1.Location = new System.Drawing.Point(226, 92);
+            this.dateTimePicker1.Name = "dateTimePicker1";
+            this.dateTimePicker1.Size = new System.Drawing.Size(200, 20);
+            this.dateTimePicker1.TabIndex = 6;
+            this.dateTimePicker1.ValueChanged += new System.EventHandler(this.dateTimePicker1_ValueChanged);
             // 
             // RunForm
             // 
@@ -366,5 +397,8 @@
         private System.Windows.Forms.ComboBox triggerComboBox;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ListBox testCasesList;
+        private System.Windows.Forms.TextBox timestampBox;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.DateTimePicker dateTimePicker1;
     }
 }

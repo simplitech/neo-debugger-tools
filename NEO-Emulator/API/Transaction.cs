@@ -102,9 +102,9 @@ namespace Neo.Emulator.API
                 transactions.Add(new VM.Types.InteropInterface(entry));
             }
 
-            var outputs = new VM.Types.Array(transactions.ToArray<StackItem>());
+            var inputs = new VM.Types.Array(transactions.ToArray<StackItem>());
 
-            engine.EvaluationStack.Push(outputs);
+            engine.EvaluationStack.Push(inputs);
 
             return true;
         }

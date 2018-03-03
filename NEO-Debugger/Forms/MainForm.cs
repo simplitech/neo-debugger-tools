@@ -35,6 +35,11 @@ namespace Neo.Debugger.Forms
         {
             _settings = new Settings();
 
+            if (string.IsNullOrEmpty(_sourceAvmPath))
+            {
+                _sourceAvmPath = _settings.lastOpenedFile;
+            }
+
             //Init the UI controls
             InitUI();
 
@@ -84,6 +89,7 @@ namespace Neo.Debugger.Forms
         {
             _debugger = new DebugManager(_settings);
             _debugger.SendToLog += _debugger_SendToLog;
+
             //Load if we had a file on the command line or a previously opened
             try
             {
@@ -186,11 +192,16 @@ namespace Neo.Debugger.Forms
         private bool GetDebugParameters()
         {
             //Run form with defaults from settings if available
-            RunForm runForm = new RunForm(_debugger.ABI, _debugger.Tests, _debugger.ContractName, _settings.lastPrivateKey, _settings.lastParams);
+            RunForm runForm = new RunForm(_debugger.ABI, _debugger.Tests, _debugger.ContractName, _settings.lastPrivateKey, _settings.lastParams, _settings.lastFunction);
             var result = runForm.ShowDialog();
             var debugParams = runForm.DebugParameters;
             if (result != DialogResult.OK)
                 return false;
+
+            if (runForm.currentMethod != null)
+            {
+                _settings.lastFunction = runForm.currentMethod.name;
+            }
 
             _debugger.SetDebugParameters(debugParams);
             return true;
@@ -797,7 +808,10 @@ namespace Neo.Debugger.Forms
                     {
                         var val = _debugger.Emulator.GetOutput();
                         var gasStr = string.Format("{0:N4}", _debugger.Emulator.GetUsedGas());
-                        MessageBox.Show("Execution finished.\nGAS cost: " + gasStr + "\nResult: " + FormattingUtils.StackItemAsString(val));
+
+                        string hintType = !string.IsNullOrEmpty(_settings.lastFunction) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(_settings.lastFunction) ? _debugger.ABI.functions[_settings.lastFunction].returnType : null;
+
+                        MessageBox.Show("Execution finished.\nGAS cost: " + gasStr + "\nResult: " + FormattingUtils.StackItemAsString(val, false, hintType));
                         break;
                     }
 

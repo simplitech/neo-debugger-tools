@@ -51,7 +51,7 @@ namespace Neo.Emulator.API
         public bool GetTransactionCount(ExecutionEngine engine)
         {
             var obj = engine.EvaluationStack.Pop();
-            var block = obj.GetInterface<Block>();
+            var block = ((VM.Types.InteropInterface)obj).GetInterface<Block>();
 
             if (block == null)
                 return false;
@@ -64,7 +64,7 @@ namespace Neo.Emulator.API
         public bool GetTransactions(ExecutionEngine engine)
         {
             var obj = engine.EvaluationStack.Pop();
-            var block = obj.GetInterface<Block>();
+            var block = ((VM.Types.InteropInterface)obj).GetInterface<Block>();
 
             if (block == null)
                 return false;
@@ -89,7 +89,7 @@ namespace Neo.Emulator.API
         {
             var index = (int)engine.EvaluationStack.Pop().GetBigInteger();
             var obj = engine.EvaluationStack.Pop();
-            var block = obj.GetInterface<Block>();
+            var block = ((VM.Types.InteropInterface)obj).GetInterface<Block>();
 
             if (block == null)
                 return false;

@@ -10,7 +10,7 @@ namespace Neo.Emulator.API
     {
         public readonly byte[] assetID;
         public readonly BigInteger amount;
-        public readonly UInt160 hash;
+        public UInt160 hash;
 
         public TransactionOutput(byte[] assetID, BigInteger amount, UInt160 hash)
         {

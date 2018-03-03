@@ -84,8 +84,11 @@ namespace Neo.Emulator
         public Address currentAddress { get; private set; }
         public Transaction currentTransaction { get; private set; }
 
+        private UInt160 currentHash;
+
         public CheckWitnessMode checkWitnessMode = CheckWitnessMode.Default;
         public TriggerType currentTrigger = TriggerType.Application;
+        public uint timestamp = DateTime.Now.ToTimestamp();
 
         private double _usedGas;
 
@@ -124,10 +127,32 @@ namespace Neo.Emulator
 
         private static void EmitObject(ScriptBuilder sb, object item)
         {
+            if (item is byte[])
+            {
+                var arr = (byte[])item;
+
+                for (int index = arr.Length - 1; index >= 0; index--)
+                {
+                    sb.EmitPush(arr[index]);
+                }
+
+                sb.EmitPush(arr.Length);
+                sb.Emit(OpCode.PACK);
+            }
+            else
             if (item is List<object>)
             {
                 var list = (List<object>)item;
-                sb.Emit((OpCode)((int)OpCode.PUSHT + list.Count - 1));
+
+                for (int index = 0; index < list.Count; index++)
+                {
+                    EmitObject(sb, list[index]);
+                }              
+
+                sb.EmitPush(list.Count);
+                sb.Emit(OpCode.PACK);
+
+                /*sb.Emit((OpCode)((int)OpCode.PUSHT + list.Count - 1));
                 sb.Emit(OpCode.NEWARRAY);
 
                 for (int index = 0; index < list.Count; index++)
@@ -136,7 +161,7 @@ namespace Neo.Emulator
                     sb.EmitPush(new BigInteger(index));
                     EmitObject(sb, list[index]);
                     sb.Emit(OpCode.SETITEM);
-                }
+                }*/
             }
             else
             if (item == null)
@@ -152,11 +177,6 @@ namespace Neo.Emulator
             if (item is bool)
             {
                 sb.EmitPush((bool)item);
-            }
-            else
-            if (item is byte[])
-            {
-                sb.EmitPush((byte[])item);
             }
             else
             if (item is BigInteger)
@@ -189,6 +209,14 @@ namespace Neo.Emulator
             engine = new ExecutionEngine(currentTransaction, Crypto.Default, null, interop);
             engine.LoadScript(contractBytes);
 
+            foreach (var output in currentTransaction.outputs)
+            {
+                if (output.hash == this.currentHash)
+                {
+                    output.hash = new UInt160(engine.CurrentContext.ScriptHash);
+                }
+            }
+
             foreach (var pos in _breakpoints)
             {
                 engine.AddBreakPoint((uint)pos);
@@ -213,10 +241,12 @@ namespace Neo.Emulator
                     EmitObject(sb, item);
                 }
 
-                engine.LoadScript(sb.ToArray());
+                var loaderScript = sb.ToArray();
+                //System.IO.File.WriteAllBytes("loader.avm", loaderScript);
+                engine.LoadScript(loaderScript);
             }
 
-            engine.Reset();
+            //engine.Reset();
 
             lastState = new DebuggerState(DebuggerState.State.Reset, 0);
             currentTransaction = null;
@@ -234,6 +264,30 @@ namespace Neo.Emulator
             }
         }
 
+        public bool GetRunningState()
+        {
+            return !engine.State.HasFlag(VMState.HALT) && !engine.State.HasFlag(VMState.FAULT) && !engine.State.HasFlag(VMState.BREAK);
+        }
+
+        private bool ExecuteSingleStep()
+        {
+            if (this.lastState.state == DebuggerState.State.Reset)
+            {
+                engine.State = VMState.NONE;
+            }
+
+            var shouldContinue = GetRunningState();
+            if (shouldContinue)
+            {
+                engine.StepInto();
+                return GetRunningState();
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
         /// <summary>
         /// executes a single instruction in the current script, and returns the last script offset
         /// </summary>
@@ -244,7 +298,7 @@ namespace Neo.Emulator
                 return lastState;
             }
 
-            engine.ExecuteSingleStep();
+            ExecuteSingleStep();
 
             try
             {
@@ -303,7 +357,7 @@ namespace Neo.Emulator
             if (engine.State.HasFlag(VMState.BREAK))
             {
                 lastState = new DebuggerState(DebuggerState.State.Break, lastOffset);
-                engine.Reset();
+                engine.State = VMState.NONE;
                 return lastState;
             }
 
@@ -351,13 +405,18 @@ namespace Neo.Emulator
         {
             var key = Runtime.invokerKeys;
 
-            var hash = key != null ? key.PublicKeyHash : new UInt160(new byte[20]);
+            var bytes = key != null ? Helper.AddressToScriptHash(key.address) : new byte[20];
 
-            var output = new TransactionOutput(assetID, amount, hash);
-            
+            var src_hash = new UInt160(bytes);
+            var dst_hash = new UInt160(Helper.AddressToScriptHash(this.currentAddress.keys.address));
+            this.currentHash = dst_hash;
+
+            var total_amount = 10000;
+           
             var tx = new Transaction(blockchain.currentBlock);
-            tx.outputs = new List<TransactionOutput>();
-            tx.outputs.Add(output);
+            //tx.inputs.Add(new TransactionInput(-1, src_hash));
+            tx.outputs.Add(new TransactionOutput(assetID, amount, dst_hash));
+            tx.outputs.Add(new TransactionOutput(assetID, total_amount - amount, src_hash));
 
             uint index = blockchain.currentHeight + 1;
             var block = new Block(index, DateTime.Now.ToTimestamp());
@@ -373,12 +432,38 @@ namespace Neo.Emulator
         {
             if (item.HasChildren)
             {
-                var list = new List<object>();
+                bool isByteArray = true;
+
                 foreach (var child in item.Children)
                 {
-                    list.Add(ConvertArgument(child));
+                    byte n;
+                    if (string.IsNullOrEmpty(child.Value) || !byte.TryParse(child.Value, out n))
+                    {
+                        isByteArray = false;
+                        break;
+                    }
                 }
-                return list;
+
+                if (isByteArray)
+                {
+                    var arr = new byte[item.ChildCount];
+                    int index = 0;
+                    foreach (var child in item.Children)
+                    {
+                        arr[index] = byte.Parse(child.Value);
+                        index++;
+                   }
+                    return arr;
+                }
+                else
+                {
+                    var list = new List<object>();
+                    foreach (var child in item.Children)
+                    {
+                        list.Add(ConvertArgument(child));
+                    }
+                    return list;
+                }
             }
 
             BigInteger intVal;
