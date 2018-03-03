@@ -270,6 +270,8 @@ namespace Neo.Debugger.Forms
                         BigInteger.TryParse(assetAmount.Text, out amount);
                         if (amount > 0)
                         {
+                            amount *= 100000000; // fix decimals
+
                             //Add the transaction info
                             _debugParameters.Transaction.Add(entry.id, amount);
                         }
