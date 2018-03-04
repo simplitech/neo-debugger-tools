@@ -91,7 +91,11 @@ namespace Neo.Debugger.Forms
             _debugger.SendToLog += _debugger_SendToLog;
 
             //Load if we had a file on the command line or a previously opened
-            LoadDebugFile(_sourceAvmPath);
+            try
+            {
+                LoadDebugFile(_sourceAvmPath);
+            }
+            catch (Exception) { }
         }
 
         private bool LoadDebugFile(string path)
