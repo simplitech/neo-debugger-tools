@@ -21,25 +21,29 @@ namespace Neo.Emulator.Profiler
 
     public class SourceStmtInfo
     {
+        private const int MAXNOPTCODES = 256;
+
         public SourceFileLine _filelineo;
         public string _sourceStmt;
-        public int[] _stmtOpcodeCount = new int[256];
-        public double[] _stmtOpcodeCost = new double[256];
+        public int[] _stmtOpcodeCount = new int[MAXNOPTCODES];
+        public double[] _stmtOpcodeCost = new double[MAXNOPTCODES];
     }
 
     public class ProfilerContext
     {
+        private const int MAXNOPTCODES = 256;
+
         public string _filename = "Unknown.cs";
         public string[] _source = { "" };
         public int _lineno = 0;
         public string _sourceString = "// No source code available";
 
-        public string[] opcodeNames = new string[256];
-        public double[] opcodeCosts = new double[256];
-        public bool[] opcodeUsed = new bool[256];
+        public string[] opcodeNames = new string[MAXNOPTCODES];
+        public double[] opcodeCosts = new double[MAXNOPTCODES];
+        public bool[] opcodeUsed = new bool[MAXNOPTCODES];
         public Dictionary<string, SourceStmtInfo> dictStmtInfo;
-        public int[] totalTallyByOpcode = new int[256];
-        public double[] totalCostByOpcode = new double[256];
+        public int[] totalTallyByOpcode = new int[MAXNOPTCODES];
+        public double[] totalCostByOpcode = new double[MAXNOPTCODES];
 
         public ProfilerContext()
         {
@@ -96,160 +100,167 @@ namespace Neo.Emulator.Profiler
             }
         }
 
-        public void DumpCSV()
+        public Exception DumpCSV()
         {
             string csvfilename = _filename.Replace(".cs", "_cs") + ".csv";
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(csvfilename))
+            try
             {
-                file.WriteLine();
-                file.WriteLine("\"Tally by Opcode\"");
-                file.WriteLine();
+                using (System.IO.StreamWriter file = new System.IO.StreamWriter(csvfilename))
+                {
+                    file.WriteLine();
+                    file.WriteLine("\"Tally by Opcode\"");
+                    file.WriteLine();
 
-                file.Write("\"" + "" + "\"");
-                file.Write(",\"" + "" + "\"");
-                file.Write(",\"" + "Opcode (Hex) >" + "\"");
-                for (int opcode = 0; opcode < 256; opcode++)
-                {
-                    if (opcodeUsed[opcode])
-                    {
-                        file.Write(",\"0x" + opcode.ToString("X2") + "\"");
-                    }
-                }
-                file.WriteLine();
-                file.Write("\"" + "" + "\"");
-                file.Write(",\"" + "" + "\"");
-                file.Write(",\"" + "Opcode >" + "\"");
-                for (int opcode = 0; opcode < 256; opcode++)
-                {
-                    if (opcodeUsed[opcode])
-                    {
-                        file.Write(",\"" + opcodeNames[opcode] + "\"");
-                    }
-                }
-                file.WriteLine();
-                file.Write("\"" + "" + "\"");
-                file.Write(",\"" + "" + "\"");
-                file.Write(",\"" + "Cost >" + "\"");
-                for (int opcode = 0; opcode < 256; opcode++)
-                {
-                    if (opcodeUsed[opcode])
-                    {
-                        file.Write(",\"" + opcodeCosts[opcode].ToString() + "\"");
-                    }
-                    totalTallyByOpcode[opcode] = 0;
-                }
-                file.WriteLine();
-
-                foreach (SourceStmtInfo ssi in dictStmtInfo.Values)
-                {
-                    file.Write("\"" + ssi._filelineo._filename + "\"");
-                    file.Write(",\"" + ssi._filelineo._lineno.ToString() + "\"");
-                    file.Write(",\"" + ssi._sourceStmt.Replace("\"", "''") + "\"");
-                    for (int opcode = 0; opcode < 256; opcode++)
+                    file.Write("\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Opcode (Hex) >" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
                         {
-                            file.Write(",\"" + ssi._stmtOpcodeCount[opcode].ToString() + "\"");
-
-                            totalTallyByOpcode[opcode] += ssi._stmtOpcodeCount[opcode];
+                            file.Write(",\"0x" + opcode.ToString("X2") + "\"");
                         }
                     }
                     file.WriteLine();
-                }
-                int totalOpcodeTally = 0;
-                file.Write("\"" + "" + "\"");
-                file.Write(",\"" + "" + "\"");
-                file.Write(",\"" + "Tally by Opcode>" + "\"");
-                for (int opcode = 0; opcode < 256; opcode++)
-                {
-                    if (opcodeUsed[opcode])
-                    {
-                        file.Write(",\"" + totalTallyByOpcode[opcode].ToString() + "\"");
-                        totalOpcodeTally += totalTallyByOpcode[opcode];
-                    }
-                }
-                file.WriteLine();
-                file.Write("\"" + "" + "\"");
-                file.Write(",\"" + "" + "\"");
-                file.Write(",\"" + "Total Tally>" + "\"");
-                file.Write(",\"" + totalOpcodeTally.ToString() + "\"");
-                file.WriteLine();
-
-                file.WriteLine();
-                file.WriteLine("\"Costs by Opcode\"");
-                file.WriteLine();
-
-                file.Write("\"" + "" + "\"");
-                file.Write(",\"" + "" + "\"");
-                file.Write(",\"" + "Opcode (Hex) >" + "\"");
-                for (int opcode = 0; opcode < 256; opcode++)
-                {
-                    if (opcodeUsed[opcode])
-                    {
-                        file.Write(",\"0x" + opcode.ToString("X2") + "\"");
-                    }
-                }
-                file.WriteLine();
-                file.Write("\"" + "" + "\"");
-                file.Write(",\"" + "" + "\"");
-                file.Write(",\"" + "Opcode >" + "\"");
-                for (int opcode = 0; opcode < 256; opcode++)
-                {
-                    if (opcodeUsed[opcode])
-                    {
-                        file.Write(",\"" + opcodeNames[opcode] + "\"");
-                    }
-                }
-                file.WriteLine();
-                file.Write("\"" + "" + "\"");
-                file.Write(",\"" + "" + "\"");
-                file.Write(",\"" + "Cost >" + "\"");
-                for (int opcode = 0; opcode < 256; opcode++)
-                {
-                    if (opcodeUsed[opcode])
-                    {
-                        file.Write(",\"" + opcodeCosts[opcode].ToString() + "\"");
-                    }
-                    totalCostByOpcode[opcode] = 0;
-                }
-                file.WriteLine();
-
-                foreach (SourceStmtInfo ssi in dictStmtInfo.Values)
-                {
-                    file.Write("\"" + ssi._filelineo._filename + "\"");
-                    file.Write(",\"" + ssi._filelineo._lineno.ToString() + "\"");
-                    file.Write(",\"" + ssi._sourceStmt.Replace("\"", "''") + "\"");
-                    for (int opcode = 0; opcode < 256; opcode++)
+                    file.Write("\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Opcode >" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
                         {
-                            file.Write(",\"" + ssi._stmtOpcodeCost[opcode].ToString() + "\"");
-
-                            totalCostByOpcode[opcode] += ssi._stmtOpcodeCost[opcode];
+                            file.Write(",\"" + opcodeNames[opcode] + "\"");
                         }
                     }
                     file.WriteLine();
-                }
-                double totalOpcodeCost = 0;
-                file.Write("\"" + "" + "\"");
-                file.Write(",\"" + "" + "\"");
-                file.Write(",\"" + "Costs by Opcode>" + "\"");
-                for (int opcode = 0; opcode < 256; opcode++)
-                {
-                    if (opcodeUsed[opcode])
+                    file.Write("\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Cost >" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
                     {
-                        file.Write(",\"" + totalCostByOpcode[opcode].ToString() + "\"");
-                        totalOpcodeCost += totalCostByOpcode[opcode];
+                        if (opcodeUsed[opcode])
+                        {
+                            file.Write(",\"" + opcodeCosts[opcode].ToString() + "\"");
+                        }
+                        totalTallyByOpcode[opcode] = 0;
                     }
+                    file.WriteLine();
+
+                    foreach (SourceStmtInfo ssi in dictStmtInfo.Values)
+                    {
+                        file.Write("\"" + ssi._filelineo._filename + "\"");
+                        file.Write(",\"" + ssi._filelineo._lineno.ToString() + "\"");
+                        file.Write(",\"" + ssi._sourceStmt.Replace("\"", "''") + "\"");
+                        for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                        {
+                            if (opcodeUsed[opcode])
+                            {
+                                file.Write(",\"" + ssi._stmtOpcodeCount[opcode].ToString() + "\"");
+
+                                totalTallyByOpcode[opcode] += ssi._stmtOpcodeCount[opcode];
+                            }
+                        }
+                        file.WriteLine();
+                    }
+                    int totalOpcodeTally = 0;
+                    file.Write("\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Tally by Opcode>" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    {
+                        if (opcodeUsed[opcode])
+                        {
+                            file.Write(",\"" + totalTallyByOpcode[opcode].ToString() + "\"");
+                            totalOpcodeTally += totalTallyByOpcode[opcode];
+                        }
+                    }
+                    file.WriteLine();
+                    file.Write("\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Total Tally>" + "\"");
+                    file.Write(",\"" + totalOpcodeTally.ToString() + "\"");
+                    file.WriteLine();
+
+                    file.WriteLine();
+                    file.WriteLine("\"Costs by Opcode\"");
+                    file.WriteLine();
+
+                    file.Write("\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Opcode (Hex) >" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    {
+                        if (opcodeUsed[opcode])
+                        {
+                            file.Write(",\"0x" + opcode.ToString("X2") + "\"");
+                        }
+                    }
+                    file.WriteLine();
+                    file.Write("\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Opcode >" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    {
+                        if (opcodeUsed[opcode])
+                        {
+                            file.Write(",\"" + opcodeNames[opcode] + "\"");
+                        }
+                    }
+                    file.WriteLine();
+                    file.Write("\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Cost >" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    {
+                        if (opcodeUsed[opcode])
+                        {
+                            file.Write(",\"" + opcodeCosts[opcode].ToString() + "\"");
+                        }
+                        totalCostByOpcode[opcode] = 0;
+                    }
+                    file.WriteLine();
+
+                    foreach (SourceStmtInfo ssi in dictStmtInfo.Values)
+                    {
+                        file.Write("\"" + ssi._filelineo._filename + "\"");
+                        file.Write(",\"" + ssi._filelineo._lineno.ToString() + "\"");
+                        file.Write(",\"" + ssi._sourceStmt.Replace("\"", "''") + "\"");
+                        for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                        {
+                            if (opcodeUsed[opcode])
+                            {
+                                file.Write(",\"" + ssi._stmtOpcodeCost[opcode].ToString() + "\"");
+
+                                totalCostByOpcode[opcode] += ssi._stmtOpcodeCost[opcode];
+                            }
+                        }
+                        file.WriteLine();
+                    }
+                    double totalOpcodeCost = 0;
+                    file.Write("\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Costs by Opcode>" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    {
+                        if (opcodeUsed[opcode])
+                        {
+                            file.Write(",\"" + totalCostByOpcode[opcode].ToString() + "\"");
+                            totalOpcodeCost += totalCostByOpcode[opcode];
+                        }
+                    }
+                    file.WriteLine();
+                    file.Write("\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Total Cost>" + "\"");
+                    file.Write(",\"" + totalOpcodeCost.ToString() + "\"");
+                    file.WriteLine();
                 }
-                file.WriteLine();
-                file.Write("\"" + "" + "\"");
-                file.Write(",\"" + "" + "\"");
-                file.Write(",\"" + "Total Cost>" + "\"");
-                file.Write(",\"" + totalOpcodeCost.ToString() + "\"");
-                file.WriteLine();
             }
-
+            catch(Exception ex)
+            {
+                return ex;
+            }
+            return null;
         }
     }
 }

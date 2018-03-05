@@ -152,7 +152,11 @@ namespace Neo.Debugger.Forms
 
             _debugger.Run();
             UpdateDebuggerStateUI();
-            _debugger.Emulator.ProfilerDumpCSV();
+            Exception ex = _debugger.Emulator.ProfilerDumpCSV();
+            if (ex != null)
+            {
+                MessageBox.Show(ex.Message, "Profiler Dump CSV");
+            }
         }
 
         private void StepDebugger()
@@ -183,7 +187,11 @@ namespace Neo.Debugger.Forms
             UpdateStackPanel();
             UpdateGasCost(_debugger.Emulator.GetUsedGas());
             UpdateDebuggerStateUI();
-            _debugger.Emulator.ProfilerDumpCSV();
+            Exception ex = _debugger.Emulator.ProfilerDumpCSV();
+            if (ex != null)
+            {
+                MessageBox.Show(ex.Message, "Profiler Dump CSV");
+            }
         }
 
         private bool ResetDebugger()
