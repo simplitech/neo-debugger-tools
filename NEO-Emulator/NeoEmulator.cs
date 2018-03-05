@@ -435,8 +435,9 @@ namespace Neo.Emulator
             var dst_hash = new UInt160(Helper.AddressToScriptHash(this.currentAddress.keys.address));
             this.currentHash = dst_hash;
 
-            var total_amount = 10000;
-           
+            BigInteger asset_decimals = 100000000;
+            BigInteger total_amount = (amount * 10) * asset_decimals; // FIXME instead of (amount * 10) we should take balance from virtual blockchain
+
             var tx = new Transaction(blockchain.currentBlock);
             //tx.inputs.Add(new TransactionInput(-1, src_hash));
             tx.outputs.Add(new TransactionOutput(assetID, amount, dst_hash));
