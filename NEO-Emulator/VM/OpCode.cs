@@ -138,6 +138,9 @@
 
         // Exceptions
         THROW = 0xF0,
-        THROWIFNOT = 0xF1
+        THROWIFNOT = 0xF1,
+
+        // Not a real opcode
+        _STORAGE = 0xFF // Profiler: for accumulating Storage costs
     }
 }

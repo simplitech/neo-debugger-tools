@@ -268,9 +268,9 @@ namespace Neo.Emulator
             _pctx.SetLineno(lineno);
         }
 
-        public void ProfilerDumpCSV()
+        public Exception ProfilerDumpCSV()
         {
-            _pctx.DumpCSV();
+            return _pctx.DumpCSV();
         }
 
         public void SetBreakpointState(int ofs, bool enabled)
@@ -343,6 +343,8 @@ namespace Neo.Emulator
                                 if (engine.lastSysCall.EndsWith("Storage.Put"))
                                 {
                                     opCost *= (Storage.lastStorageLength / 1024.0);
+                                    if (opCost < 1.0) opCost = 1.0;
+                                    _pctx.TallyOpcode(OpCode._STORAGE, opCost);
                                 }
                                 break;
                             }
