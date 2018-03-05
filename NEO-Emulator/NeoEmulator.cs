@@ -8,6 +8,7 @@ using Neo.Emulator.API;
 using LunarParser;
 using Neo.Emulator.Utils;
 using System.Diagnostics;
+using Neo.Emulator.Profiler;
 
 namespace Neo.Emulator
 {
@@ -92,10 +93,15 @@ namespace Neo.Emulator
 
         private double _usedGas;
 
+        //Profiler context
+        public static ProfilerContext _pctx;
+
         public NeoEmulator(Blockchain blockchain)
         {
             this.blockchain = blockchain;
             this.interop = new InteropService();
+
+            _pctx = new ProfilerContext();
         }
 
         public int GetInstructionPtr()
@@ -252,6 +258,21 @@ namespace Neo.Emulator
             currentTransaction = null;
         }
 
+        public void SetProfilerFilenameSource(string filename, string source)
+        {
+            _pctx.SetFilenameSource(filename, source);
+        }
+
+        public void SetProfilerLineno(int lineno)
+        {
+            _pctx.SetLineno(lineno);
+        }
+
+        public void ProfilerDumpCSV()
+        {
+            _pctx.DumpCSV();
+        }
+
         public void SetBreakpointState(int ofs, bool enabled)
         {
             if (enabled)
@@ -342,6 +363,7 @@ namespace Neo.Emulator
                     }
 
                 _usedGas += opCost;
+                _pctx.TallyOpcode(opcode, opCost);
             }
             catch
             {

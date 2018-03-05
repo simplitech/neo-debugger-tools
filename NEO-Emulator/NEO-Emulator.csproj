@@ -254,6 +254,7 @@
     <Compile Include="Dissambler\NeoDebugMap.cs" />
     <Compile Include="Dissambler\NeoDisassembler.cs" />
     <Compile Include="NeoEmulator.cs" />
+    <Compile Include="Profiler\ProfilerContext.cs" />
     <Compile Include="StorageContext.cs" />
     <Compile Include="TestCases.cs" />
     <Compile Include="TriggerType.cs" />

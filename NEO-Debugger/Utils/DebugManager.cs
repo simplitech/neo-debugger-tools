@@ -232,6 +232,7 @@ namespace Neo.Debugger.Utils
             }
         }
 
+        public string srcFileName;
 
         public DebugManager(Settings settings)
         {
@@ -302,14 +303,14 @@ namespace Neo.Debugger.Utils
 
             if (_map != null && _map.Entries.Any())
             {
-                var srcFile = _map.Entries.FirstOrDefault().url;
-                if (string.IsNullOrEmpty(srcFile))
+                srcFileName = _map.Entries.FirstOrDefault().url;
+                if (string.IsNullOrEmpty(srcFileName))
                     throw new Exception("Error: Could not load the debug map correctly, no source file specified in map.");
-                if (!File.Exists(srcFile))
-                    throw new Exception($"Error: Could not load the source code, check that this file exists: {srcFile}");
+                if (!File.Exists(srcFileName))
+                    throw new Exception($"Error: Could not load the source code, check that this file exists: {srcFileName}");
 
-                _debugContent[DebugMode.Source] = File.ReadAllText(srcFile);
-                _language = LanguageSupport.DetectLanguage(srcFile);
+                _debugContent[DebugMode.Source] = File.ReadAllText(srcFileName);
+                _language = LanguageSupport.DetectLanguage(srcFileName);
                 _mode = DebugMode.Source;
             }
 
@@ -330,6 +331,11 @@ namespace Neo.Debugger.Utils
             Blockchain blockchain = new Blockchain();
             blockchain.Load(_blockchainFilePath);
             _emulator = new NeoEmulator(blockchain);
+
+            if (_debugContent.Keys.Contains(DebugMode.Source) && !String.IsNullOrEmpty(_debugContent[DebugMode.Source]))
+            {
+                _emulator.SetProfilerFilenameSource(srcFileName, _debugContent[DebugMode.Source]);
+            }
 
             return true;
         }
@@ -372,6 +378,7 @@ namespace Neo.Debugger.Utils
                     case DebugMode.Source:
                         {
                             var line = _map.ResolveLine(ofs);
+                            _emulator.SetProfilerLineno(line - 1);
                             return line - 1;
                         }
 
@@ -402,6 +409,7 @@ namespace Neo.Debugger.Utils
                     case DebugMode.Source:
                         {
                             var ofs = _map.ResolveOffset(line + 1);
+                            _emulator.SetProfilerLineno(line + 1);
                             return ofs;
                         }
 
@@ -488,6 +496,7 @@ namespace Neo.Debugger.Utils
         public void UpdateState()
         {
             _currentLine = ResolveLine(_state.offset);
+            _emulator.SetProfilerLineno(_currentLine);
             switch (_state.state)
             {
                 case DebuggerState.State.Finished:
@@ -505,6 +514,7 @@ namespace Neo.Debugger.Utils
         public void Reset()
         {
             _currentLine = -1;
+            _emulator.SetProfilerLineno(_currentLine);
             _resetFlag = false;
         }
 
