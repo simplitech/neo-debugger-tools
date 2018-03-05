@@ -42,7 +42,7 @@ namespace Neo.Debugger.Utils
         {
             get
             {
-                return _emulator.GetUsedGas();
+                return _emulator.usedGas;
             }
         }
         public DebugMode Mode
@@ -283,6 +283,7 @@ namespace Neo.Debugger.Utils
             }
             else
             {
+                _aBI = new ABI();
                 Log($"Warning: {_abiFilePath} was not found. Please recompile your AVM with the latest compiler.");
             }
 

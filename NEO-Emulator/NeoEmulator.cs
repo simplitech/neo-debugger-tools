@@ -91,7 +91,8 @@ namespace Neo.Emulator
         public TriggerType currentTrigger = TriggerType.Application;
         public uint timestamp = DateTime.Now.ToTimestamp();
 
-        private double _usedGas;
+        public double usedGas { get; private set; }
+        public int usedOpcodeCount { get; private set; }
 
         //Profiler context
         public static ProfilerContext _pctx;
@@ -209,7 +210,8 @@ namespace Neo.Emulator
                 currentTransaction = new Transaction(this.blockchain.currentBlock);
             }
 
-            _usedGas = 0;
+            usedGas = 0;
+            usedOpcodeCount = 0;
 
             currentTransaction.emulator = this;
             engine = new ExecutionEngine(currentTransaction, Crypto.Default, null, interop);
@@ -364,7 +366,8 @@ namespace Neo.Emulator
                         default: opCost = 0.001; break;
                     }
 
-                _usedGas += opCost;
+                usedGas += opCost;
+                usedOpcodeCount++;
                 _pctx.TallyOpcode(opcode, opCost);
             }
             catch
@@ -417,11 +420,6 @@ namespace Neo.Emulator
         public IEnumerable<StackItem> GetStack()
         {
             return engine.EvaluationStack;
-        }
-
-        public double GetUsedGas()
-        {
-            return _usedGas;
         }
 
         #region TRANSACTIONS

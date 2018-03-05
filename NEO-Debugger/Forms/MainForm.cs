@@ -185,7 +185,7 @@ namespace Neo.Debugger.Forms
 
             //Update UI
             UpdateStackPanel();
-            UpdateGasCost(_debugger.Emulator.GetUsedGas());
+            UpdateGasCost(_debugger.Emulator.usedGas);
             UpdateDebuggerStateUI();
             Exception ex = _debugger.Emulator.ProfilerDumpCSV();
             if (ex != null)
@@ -833,11 +833,11 @@ namespace Neo.Debugger.Forms
                 case DebuggerState.State.Finished:
                     {
                         var val = _debugger.Emulator.GetOutput();
-                        var gasStr = string.Format("{0:N4}", _debugger.Emulator.GetUsedGas());
+                        var gasStr = string.Format("{0:N4}", _debugger.Emulator.usedGas);
 
                         string hintType = !string.IsNullOrEmpty(_settings.lastFunction) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(_settings.lastFunction) ? _debugger.ABI.functions[_settings.lastFunction].returnType : null;
 
-                        MessageBox.Show("Execution finished.\nGAS cost: " + gasStr + "\nResult: " + FormattingUtils.StackItemAsString(val, false, hintType));
+                        MessageBox.Show("Execution finished.\nGAS cost: " + gasStr + "\nInstruction count: "+_debugger.Emulator.usedOpcodeCount+"\nResult: " + FormattingUtils.StackItemAsString(val, false, hintType));
                         break;
                     }
 
