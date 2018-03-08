@@ -23,7 +23,6 @@ namespace Neo.Debugger.Forms
         private string _argumentsAvmFile;
         private Settings _settings;
         private DebugManager _debugger;
-
         private Scintilla TextArea;
 
         public MainForm(string argumentsAvmFile)
@@ -57,11 +56,14 @@ namespace Neo.Debugger.Forms
         {
             // CREATE CONTROL
             TextArea = new ScintillaNET.Scintilla();
+            TextArea.MouseClick += TextArea_MouseClick;
+            TextArea.CaretForeColor = Color.White;
             TextPanel.Controls.Add(TextArea);
 
             // BASIC CONFIG
             TextArea.Dock = System.Windows.Forms.DockStyle.Fill;
             TextArea.TextChanged += (this.TextArea_OnTextChanged);
+            TextArea.Enabled = true;
 
             // INITIAL VIEW CONFIG
             TextArea.WrapMode = WrapMode.None;
@@ -85,6 +87,11 @@ namespace Neo.Debugger.Forms
 
             // INIT HOTKEYS
             InitHotkeys();
+        }
+
+        private void TextArea_MouseClick(object sender, MouseEventArgs e)
+        {
+            TextArea.GotoPosition(TextArea.CharPositionFromPoint(e.X, e.Y) + 1);
         }
 
         private void InitDebugger()
@@ -113,9 +120,9 @@ namespace Neo.Debugger.Forms
             }
         }
 
-        private bool LoadDebugFile(string path)
+        private bool LoadDebugFile(string avmFilePath)
         {
-            if (!_debugger.LoadAvmFile(path))
+            if (!_debugger.LoadAvmFile(avmFilePath))
                 return false;
 
             if (!_debugger.LoadEmulator())
@@ -147,6 +154,14 @@ namespace Neo.Debugger.Forms
                 return;
             }
 
+            if (_debugger.Precompile)
+            {
+                if(!_debugger.PrecompileContract(TextArea.Text, "DebugContract.cs"))
+                    return;
+
+                LoadDebugFile(_debugger.AvmFilePath);
+            }
+
             if (_debugger.ResetFlag && !ResetDebugger())
                 return;
 
@@ -166,6 +181,14 @@ namespace Neo.Debugger.Forms
             {
                 MessageBox.Show("Please load an .avm file first!");
                 return;
+            }
+
+            if (_debugger.Precompile)
+            {
+                if (!_debugger.PrecompileContract(TextArea.Text, "DebugContract.cs"))
+                    return;
+
+                LoadDebugFile(_debugger.AvmFilePath);
             }
 
             if (_debugger.ResetFlag && !ResetDebugger())
@@ -511,7 +534,8 @@ namespace Neo.Debugger.Forms
 
         private void TextArea_OnTextChanged(object sender, EventArgs e)
         {
-
+            //Document is dirty, we will need to force a recompile before next debug
+            _debugger.Precompile = true;
         }
 
         #endregion
@@ -907,7 +931,9 @@ namespace Neo.Debugger.Forms
 
             TextArea.ReadOnly = false;
             TextArea.Text = _debugger.DebugContent[_debugger.Mode];
-            TextArea.ReadOnly = true;
+            //TextArea.ReadOnly = true;
+            //Reset the precompile flag if we reload
+            _debugger.Precompile = false;
         }
 
         private void ToggleDebuggerSource()

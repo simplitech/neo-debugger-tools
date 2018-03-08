@@ -320,9 +320,11 @@
       <DependentUpon>StorageForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Utils\ColorUtil.cs" />
+    <Compile Include="Utils\Compiler.cs" />
     <Compile Include="Utils\DebugManager.cs" />
     <Compile Include="Utils\HotKeyManager.cs" />
     <Compile Include="Utils\InputBox.cs" />
+    <Compile Include="Utils\MouseHoverManager.cs" />
     <Compile Include="Utils\SearchManager.cs" />
     <Compile Include="Utils\Util.cs" />
     <EmbeddedResource Include="Forms\BlockchainForm.resx">

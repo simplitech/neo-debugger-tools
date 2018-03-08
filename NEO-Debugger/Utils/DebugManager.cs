@@ -101,6 +101,15 @@ namespace Neo.Debugger.Utils
                 return Path.GetFileName(_avmFilePath);
             }
         }
+
+        public string AvmFilePath
+        {
+            get
+            {
+                return _avmFilePath;
+            }
+        }
+
         public ABI ABI
         {
             get
@@ -165,6 +174,24 @@ namespace Neo.Debugger.Utils
             }
         }
 
+        public string SourceFile
+        {
+            get { return _srcFileName; }
+            set { _srcFileName = value; }
+        }
+
+        public bool Precompile
+        {
+            get
+            {
+                return _precompile;
+            }
+            set
+            {
+                _precompile = value;
+            }
+        }
+
         #endregion
 
         //Settings
@@ -186,6 +213,7 @@ namespace Neo.Debugger.Utils
         private ABI _aBI { get; set; }
         private NeoMapFile _map { get; set; }
         private AVMDisassemble _avmAsm { get; set; }
+        private bool _precompile { get; set; }
 
         //Context
         private string _contractName { get; set; }
@@ -232,7 +260,7 @@ namespace Neo.Debugger.Utils
             }
         }
 
-        public string srcFileName;
+        private string _srcFileName;
 
         public DebugManager(Settings settings)
         {
@@ -304,14 +332,14 @@ namespace Neo.Debugger.Utils
 
             if (_map != null && _map.Entries.Any())
             {
-                srcFileName = _map.Entries.FirstOrDefault().url;
-                if (string.IsNullOrEmpty(srcFileName))
+                _srcFileName = _map.Entries.FirstOrDefault().url;
+                if (string.IsNullOrEmpty(_srcFileName))
                     throw new Exception("Error: Could not load the debug map correctly, no source file specified in map.");
-                if (!File.Exists(srcFileName))
-                    throw new Exception($"Error: Could not load the source code, check that this file exists: {srcFileName}");
+                if (!File.Exists(_srcFileName))
+                    throw new Exception($"Error: Could not load the source code, check that this file exists: {_srcFileName}");
 
-                _debugContent[DebugMode.Source] = File.ReadAllText(srcFileName);
-                _language = LanguageSupport.DetectLanguage(srcFileName);
+                _debugContent[DebugMode.Source] = File.ReadAllText(_srcFileName);
+                _language = LanguageSupport.DetectLanguage(_srcFileName);
                 _mode = DebugMode.Source;
             }
 
@@ -335,7 +363,7 @@ namespace Neo.Debugger.Utils
 
             if (_debugContent.Keys.Contains(DebugMode.Source) && !String.IsNullOrEmpty(_debugContent[DebugMode.Source]))
             {
-                _emulator.SetProfilerFilenameSource(srcFileName, _debugContent[DebugMode.Source]);
+                _emulator.SetProfilerFilenameSource(_srcFileName, _debugContent[DebugMode.Source]);
             }
 
             return true;
@@ -550,6 +578,32 @@ namespace Neo.Debugger.Utils
             _emulator.Reset(debugParams.ArgList);
             Reset();
             return true;
+        }
+
+        public bool PrecompileContract(string sourceCode, string sourceFile)
+        {
+            Compiler compiler = new Compiler(_settings);
+            compiler.SendToLog += Compiler_SendToLog;
+
+            Directory.CreateDirectory(_settings.path);
+            var fileName = Path.Combine(_settings.path, sourceFile);
+
+            bool success = compiler.CompileContract(sourceCode, fileName);
+
+            if (success)
+            {
+                _srcFileName = sourceFile;
+                _avmFilePath = fileName.Replace(".cs", ".avm");
+            }
+
+            //Reset the flag
+            _precompile = false;
+            return success;
+        }
+
+        private void Compiler_SendToLog(object sender, CompilerLogEventArgs e)
+        {
+            Log("Compiler: " + e.Message);
         }
     }
 }
