@@ -42,7 +42,7 @@ namespace Neo.Debugger.Utils
         {
             get
             {
-                return _emulator.GetUsedGas();
+                return _emulator.usedGas;
             }
         }
         public DebugMode Mode
@@ -232,6 +232,7 @@ namespace Neo.Debugger.Utils
             }
         }
 
+        public string srcFileName;
 
         public DebugManager(Settings settings)
         {
@@ -259,41 +260,58 @@ namespace Neo.Debugger.Utils
                 Log("Old map file format found.  Please recompile your avm with the latest compiler.");
                 return false;
             }
-            else if (!File.Exists(_mapFilePath))
-            {
-                Log($"Could not find {_mapFilePath}");
-                return false;
-            }
-            else if (!File.Exists(_abiFilePath))
-            {
-                Log($"Error: {_abiFilePath} was not found. Please recompile your AVM with the latest compiler.");
-                return false;
-            }
-                
+
             _debugContent = new Dictionary<DebugMode, string>();
             _mode = DebugMode.Assembly;
             _language = SourceLanguage.Other;
             _contractName = Path.GetFileNameWithoutExtension(_avmFilePath);
             _contractByteCode = File.ReadAllBytes(_avmFilePath);
             _map = new NeoMapFile();
-            _avmAsm = NeoDisassembler.Disassemble(_contractByteCode);
-            _aBI = new ABI(_abiFilePath);
+            try
+            {
+                _avmAsm = NeoDisassembler.Disassemble(_contractByteCode);
+            }
+            catch (DisassembleException e)
+            {
+                Log($"Disassembler Error: {e.Message}");
+                return false;
+            }
+
+            if (File.Exists(_abiFilePath))
+            {
+                _aBI = new ABI(_abiFilePath);
+            }
+            else
+            {
+                _aBI = new ABI();
+                Log($"Warning: {_abiFilePath} was not found. Please recompile your AVM with the latest compiler.");
+            }
 
             //We always should have the assembly content
             _debugContent[DebugMode.Assembly] = _avmAsm.ToString();
 
             //Let's see if we have source code we can map
-            _map.LoadFromFile(_mapFilePath, _contractByteCode);
+            if (File.Exists(_mapFilePath))
+            {
+                _map.LoadFromFile(_mapFilePath, _contractByteCode);
+            }
+            else
+            {
+                _map = null;
+                Log($"Warning: Could not find {_mapFilePath}");
+                //return false;
+            }
+
             if (_map != null && _map.Entries.Any())
             {
-                var srcFile = _map.Entries.FirstOrDefault().url;
-                if (string.IsNullOrEmpty(srcFile))
+                srcFileName = _map.Entries.FirstOrDefault().url;
+                if (string.IsNullOrEmpty(srcFileName))
                     throw new Exception("Error: Could not load the debug map correctly, no source file specified in map.");
-                if (!File.Exists(srcFile))
-                    throw new Exception($"Error: Could not load the source code, check that this file exists: {srcFile}");
+                if (!File.Exists(srcFileName))
+                    throw new Exception($"Error: Could not load the source code, check that this file exists: {srcFileName}");
 
-                _debugContent[DebugMode.Source] = File.ReadAllText(srcFile);
-                _language = LanguageSupport.DetectLanguage(srcFile);
+                _debugContent[DebugMode.Source] = File.ReadAllText(srcFileName);
+                _language = LanguageSupport.DetectLanguage(srcFileName);
                 _mode = DebugMode.Source;
             }
 
@@ -315,32 +333,32 @@ namespace Neo.Debugger.Utils
             blockchain.Load(_blockchainFilePath);
             _emulator = new NeoEmulator(blockchain);
 
+            if (_debugContent.Keys.Contains(DebugMode.Source) && !String.IsNullOrEmpty(_debugContent[DebugMode.Source]))
+            {
+                _emulator.SetProfilerFilenameSource(srcFileName, _debugContent[DebugMode.Source]);
+            }
+
             return true;
         }
 
         public bool LoadContract()
         {
-            if (_contractAddress != null)
-            {
-                //Set the executing address for the emulator
-                _emulator.SetExecutingAddress(_contractAddress);
-                return true;
-            }
-                
-
             if (String.IsNullOrEmpty(_contractName) || _contractByteCode == null || _contractByteCode.Length == 0)
             {
                 return false;
             }
 
-            var address = _emulator.blockchain.DeployContract(_contractName, _contractByteCode);
-            Log($"Deployed contract {_contractName} on virtual blockchain.");
-            if (!address.byteCode.SequenceEqual(_contractByteCode))
+            var address = _emulator.blockchain.FindAddressByName(_contractName);
+            if (address == null)
+            {
+                address = _emulator.blockchain.DeployContract(_contractName, _contractByteCode);
+                Log($"Deployed contract {_contractName} on virtual blockchain at address {address.keys.address}.");
+            }
+            else
             {
                 address.byteCode = _contractByteCode;
-                Log($"Deployed contract {_contractName} on virtual blockchain and updated bytecode.");
+                Log($"Updated bytecode for {_contractName} on virtual blockchain.");
             }
-
 
             _emulator.SetExecutingAddress(_contractAddress);
             return true;
@@ -361,13 +379,14 @@ namespace Neo.Debugger.Utils
                     case DebugMode.Source:
                         {
                             var line = _map.ResolveLine(ofs);
+                            _emulator.SetProfilerLineno(line - 1);
                             return line - 1;
                         }
 
                     case DebugMode.Assembly:
                         {
                             var line = _avmAsm.ResolveLine(ofs);
-                            return line + 2;
+                            return line + 1;
                         }
 
                     default:
@@ -391,6 +410,7 @@ namespace Neo.Debugger.Utils
                     case DebugMode.Source:
                         {
                             var ofs = _map.ResolveOffset(line + 1);
+                            _emulator.SetProfilerLineno(line + 1);
                             return ofs;
                         }
 
@@ -477,6 +497,7 @@ namespace Neo.Debugger.Utils
         public void UpdateState()
         {
             _currentLine = ResolveLine(_state.offset);
+            _emulator.SetProfilerLineno(_currentLine);
             switch (_state.state)
             {
                 case DebuggerState.State.Finished:
@@ -494,6 +515,7 @@ namespace Neo.Debugger.Utils
         public void Reset()
         {
             _currentLine = -1;
+            _emulator.SetProfilerLineno(_currentLine);
             _resetFlag = false;
         }
 
@@ -518,12 +540,14 @@ namespace Neo.Debugger.Utils
             //Set the emulator context
             _emulator.checkWitnessMode = debugParams.WitnessMode;
             _emulator.currentTrigger = debugParams.TriggerType;
-            _emulator.Reset(debugParams.ArgList);
+            _emulator.timestamp = debugParams.Timestamp;
             if (debugParams.Transaction.Count > 0)
             {
                 var transaction = debugParams.Transaction.First();
                 _emulator.SetTransaction(transaction.Key, transaction.Value);
             }
+
+            _emulator.Reset(debugParams.ArgList);
             Reset();
             return true;
         }

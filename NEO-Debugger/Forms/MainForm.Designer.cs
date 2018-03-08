@@ -355,15 +355,15 @@
             // cCompilerToolStripMenuItem
             // 
             this.cCompilerToolStripMenuItem.Name = "cCompilerToolStripMenuItem";
-            this.cCompilerToolStripMenuItem.Size = new System.Drawing.Size(155, 24);
+            this.cCompilerToolStripMenuItem.Size = new System.Drawing.Size(154, 24);
             this.cCompilerToolStripMenuItem.Text = "C# Compiler";
             this.cCompilerToolStripMenuItem.Click += new System.EventHandler(this.cCompilerToolStripMenuItem_Click);
             // 
             // keyDecoderToolStripMenuItem
             // 
             this.keyDecoderToolStripMenuItem.Name = "keyDecoderToolStripMenuItem";
-            this.keyDecoderToolStripMenuItem.Size = new System.Drawing.Size(155, 24);
-            this.keyDecoderToolStripMenuItem.Text = "Key Decoder";
+            this.keyDecoderToolStripMenuItem.Size = new System.Drawing.Size(154, 24);
+            this.keyDecoderToolStripMenuItem.Text = "Key Tool";
             this.keyDecoderToolStripMenuItem.Click += new System.EventHandler(this.keyDecoderToolStripMenuItem_Click);
             // 
             // PanelSearch
@@ -514,6 +514,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "MainForm";
+            this.Text = "NEO Debugger";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Resize += new System.EventHandler(this.MainForm_Resize);

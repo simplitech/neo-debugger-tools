@@ -35,7 +35,8 @@ namespace Neo.Debugger.Forms
             var storage = _debugger.currentAddress.storage;
             foreach (var entry in storage.entries)
             {
-                dataGridView1.Rows.Add(FormattingUtils.OutputData(entry.Key, false), FormattingUtils.OutputData(entry.Value, false, true));
+                string hintType = entry.Key.Length == 20 ? "Integer" : "Integer";
+                dataGridView1.Rows.Add(FormattingUtils.OutputData(entry.Key, false), FormattingUtils.OutputData(entry.Value, false, hintType));
             }
         }
     }

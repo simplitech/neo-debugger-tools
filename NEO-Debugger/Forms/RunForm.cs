@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Windows.Forms;
 
@@ -19,10 +20,10 @@ namespace Neo.Debugger.Forms
         private ABI _abi;
         private TestSuite _testSuite;
         private string currentContractName = "";
-        private string lastContractName = "";
         private bool editMode = false;
         private int editRow;
-        private AVMFunction currentMethod;
+
+        public AVMFunction currentMethod { get; private set; }
 
         private DebugParameters _debugParameters;
         public DebugParameters DebugParameters
@@ -36,7 +37,7 @@ namespace Neo.Debugger.Forms
         private string _defaultPrivateKey;
         private Dictionary<string, string> _defaultParams;
 
-        public RunForm(ABI abi, TestSuite tests, string contractName, string defaultPrivateKey, Dictionary<string,string> defaultParams)
+        public RunForm(ABI abi, TestSuite tests, string contractName, string defaultPrivateKey, Dictionary<string,string> defaultParams, string defaultFunction)
         {
             InitializeComponent();
             _testSuite = tests;
@@ -58,7 +59,28 @@ namespace Neo.Debugger.Forms
             assetComboBox.SelectedIndex = 0;
 
             triggerComboBox.SelectedIndex = 0;
-            witnessComboBox.SelectedIndex = 0; 
+            witnessComboBox.SelectedIndex = 0;
+
+            paramsList.Items.Clear();
+
+            foreach (var f in _abi.functions.Values)
+            {
+                paramsList.Items.Add(f.name);
+            }
+
+            if (string.IsNullOrEmpty(defaultFunction))
+            {
+                defaultFunction = _abi.entryPoint.name;
+            }
+            
+            int mainItem = paramsList.FindString(defaultFunction);
+            if (mainItem >= 0) paramsList.SetSelected(mainItem, true);
+            
+            testCasesList.Items.Clear();
+            foreach (var entry in _testSuite.cases.Keys)
+            {
+                testCasesList.Items.Add(entry);
+            }
         }
 
         private bool InitInvoke()
@@ -138,17 +160,27 @@ namespace Neo.Debugger.Forms
                         {
                             val = s;
                         }
-                        else if (Util.IsHex(s))
+                        else
+                        if (s.StartsWith("\"") && s.EndsWith("\""))
                         {
-                            var bytes = s.HexToBytes();
-                            s = Util.BytesToString(bytes);
-                        }
-                        else if (Util.IsValidWallet(s))
-                        {
-                            var bytes = s.Base58CheckDecode();
-                            var scriptHash = Crypto.Default.ToScriptHash(bytes);
-                            bytes = scriptHash.ToArray();
-                            s = Util.BytesToString(bytes);
+                            s = s.Substring(1, s.Length - 2);
+                            if (Util.IsHex(s))
+                            {
+                                var bytes = s.HexToBytes();
+                                s = Util.BytesToString(bytes);
+                            }
+                            else if (Util.IsValidWallet(s))
+                            {
+                                var scriptHash = Emulator.Helper.AddressToScriptHash(s);
+                                s = Util.BytesToString(scriptHash);
+                            }
+                            else
+                            {
+                                ShowArgumentError(f, index, val);
+                                return false;
+                            }
+
+                            val = $"[{s}]";
                         }
                         else
                         {
@@ -238,6 +270,8 @@ namespace Neo.Debugger.Forms
                         BigInteger.TryParse(assetAmount.Text, out amount);
                         if (amount > 0)
                         {
+                            amount *= 100000000; // fix decimals
+
                             //Add the transaction info
                             _debugParameters.Transaction.Add(entry.id, amount);
                         }
@@ -252,6 +286,17 @@ namespace Neo.Debugger.Forms
                 }
             }
 
+            uint timestamp;
+            if (!uint.TryParse(timestampBox.Text, out timestamp))
+            {
+                MessageBox.Show("Invalid timestamp");
+                return false;
+            }
+            else
+            {
+                _debugParameters.Timestamp = timestamp;
+            }
+
             return true;
         }
 
@@ -264,6 +309,7 @@ namespace Neo.Debugger.Forms
             inputGrid.AllowUserToAddRows = false;
 
             assetAmount.Enabled = assetComboBox.SelectedIndex > 0;
+            timestampBox.Text = Emulator.Helper.ToTimestamp(DateTime.UtcNow).ToString();
 
             if (Runtime.invokerKeys == null && File.Exists("last.key"))
             {
@@ -284,34 +330,6 @@ namespace Neo.Debugger.Forms
             }
 
             privateKeyInput.Text = _defaultPrivateKey;
-
-            ReloadContract();
-        }
-
-        private void ReloadContract()
-        {
-            if (currentContractName == lastContractName)
-            {
-                return;
-            }
-
-            lastContractName = currentContractName;
-
-            paramsList.Items.Clear();
-
-            foreach (var f in _abi.functions.Values)
-            {
-                paramsList.Items.Add(f.name);
-            }
-
-            int mainItem = paramsList.FindString(_abi.entryPoint.name);
-            if (mainItem >= 0) paramsList.SetSelected(mainItem, true);
-
-            testCasesList.Items.Clear();
-            foreach (var entry in _testSuite.cases.Keys)
-            {
-                testCasesList.Items.Add(entry);
-            }
         }
 
         private void ResetTabs()
@@ -361,16 +379,12 @@ namespace Neo.Debugger.Forms
                         }
 
                         inputGrid.Rows[j].Cells[1].Value = val;
+                        inputGrid.Rows[j].Cells[1].Style.ForeColor = Color.Black;
                     }
 
                     break;
                 }
             }
-        }
-
-        private void assetComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            assetAmount.Enabled = assetComboBox.SelectedIndex > 0;
         }
 
         private void inputGrid_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -554,5 +568,29 @@ namespace Neo.Debugger.Forms
 
         #endregion
 
+        private bool lockDate;
+
+        private void timestampBox_TextChanged(object sender, EventArgs e)
+        {
+            if (lockDate) return;
+
+            uint timestamp;
+            if (uint.TryParse(timestampBox.Text, out timestamp))
+            {
+                dateTimePicker1.Value = Emulator.Helper.ToDateTime(timestamp);
+            }
+        }
+
+        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
+        {
+            lockDate = true;
+            timestampBox.Text = Emulator.Helper.ToTimestamp(dateTimePicker1.Value).ToString();
+            lockDate = false;
+        }
+
+        private void assetComboBox_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            assetAmount.Enabled = assetComboBox.SelectedIndex > 0;
+        }
     }
 }
