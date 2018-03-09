@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace Neo.Debugger.Models
 {
+    public class CompilerLogEventArgs : EventArgs
+    {
+        public string Message { get; set; }
+    }
+
     public class DebugManagerLogEventArgs : EventArgs
     {
         public bool Error { get; set; }
