@@ -349,7 +349,7 @@ namespace NEO_DevShell
                 Shell.blockchain.Save(Shell.blockchainPath);
 
                 Shell.Write("Result: " + FormattingUtils.StackItemAsString(val));
-                Shell.Write("GAS used: " + Shell.debugger.GetUsedGas());
+                Shell.Write("GAS used: " + Shell.debugger.usedGas);
             }
         }
     }
