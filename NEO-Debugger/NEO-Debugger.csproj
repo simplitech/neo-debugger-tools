@@ -276,18 +276,30 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Contracts\AgencyTransaction.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Contracts\Domain.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Contracts\HelloWorld.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Contracts\ICOTemplate.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Contracts\Lock.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Contracts\StructExample.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Data\Enums.cs" />
     <Compile Include="Forms\BlockchainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\BlockchainForm.Designer.cs">
       <DependentUpon>BlockchainForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\CSharpCompilerForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\CSharpCompilerForm.Designer.cs">
-      <DependentUpon>CSharpCompilerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\KeyToolForm.cs">
       <SubType>Form</SubType>
@@ -329,10 +341,6 @@
     <Compile Include="Utils\Util.cs" />
     <EmbeddedResource Include="Forms\BlockchainForm.resx">
       <DependentUpon>BlockchainForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\CSharpCompilerForm.resx">
-      <DependentUpon>CSharpCompilerForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\KeyToolForm.resx">

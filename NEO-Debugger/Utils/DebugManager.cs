@@ -86,6 +86,10 @@ namespace Neo.Debugger.Utils
             {
                 return _language;
             }
+            set
+            {
+                _language = value;
+            }
         }
         public Dictionary<DebugMode, string> DebugContent
         {
