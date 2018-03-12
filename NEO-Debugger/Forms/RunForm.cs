@@ -1,10 +1,10 @@
 ﻿using LunarParser;
 using LunarParser.JSON;
 using Neo.Cryptography;
-using Neo.Debugger.Models;
-using Neo.Debugger.Utils;
 using Neo.Emulator;
 using Neo.Emulator.API;
+using Neo.Debugger.Core.Models;
+using Neo.Debugger.Core.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

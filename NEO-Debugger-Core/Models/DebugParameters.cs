@@ -7,7 +7,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neo.Debugger.Models
+namespace Neo.Debugger.Core.Models
 {
     public class DebugParameters
     {

@@ -11,8 +11,9 @@ using Neo.Emulator.API;
 using Neo.Emulator.Utils;
 using Neo.Emulator.Dissambler;
 using Neo.Emulator;
-using Neo.Debugger.Data;
-using Neo.Debugger.Models;
+using Neo.Debugger.Core.Models;
+using Neo.Debugger.Core.Utils;
+using Neo.Debugger.Core.Data;
 
 namespace Neo.Debugger.Forms
 {
