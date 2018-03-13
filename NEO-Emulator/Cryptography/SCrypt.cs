@@ -298,7 +298,7 @@ namespace Neo.Cryptography
 
             Buffer.BlockCopy(salt, 0, saltBuffer, 0, saltLength);
 
-            /*using (var incrementalHasher = IncrementalHash.CreateHMAC(HashAlgorithmName.SHA256, mac.Key))
+            using (var incrementalHasher = IncrementalHash.CreateHMAC(HashAlgorithmName.SHA256, mac.Key))
             {
                 for (int i = 1; i <= blockCount; i++)
                 {
@@ -324,7 +324,7 @@ namespace Neo.Cryptography
 
                     Buffer.BlockCopy(T, 0, derivedKey, (i - 1) * 32, (i == blockCount ? r : 32));
                 }
-            }*/
+            }
         }
     }
 }

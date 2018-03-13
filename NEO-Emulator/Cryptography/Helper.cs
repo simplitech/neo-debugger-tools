@@ -27,7 +27,7 @@ namespace Neo.Cryptography
             return result;
         }
 
-        internal static byte[] AES256Decrypt(this byte[] block, byte[] key)
+        public static byte[] AES256Decrypt(this byte[] block, byte[] key)
         {
             using (Aes aes = Aes.Create())
             {
@@ -41,7 +41,7 @@ namespace Neo.Cryptography
             }
         }
 
-        internal static byte[] AES256Encrypt(this byte[] block, byte[] key)
+        public static byte[] AES256Encrypt(this byte[] block, byte[] key)
         {
             using (Aes aes = Aes.Create())
             {
@@ -55,7 +55,7 @@ namespace Neo.Cryptography
             }
         }
 
-        internal static byte[] AesDecrypt(this byte[] data, byte[] key, byte[] iv)
+        public static byte[] AesDecrypt(this byte[] data, byte[] key, byte[] iv)
         {
             if (data == null || key == null || iv == null) throw new ArgumentNullException();
             if (data.Length % 16 != 0 || key.Length != 32 || iv.Length != 16) throw new ArgumentException();
@@ -69,7 +69,7 @@ namespace Neo.Cryptography
             }
         }
 
-        internal static byte[] AesEncrypt(this byte[] data, byte[] key, byte[] iv)
+        public static byte[] AesEncrypt(this byte[] data, byte[] key, byte[] iv)
         {
             if (data == null || key == null || iv == null) throw new ArgumentNullException();
             if (data.Length % 16 != 0 || key.Length != 32 || iv.Length != 16) throw new ArgumentException();
