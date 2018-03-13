@@ -1,6 +1,7 @@
 ﻿using LunarParser.JSON;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Neo.Emulator
 {
@@ -22,6 +23,16 @@ namespace Neo.Emulator
         public Dictionary<string, AVMFunction> functions = new Dictionary<string, AVMFunction>();
         public AVMFunction entryPoint { get; private set; }
         public readonly string fileName;
+
+        public ABI()
+        {
+            var f = new AVMFunction();
+            f.name = "Main";
+            f.inputs = new AVMInput[] { new AVMInput() { name = "args", type = "Array" } };
+
+            this.functions[f.name] = f;
+            this.entryPoint = functions.Values.FirstOrDefault();
+        }
 
         public ABI(string fileName)
         {

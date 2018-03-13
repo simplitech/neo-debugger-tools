@@ -8,6 +8,7 @@ using Neo.Emulator.API;
 using LunarParser;
 using Neo.Emulator.Utils;
 using System.Diagnostics;
+using Neo.Emulator.Profiler;
 
 namespace Neo.Emulator
 {
@@ -90,12 +91,18 @@ namespace Neo.Emulator
         public TriggerType currentTrigger = TriggerType.Application;
         public uint timestamp = DateTime.Now.ToTimestamp();
 
-        private double _usedGas;
+        public double usedGas { get; private set; }
+        public int usedOpcodeCount { get; private set; }
+
+        //Profiler context
+        public static ProfilerContext _pctx;
 
         public NeoEmulator(Blockchain blockchain)
         {
             this.blockchain = blockchain;
             this.interop = new InteropService();
+
+            _pctx = new ProfilerContext();
         }
 
         public int GetInstructionPtr()
@@ -203,7 +210,8 @@ namespace Neo.Emulator
                 currentTransaction = new Transaction(this.blockchain.currentBlock);
             }
 
-            _usedGas = 0;
+            usedGas = 0;
+            usedOpcodeCount = 0;
 
             currentTransaction.emulator = this;
             engine = new ExecutionEngine(currentTransaction, Crypto.Default, null, interop);
@@ -250,6 +258,21 @@ namespace Neo.Emulator
 
             lastState = new DebuggerState(DebuggerState.State.Reset, 0);
             currentTransaction = null;
+        }
+
+        public void SetProfilerFilenameSource(string filename, string source)
+        {
+            _pctx.SetFilenameSource(filename, source);
+        }
+
+        public void SetProfilerLineno(int lineno)
+        {
+            _pctx.SetLineno(lineno);
+        }
+
+        public Exception ProfilerDumpCSV()
+        {
+            return _pctx.DumpCSV();
         }
 
         public void SetBreakpointState(int ofs, bool enabled)
@@ -322,6 +345,8 @@ namespace Neo.Emulator
                                 if (engine.lastSysCall.EndsWith("Storage.Put"))
                                 {
                                     opCost *= (Storage.lastStorageLength / 1024.0);
+                                    if (opCost < 1.0) opCost = 1.0;
+                                    _pctx.TallyOpcode(OpCode._STORAGE, opCost);
                                 }
                                 break;
                             }
@@ -341,7 +366,9 @@ namespace Neo.Emulator
                         default: opCost = 0.001; break;
                     }
 
-                _usedGas += opCost;
+                usedGas += opCost;
+                usedOpcodeCount++;
+                _pctx.TallyOpcode(opcode, opCost);
             }
             catch
             {
@@ -395,11 +422,6 @@ namespace Neo.Emulator
             return engine.EvaluationStack;
         }
 
-        public double GetUsedGas()
-        {
-            return _usedGas;
-        }
-
         #region TRANSACTIONS
         public void SetTransaction(byte[] assetID, BigInteger amount)
         {
@@ -411,8 +433,9 @@ namespace Neo.Emulator
             var dst_hash = new UInt160(Helper.AddressToScriptHash(this.currentAddress.keys.address));
             this.currentHash = dst_hash;
 
-            var total_amount = 10000;
-           
+            BigInteger asset_decimals = 100000000;
+            BigInteger total_amount = (amount * 10) * asset_decimals; // FIXME instead of (amount * 10) we should take balance from virtual blockchain
+
             var tx = new Transaction(blockchain.currentBlock);
             //tx.inputs.Add(new TransactionInput(-1, src_hash));
             tx.outputs.Add(new TransactionOutput(assetID, amount, dst_hash));
