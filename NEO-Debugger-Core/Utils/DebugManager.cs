@@ -1,18 +1,16 @@
-﻿using Neo.Debugger.Data;
-using Neo.Debugger.Forms;
-using Neo.Debugger.Models;
-using Neo.Emulator;
+﻿using Neo.Emulator;
 using Neo.Emulator.API;
 using Neo.Emulator.Dissambler;
+using Neo.Debugger.Core.Data;
+using Neo.Debugger.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Neo.Debugger.Forms.MainForm;
 
-namespace Neo.Debugger.Utils
+namespace Neo.Debugger.Core.Utils
 {
     public class DebugManager
     {

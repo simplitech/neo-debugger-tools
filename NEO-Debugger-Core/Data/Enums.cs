@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neo.Debugger.Data
+namespace Neo.Debugger.Core.Data
 {
     public enum SourceLanguage
     {

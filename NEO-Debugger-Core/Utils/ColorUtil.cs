@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Neo.Debugger.Utils
+namespace Neo.Debugger.Core.Utils
 {
     public static class ColorUtil
     {

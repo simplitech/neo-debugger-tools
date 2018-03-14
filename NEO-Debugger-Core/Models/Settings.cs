@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Neo.Debugger
+namespace Neo.Debugger.Core.Models
 {
     public class Settings
     {

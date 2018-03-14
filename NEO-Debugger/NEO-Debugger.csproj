@@ -294,7 +294,6 @@
     <Compile Include="Contracts\StructExample.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="Data\Enums.cs" />
     <Compile Include="Forms\BlockchainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -313,32 +312,24 @@
     <Compile Include="Forms\RunForm.Designer.cs">
       <DependentUpon>RunForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LanguageSupport.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\DebugParameters.cs" />
-    <Compile Include="Models\EventArgs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="Forms\StorageForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\StorageForm.Designer.cs">
       <DependentUpon>StorageForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Utils\ColorUtil.cs" />
-    <Compile Include="Utils\Compiler.cs" />
-    <Compile Include="Utils\DebugManager.cs" />
     <Compile Include="Utils\HotKeyManager.cs" />
     <Compile Include="Utils\InputBox.cs" />
     <Compile Include="Utils\MouseHoverManager.cs" />
     <Compile Include="Utils\SearchManager.cs" />
-    <Compile Include="Utils\Util.cs" />
     <EmbeddedResource Include="Forms\BlockchainForm.resx">
       <DependentUpon>BlockchainForm.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -378,10 +369,17 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NEO-Debugger-Core\NEO-Debugger-Core.csproj">
+      <Project>{f034e57e-520b-4572-88f0-76e8d28d4e7b}</Project>
+      <Name>NEO-Debugger-Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NEO-Emulator\NEO-Emulator.csproj">
       <Project>{372429c2-71be-41c2-92d0-5a9187bc238a}</Project>
       <Name>NEO-Emulator</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.1\build\netstandard2.0\NETStandard.Library.targets')" />
