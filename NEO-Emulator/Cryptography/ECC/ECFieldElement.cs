@@ -5,9 +5,9 @@ using System.Numerics;
 
 namespace Neo.Cryptography.ECC
 {
-    internal class ECFieldElement : IComparable<ECFieldElement>, IEquatable<ECFieldElement>
+    public class ECFieldElement : IComparable<ECFieldElement>, IEquatable<ECFieldElement>
     {
-        internal readonly BigInteger Value;
+        public readonly BigInteger Value;
         private readonly ECCurve curve;
 
         public ECFieldElement(BigInteger value, ECCurve curve)
