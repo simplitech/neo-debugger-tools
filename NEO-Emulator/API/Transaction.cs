@@ -20,6 +20,7 @@ namespace Neo.Emulator.API
         public Transaction(Block block)
         {
             this.block = block;
+            block.AddTransaction(this);
 
             var rnd = new Random();
             this.hash = new byte[20];

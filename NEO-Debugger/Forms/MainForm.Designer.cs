@@ -35,13 +35,15 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newFromTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helloWorldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.domainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.agencyTransactionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.iCOTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.domainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helloWorldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.structExampleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.searchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.findDialogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,7 +69,10 @@
             this.originalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.assemblyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.blockchainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.blockchainToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resetToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cCompilerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.keyDecoderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -82,8 +87,6 @@
             this.stackPanel = new System.Windows.Forms.RichTextBox();
             this.stackLabel = new System.Windows.Forms.Label();
             this.gasCostLabel = new System.Windows.Forms.Label();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.PanelSearch.SuspendLayout();
             this.SuspendLayout();
@@ -119,6 +122,7 @@
             this.searchToolStripMenuItem,
             this.viewToolStripMenuItem,
             this.debugToolStripMenuItem,
+            this.blockchainToolStripMenuItem1,
             this.toolsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -158,20 +162,6 @@
             this.newFromTemplateToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
             this.newFromTemplateToolStripMenuItem.Text = "New From Template";
             // 
-            // helloWorldToolStripMenuItem
-            // 
-            this.helloWorldToolStripMenuItem.Name = "helloWorldToolStripMenuItem";
-            this.helloWorldToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
-            this.helloWorldToolStripMenuItem.Text = "Hello World";
-            this.helloWorldToolStripMenuItem.Click += new System.EventHandler(this.helloWorldToolStripMenuItem_Click);
-            // 
-            // domainToolStripMenuItem
-            // 
-            this.domainToolStripMenuItem.Name = "domainToolStripMenuItem";
-            this.domainToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
-            this.domainToolStripMenuItem.Text = "Domain";
-            this.domainToolStripMenuItem.Click += new System.EventHandler(this.domainToolStripMenuItem_Click);
-            // 
             // agencyTransactionToolStripMenuItem
             // 
             this.agencyTransactionToolStripMenuItem.Name = "agencyTransactionToolStripMenuItem";
@@ -185,6 +175,20 @@
             this.iCOTemplateToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
             this.iCOTemplateToolStripMenuItem.Text = "ICO Template";
             this.iCOTemplateToolStripMenuItem.Click += new System.EventHandler(this.iCOTemplateToolStripMenuItem_Click);
+            // 
+            // domainToolStripMenuItem
+            // 
+            this.domainToolStripMenuItem.Name = "domainToolStripMenuItem";
+            this.domainToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
+            this.domainToolStripMenuItem.Text = "Domain";
+            this.domainToolStripMenuItem.Click += new System.EventHandler(this.domainToolStripMenuItem_Click);
+            // 
+            // helloWorldToolStripMenuItem
+            // 
+            this.helloWorldToolStripMenuItem.Name = "helloWorldToolStripMenuItem";
+            this.helloWorldToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
+            this.helloWorldToolStripMenuItem.Text = "Hello World";
+            this.helloWorldToolStripMenuItem.Click += new System.EventHandler(this.helloWorldToolStripMenuItem_Click);
             // 
             // lockToolStripMenuItem
             // 
@@ -206,6 +210,18 @@
             this.openToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
             this.openToolStripMenuItem.Text = "Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(197, 6);
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
+            this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // searchToolStripMenuItem
             // 
@@ -350,8 +366,7 @@
             this.stepToolStripMenuItem,
             this.resetToolStripMenuItem,
             this.sourceToolStripMenuItem,
-            this.toolStripMenuItem2,
-            this.blockchainToolStripMenuItem});
+            this.toolStripMenuItem2});
             this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
             this.debugToolStripMenuItem.Size = new System.Drawing.Size(62, 23);
             this.debugToolStripMenuItem.Text = "Debug";
@@ -360,7 +375,7 @@
             // 
             this.runToolStripMenuItem.Name = "runToolStripMenuItem";
             this.runToolStripMenuItem.ShortcutKeyDisplayString = "F5";
-            this.runToolStripMenuItem.Size = new System.Drawing.Size(166, 24);
+            this.runToolStripMenuItem.Size = new System.Drawing.Size(151, 24);
             this.runToolStripMenuItem.Text = "Run";
             this.runToolStripMenuItem.Click += new System.EventHandler(this.runToolStripMenuItem_Click);
             // 
@@ -368,14 +383,14 @@
             // 
             this.stepToolStripMenuItem.Name = "stepToolStripMenuItem";
             this.stepToolStripMenuItem.ShortcutKeyDisplayString = "F10";
-            this.stepToolStripMenuItem.Size = new System.Drawing.Size(166, 24);
+            this.stepToolStripMenuItem.Size = new System.Drawing.Size(151, 24);
             this.stepToolStripMenuItem.Text = "Step";
             this.stepToolStripMenuItem.Click += new System.EventHandler(this.stepToolStripMenuItem_Click);
             // 
             // resetToolStripMenuItem
             // 
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-            this.resetToolStripMenuItem.Size = new System.Drawing.Size(166, 24);
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(151, 24);
             this.resetToolStripMenuItem.Text = "Reset";
             this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
             // 
@@ -386,7 +401,7 @@
             this.assemblyToolStripMenuItem});
             this.sourceToolStripMenuItem.Name = "sourceToolStripMenuItem";
             this.sourceToolStripMenuItem.ShortcutKeyDisplayString = "F12";
-            this.sourceToolStripMenuItem.Size = new System.Drawing.Size(166, 24);
+            this.sourceToolStripMenuItem.Size = new System.Drawing.Size(151, 24);
             this.sourceToolStripMenuItem.Text = "Source";
             // 
             // originalToolStripMenuItem
@@ -407,17 +422,40 @@
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
             this.toolStripMenuItem2.ShortcutKeyDisplayString = "F6";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(166, 24);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(151, 24);
             this.toolStripMenuItem2.Text = "Storage";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
-            // blockchainToolStripMenuItem
+            // blockchainToolStripMenuItem1
             // 
-            this.blockchainToolStripMenuItem.Name = "blockchainToolStripMenuItem";
-            this.blockchainToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F7;
-            this.blockchainToolStripMenuItem.Size = new System.Drawing.Size(166, 24);
-            this.blockchainToolStripMenuItem.Text = "Blockchain";
-            this.blockchainToolStripMenuItem.Click += new System.EventHandler(this.blockchainToolStripMenuItem_Click);
+            this.blockchainToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.viewToolStripMenuItem1,
+            this.loadToolStripMenuItem,
+            this.resetToolStripMenuItem1});
+            this.blockchainToolStripMenuItem1.Name = "blockchainToolStripMenuItem1";
+            this.blockchainToolStripMenuItem1.Size = new System.Drawing.Size(85, 23);
+            this.blockchainToolStripMenuItem1.Text = "Blockchain";
+            // 
+            // viewToolStripMenuItem1
+            // 
+            this.viewToolStripMenuItem1.Name = "viewToolStripMenuItem1";
+            this.viewToolStripMenuItem1.Size = new System.Drawing.Size(152, 24);
+            this.viewToolStripMenuItem1.Text = "View";
+            this.viewToolStripMenuItem1.Click += new System.EventHandler(this.blockchainToolStripMenuItem_Click);
+            // 
+            // loadToolStripMenuItem
+            // 
+            this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(152, 24);
+            this.loadToolStripMenuItem.Text = "Load";
+            this.loadToolStripMenuItem.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
+            // 
+            // resetToolStripMenuItem1
+            // 
+            this.resetToolStripMenuItem1.Name = "resetToolStripMenuItem1";
+            this.resetToolStripMenuItem1.Size = new System.Drawing.Size(152, 24);
+            this.resetToolStripMenuItem1.Text = "Reset";
+            this.resetToolStripMenuItem1.Click += new System.EventHandler(this.resetToolStripMenuItem1_Click);
             // 
             // toolsToolStripMenuItem
             // 
@@ -519,7 +557,6 @@
             // openFileDialog
             // 
             this.openFileDialog.DefaultExt = "txt";
-            this.openFileDialog.FileName = "New File";
             this.openFileDialog.Filter = "NEO AVM files|*.avm";
             // 
             // logView
@@ -569,18 +606,6 @@
             this.gasCostLabel.Text = "Log";
             this.gasCostLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.gasCostLabel.Visible = false;
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(197, 6);
-            // 
-            // exitToolStripMenuItem
-            // 
-            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
-            this.exitToolStripMenuItem.Text = "Exit";
-            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -659,7 +684,6 @@
         private System.Windows.Forms.ToolStripMenuItem assemblyToolStripMenuItem;
         private System.Windows.Forms.Label gasCostLabel;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
-        private System.Windows.Forms.ToolStripMenuItem blockchainToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cCompilerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem keyDecoderToolStripMenuItem;
@@ -673,6 +697,10 @@
         private System.Windows.Forms.ToolStripMenuItem structExampleToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem blockchainToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem1;
     }
 }
 

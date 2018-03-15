@@ -3,6 +3,7 @@ using Neo.Emulator.Utils;
 using Neo.VM;
 using Neo.Cryptography;
 using System.Numerics;
+using System;
 
 namespace Neo.Emulator.API
 {
@@ -22,6 +23,15 @@ namespace Neo.Emulator.API
             this.assetID = assetID;
             this.amount = amount;
             this.hash = hash;
+        }
+
+        // NOTE - Temporary hack until real hashes are calculated
+        internal static UInt160 RandomHash()
+        {
+            var rnd = new Random();
+            var bytes = new byte[20];
+            rnd.NextBytes(bytes);
+            return new UInt160(bytes);
         }
 
         internal static TransactionOutput FromNode(DataNode root)

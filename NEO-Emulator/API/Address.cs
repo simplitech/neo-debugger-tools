@@ -57,12 +57,22 @@ namespace Neo.Emulator.API
         {
             var result = DataNode.CreateObject("address");
 
-            result.AddField("name", this.name);
+            if (this.name != null)
+            {
+                result.AddField("name", this.name);
+            }
+
             result.AddField("hash", this.keys.PrivateKey.ByteToHex());
             result.AddField("key", this.keys.PrivateKey.ByteToHex());
-            result.AddField("code", this.byteCode.ByteToHex());
+            if (this.byteCode != null)
+            {
+                result.AddField("code", this.byteCode.ByteToHex());
+            }
 
-            result.AddNode(this.storage.Save());
+            if (this.storage != null)
+            {
+                result.AddNode(this.storage.Save());
+            }
 
             return result;
         }

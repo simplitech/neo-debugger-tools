@@ -549,8 +549,9 @@ namespace Neo.Debugger.Forms
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            openFileDialog.Filter = "NEO AVM files|*.avm";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {                
+            {
                 LoadDebugFile(openFileDialog.FileName);
             }
         }
@@ -1204,6 +1205,39 @@ namespace Neo.Debugger.Forms
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void resetToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (!_debugger.BlockchainLoaded)
+            {
+                MessageBox.Show("No blockchain loaded yet!");
+                return;
+            }
+
+            if (_debugger.Blockchain.currentHeight > 1)
+            {
+                if (MessageBox.Show("The current loaded Blockchain already has some transactions. This action can not be reversed, are you sure you want to reset it?", "Blockchain Reset",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question,
+                    MessageBoxDefaultButton.Button1) != System.Windows.Forms.DialogResult.Yes)
+                {
+                    return;
+                }
+            }
+
+            _debugger.Blockchain.Reset();
+            _debugger.Blockchain.Save();
+
+            SendLogToPanel("Reset to virtual blockchain at path: "+_debugger.Blockchain.fileName);
+        }
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            openFileDialog.Filter = "Virtual blockchain files|*.chain.json";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                _debugger.Blockchain.Load(openFileDialog.FileName);
+            }
         }
     }
 }

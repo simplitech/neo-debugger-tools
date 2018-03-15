@@ -5,34 +5,91 @@ using Neo.VM;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 
 namespace Neo.Emulator.API
 {
     public class Blockchain
     {
-        public uint currentHeight { get { return (uint)blocks.Count; } }
-        public Dictionary<uint, Block> blocks = new Dictionary<uint, Block>();
-        public List<Address> addresses = new List<Address>();
+        public uint currentHeight { get { return (uint)_blocks.Count; } }
+        public IEnumerable<Address> Addresses { get { return _addresses; } }
+        public int AddressCount { get { return _addresses.Count; } }
+
+        public IEnumerable<Block> Blocks { get { return _blocks.Values; } }
+
+        private Dictionary<uint, Block> _blocks = new Dictionary<uint, Block>();
+        private List<Address> _addresses = new List<Address>();
+
+        public string fileName { get; set; }
 
         public Block currentBlock
         {
             get
             {
-                if (blocks.Count == 0)
+                if (_blocks.Count == 0)
                 {
                     return null;
                 }
-                return blocks[currentHeight];
+                return _blocks[currentHeight];
             }
         }
 
+        public static readonly string InitialPrivateWIF = "L1nqvvVGGesAQ5vLyyR21Q2gVt4ifw8ZrKGJa58tv9xP7hGa2SMx";
+
         public Blockchain()
         {
+            this.fileName = null;
+            Reset();
+        }
 
+        public void Reset()
+        {
+            var keypair = KeyPair.FromWIF(InitialPrivateWIF);
+
+            int amount = 10000;
+
+            var balances = new Dictionary<string, decimal>();
+            balances["NEO"] = amount;
+            balances["GAS"] = amount;
+
+            _addresses.Clear();
+            _addresses.Add(new Address() { name = "Genesis", balances = balances, byteCode = null, keys = keypair, storage = null });
+
+            _blocks.Clear();
+            var block = CreateBlock();
+
+            var hash = new UInt160(Helper.AddressToScriptHash(keypair.address));
+
+            var tx = new Transaction(block);
+
+            foreach (var entry in balances)
+            {
+                BigInteger total = (BigInteger)amount * Asset.Decimals;
+                tx.outputs.Add(new TransactionOutput(Asset.GetAssetId(entry.Key), total, hash));
+            }
+        }
+
+        public Block CreateBlock()
+        {
+            var block = new Block(currentHeight + 1, DateTime.Now.ToTimestamp());
+            _blocks[block.height] = block;
+            return block;
+        }
+
+        public Block GetBlockByHeight(uint height)
+        {
+            if (_blocks.ContainsKey(height))
+            {
+                return _blocks[height];
+            }
+
+            return null;
         }
 
         public bool Load(string fileName)
         {
+            this.fileName = fileName;
+
             if (!File.Exists(fileName))
             {
                 return false;
@@ -43,16 +100,18 @@ namespace Neo.Emulator.API
 
             root = root["blockchain"];
 
-            blocks.Clear();
+            _blocks.Clear();
+            _addresses.Clear();
+
             foreach (var child in root.Children)
             {
                 if (child.Name.Equals("block"))
                 {
-                    uint index = (uint)(blocks.Count + 1);
+                    uint index = (uint)(_blocks.Count + 1);
                     var block = new Block(index, 0);
                     if (block.Load(child))
                     {
-                        blocks[index] = block;
+                        _blocks[index] = block;
                     }
                 }
                 if (child.Name.Equals("address"))
@@ -60,7 +119,7 @@ namespace Neo.Emulator.API
                     var address = new Address();
                     if (address.Load(child))
                     {
-                        addresses.Add(address);
+                        _addresses.Add(address);
                     }
                 }
             }
@@ -68,16 +127,28 @@ namespace Neo.Emulator.API
             return true;
         }
 
+        public void Save()
+        {
+            if (this.fileName == null)
+            {
+                throw new Exception("Blockchain filename cannot be null");
+            }
+
+            this.Save(this.fileName);
+        }
+
         public void Save(string fileName)
         {
+            this.fileName = fileName;
+
             var result = DataNode.CreateObject("blockchain");
-            for (uint i = 1; i <= blocks.Count; i++)
+            for (uint i = 1; i <= _blocks.Count; i++)
             {
-                var block = blocks[i];
+                var block = _blocks[i];
                 result.AddNode(block.Save());
             }
 
-            foreach (var address in addresses)
+            foreach (var address in _addresses)
             {
                 result.AddNode(address.Save());
             }
@@ -98,7 +169,7 @@ namespace Neo.Emulator.API
             address.name = name;
             address.keys = keys;
 
-            this.addresses.Add(address);
+            this._addresses.Add(address);
 
             return address;
         }
@@ -141,16 +212,16 @@ namespace Neo.Emulator.API
 
                 var height = (uint)temp;
 
-                if (blockchain.blocks.ContainsKey(height))
+                if (blockchain._blocks.ContainsKey(height))
                 {
-                    block = blockchain.blocks[height];
+                    block = blockchain._blocks[height];
                 }
                 else
                 if (height <= blockchain.currentHeight)
                 {
                     uint index = height + 1;
                     block = new Block(index, 1506787300);
-                    blockchain.blocks[index] = block;
+                    blockchain._blocks[index] = block;
                 }
             }
 
@@ -165,7 +236,7 @@ namespace Neo.Emulator.API
 
         public Address FindAddressByName(string name)
         {
-            foreach (var addr in addresses)
+            foreach (var addr in _addresses)
             {
                 if (addr.name.Equals(name))
                 {

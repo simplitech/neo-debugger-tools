@@ -8,18 +8,35 @@ namespace Neo.Emulator.API
     public class Block : Header
     {
         public uint height;
-        public List<Transaction> transactions = new List<Transaction>();
+
+        private List<Transaction> _transactions = new List<Transaction>();
+        public IEnumerable<Transaction> Transactions { get { return _transactions; } }
 
         public Block(uint height, uint timestamp) : base(timestamp)
         {
             this.height = height;
         }
 
+        internal void AddTransaction(Transaction tx)
+        {
+            if (_transactions.Contains(tx))
+            {
+                return;
+            }
+
+            _transactions.Add(tx);
+        }
+
+        public Transaction GetTransactionByIndex(int index)
+        {
+            return _transactions[index];
+        }
+
         internal bool Load(DataNode root)
         {
             this.timestamp = root.GetUInt32("timestamp");
 
-            this.transactions.Clear();
+            this._transactions.Clear();
 
             foreach (var child in root.Children)
             {
@@ -27,7 +44,7 @@ namespace Neo.Emulator.API
                 {
                     var tx = new Transaction(this);
                     tx.Load(child);
-                    transactions.Add(tx);
+                    _transactions.Add(tx);
                 }
             }
 
@@ -37,7 +54,7 @@ namespace Neo.Emulator.API
         public DataNode Save()
         {
             var result = DataNode.CreateObject("block");
-            foreach (var tx in transactions)
+            foreach (var tx in _transactions)
             {
                 result.AddNode(tx.Save());
             }
@@ -56,7 +73,7 @@ namespace Neo.Emulator.API
             if (block == null)
                 return false;
 
-            engine.EvaluationStack.Push(block.transactions.Count);
+            engine.EvaluationStack.Push(block._transactions.Count);
             return true;
         }
 
@@ -71,11 +88,13 @@ namespace Neo.Emulator.API
 
             // returns Transaction[]
 
-            var txs = new StackItem[block.transactions.Count];
-            for (int i=0; i<block.transactions.Count; i++)
+            var txs = new StackItem[block._transactions.Count];
+
+            int index = 0;
+            foreach (var tx in block.Transactions)
             {
-                var tx = block.transactions[i];
-                txs[i] = new VM.Types.InteropInterface(tx);
+                txs[index] = new VM.Types.InteropInterface(tx);
+                index++;
             }
 
             var array = new VM.Types.Array(txs);
@@ -94,14 +113,15 @@ namespace Neo.Emulator.API
             if (block == null)
                 return false;
 
-            if (index<0 || index>=block.transactions.Count)
+            if (index<0 || index>=block._transactions.Count)
             {
                 return false;
             }
 
-            var tx = block.transactions[index];
+            var tx = block.GetTransactionByIndex(index);
             engine.EvaluationStack.Push(new VM.Types.InteropInterface(tx));
             return true;
         }
+
     }
 }

@@ -12,77 +12,77 @@ namespace Neo.Debugger.Forms
         {
             InitializeComponent();
             _blockchain = blockchain;
-
-            dataGridView1.Columns.Add("Key", "Key");
-            dataGridView1.Columns.Add("Value", "Value");
-
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            dataGridView1.RowHeadersVisible = false;
-            dataGridView1.Columns[0].ReadOnly = true;
-            dataGridView1.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dataGridView1.Columns[0].FillWeight = 3;
-
-            dataGridView1.Columns[1].ReadOnly = true;
-            dataGridView1.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dataGridView1.Columns[1].FillWeight = 4;
-
-            dataGridView2.Columns.Add("Address", "Address");
-            dataGridView2.Columns.Add("Private Key", "Private Key");
-            dataGridView2.Columns.Add("Assets", "Assets");
-
-            dataGridView2.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            dataGridView2.RowHeadersVisible = false;
-
-            for (int i=0; i<=2; i++)
-            {
-                dataGridView2.Columns[i].ReadOnly = true;
-                dataGridView2.Columns[i].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                dataGridView2.Columns[i].FillWeight = 2;
-            }
-            dataGridView2.Columns[1].FillWeight = 3;
         }
 
         private void BlockchainForm_Shown(object sender, System.EventArgs e)
         {
             var blockchain = _blockchain;
 
-            foreach (var block in blockchain.blocks.Values)
+            treeView2.Nodes.Clear();
+            foreach (var block in blockchain.Blocks)
             {
-                foreach (var tx in block.transactions)
+                var blockNode = treeView2.Nodes.Add("Block #" + block.height);
+                var tsNode = blockNode.Nodes.Add("Timestamp");
+                tsNode.Nodes.Add(block.timestamp.ToDateTime().ToString());
+
+                var txsNode = blockNode.Nodes.Add("Transactions");
+
+                foreach (var tx in block.Transactions)
                 {
-                    listBox1.Items.Add(tx.hash.ToHexString());
+                    var txNode = txsNode.Nodes.Add(tx.hash.ByteToHex());
+
+                    if (tx.inputs.Count > 0)
+                    {
+                        var inputNode = txNode.Nodes.Add("Inputs");
+                        foreach (var input in tx.inputs)
+                        {
+                            var prevHashNode = inputNode.Nodes.Add(input.prevHash.ByteToHex());
+                        }
+                    }
+
+                    if (tx.outputs.Count > 0)
+                    {
+                        var outputNode = txNode.Nodes.Add("Outputs");
+                        foreach (var output in tx.outputs)
+                        {
+                            var hashLbNode = outputNode.Nodes.Add("Hash");
+                            var hashNode = hashLbNode.Nodes.Add(output.hash.ToString());
+                        }
+                    }
                 }
             }
 
-            panel1.Visible = false;
+            treeView1.Nodes.Clear();
 
-            dataGridView2.Rows.Clear();
-            foreach (var address in blockchain.addresses)
+            foreach (var address in blockchain.Addresses)
             {
-                string assets = "";
+                var node = treeView1.Nodes.Add(address.keys.address);
 
-                foreach (var balance in address.balances)
+                if (!string.IsNullOrEmpty(address.name))
                 {
-                    if (assets.Length > 0) assets += ", ";
 
-                    assets += balance.Value + " " + balance.Key;
                 }
 
-                if (assets.Length == 0)
+                if (address.balances.Count > 0)
                 {
-                    assets = "None";
-                }
+                    var balanceNode = node.Nodes.Add("Balances");
+                    
 
-                dataGridView2.Rows.Add(address.keys.address, address.keys.PrivateKey.ToHexString(), assets);
+                    foreach (var balance in address.balances)
+                    {
+                        var child = balanceNode.Nodes.Add(balance.Key);
+                        var value = child.Nodes.Add(balance.Value.ToString());
+                    }
+                }
             }
         }
 
         private Transaction FindByHash(string hash)
         {
             var blockchain = _blockchain;
-            foreach (var block in blockchain.blocks.Values)
+            foreach (var block in blockchain.Blocks)
             {
-                foreach (var tx in block.transactions)
+                foreach (var tx in block.Transactions)
                 {
                     if (tx.hash.ToHexString() == hash)
                     {
@@ -94,37 +94,5 @@ namespace Neo.Debugger.Forms
             return null;
         }
 
-        private void listBox1_SelectedIndexChanged(object sender, System.EventArgs e)
-        {
-            Transaction tx = FindByHash(listBox1.SelectedItem.ToString());
-            if (tx == null)
-            {
-                panel1.Visible = false;
-                return;
-            }
-
-            panel1.Visible = true;
-
-            dataGridView1.Rows.Clear();
-
-            dataGridView1.Rows.Add("Hash", tx.hash.ToHexString());
-            dataGridView1.Rows.Add("Block", tx.block.height);
-
-            int index;
-
-            index = 0;
-            foreach (var input in tx.inputs)
-            {
-                dataGridView1.Rows.Add("Input #" + index, input.prevHash.ToHexString());
-                index++;
-            }
-
-            index = 0;
-            foreach (var output in tx.outputs)
-            {
-                dataGridView1.Rows.Add("Output #" + index, output.hash.ToString());
-                index++;
-            }
-        }
     }
 }

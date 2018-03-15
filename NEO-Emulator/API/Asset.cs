@@ -7,6 +7,8 @@ namespace Neo.Emulator.API
 {
     public static class Asset
     {
+        public const uint Decimals = 100000000;
+
         public struct Entry
         {
             public byte[] id;
@@ -37,6 +39,19 @@ namespace Neo.Emulator.API
 
                 return _entries;
             }
+        }
+
+        public static byte[] GetAssetId(string symbol)
+        {
+            foreach (var entry in Entries)
+            {
+                if (entry.name == symbol)
+                {
+                    return entry.id;
+                }
+            }
+
+            throw new ArgumentException($"Unknown asset with symbol {symbol}");
         }
 
         [Syscall("Neo.Asset.GetAssetId")]
