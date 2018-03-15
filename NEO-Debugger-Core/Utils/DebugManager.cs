@@ -258,7 +258,7 @@ namespace Neo.Debugger.Core.Utils
         private string _blockchainFilePath {
             get
             {
-                return _avmFilePath.Replace(".avm", ".chain");
+                return _avmFilePath.Replace(".avm", ".chain.json");
             }
         }
 
@@ -359,7 +359,7 @@ namespace Neo.Debugger.Core.Utils
         public bool LoadEmulator()
         {
             //Create load the emulator
-            Blockchain blockchain = new Blockchain();
+            var blockchain = new Blockchain();
             blockchain.Load(_blockchainFilePath);
             _emulator = new NeoEmulator(blockchain);
 

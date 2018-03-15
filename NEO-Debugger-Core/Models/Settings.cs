@@ -1,5 +1,6 @@
 ﻿using LunarParser;
 using LunarParser.JSON;
+using Neo.Emulator.API;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,7 +33,7 @@ namespace Neo.Debugger.Core.Models
                 root = root["settings"];
 
                 this.lastOpenedFile = root.GetString("lastfile");
-                this.lastPrivateKey = root.GetString("lastkey", "L1nqvvVGGesAQ5vLyyR21Q2gVt4ifw8ZrKGJa58tv9xP7hGa2SMx");
+                this.lastPrivateKey = root.GetString("lastkey", Blockchain.InitialPrivateWIF);
 
                 var paramsNode = root.GetNode("lastparams");
                 this.lastParams.Clear();

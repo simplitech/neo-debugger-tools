@@ -61,13 +61,10 @@
     <Compile Include="Utils\Util.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NEO-Compiler-Lib\NEO-Compiler-Lib.csproj">
-      <Project>{dd92bc77-e062-4e9e-a5f2-d8bdd1689848}</Project>
-      <Name>NEO-Compiler-Lib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NEO-Compiler\NEO-Compiler.csproj">
       <Project>{36e1ccd1-3c95-459d-88d1-6f14e07eaec9}</Project>
       <Name>NEO-Compiler</Name>

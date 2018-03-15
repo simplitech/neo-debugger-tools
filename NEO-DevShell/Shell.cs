@@ -271,7 +271,7 @@ namespace NEO_DevShell
                 Shell.blockchainPath = filePath;
 
                 Shell.blockchain.Load(Shell.blockchainPath);
-                Shell.Write($"Loaded blockchain ({Shell.blockchain.blocks.Count} bytes, {Shell.blockchain.addresses.Count} addresses)");
+                Shell.Write($"Loaded blockchain, ({Shell.blockchain.currentHeight} blocks, {Shell.blockchain.AddressCount} addresses)");
             }
             else
             {
