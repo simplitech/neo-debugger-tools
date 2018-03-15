@@ -436,17 +436,14 @@ namespace Neo.Emulator
             BigInteger asset_decimals = 100000000;
             BigInteger total_amount = (amount * 10) * asset_decimals; // FIXME instead of (amount * 10) we should take balance from virtual blockchain
 
-            var tx = new Transaction(blockchain.currentBlock);
+            var block = blockchain.CreateBlock();
+
+            var tx = new Transaction(block);
             //tx.inputs.Add(new TransactionInput(-1, src_hash));
             tx.outputs.Add(new TransactionOutput(assetID, amount, dst_hash));
             tx.outputs.Add(new TransactionOutput(assetID, total_amount - amount, src_hash));
 
-            uint index = blockchain.currentHeight + 1;
-            var block = new Block(index, DateTime.Now.ToTimestamp());
-            block.transactions.Add(tx);
-           
-            blockchain.blocks[index] = block;
-
+          
             this.currentTransaction = tx;
         }
         #endregion
