@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ICO_Unit_Tests</RootNamespace>
     <AssemblyName>ICO-Unit-Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,7 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NEO-Emulator\NEO-Emulator.csproj">
-      <Project>{372429C2-71BE-41C2-92D0-5A9187BC238A}</Project>
+      <Project>{372429c2-71be-41c2-92d0-5a9187bc238a}</Project>
       <Name>NEO-Emulator</Name>
     </ProjectReference>
   </ItemGroup>
