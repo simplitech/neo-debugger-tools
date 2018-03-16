@@ -12,6 +12,7 @@ using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
 using Neo.Debugger.Core.Data;
 using System.Text.RegularExpressions;
+using Neo.VM;
 
 namespace Neo.Debugger.Forms
 {
@@ -907,7 +908,16 @@ namespace Neo.Debugger.Forms
 
                 case DebuggerState.State.Finished:
                     {
-                        var val = _debugger.Emulator.GetOutput();
+                        StackItem val;
+                        try
+                        {
+                            val = _debugger.Emulator.GetOutput();
+                        }
+                        catch
+                        {
+                            val = null;
+                        }
+                        
                         var gasStr = string.Format("{0:N4}", _debugger.Emulator.usedGas);
 
                         string hintType = !string.IsNullOrEmpty(_settings.lastFunction) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(_settings.lastFunction) ? _debugger.ABI.functions[_settings.lastFunction].returnType : null;

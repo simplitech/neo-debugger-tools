@@ -158,9 +158,6 @@
     <Reference Include="Neo.SmartContract.Framework, Version=2.5.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Neo.SmartContract.Framework.2.5.4\lib\net40\Neo.SmartContract.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="Neo.VM, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Neo.VM.2.0.4\lib\net461\Neo.VM.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
