@@ -22,6 +22,7 @@ namespace Neo.Debugger.Forms
         private string currentContractName = "";
         private bool editMode = false;
         private int editRow;
+        private bool lockDate;
 
         public AVMFunction currentMethod { get; private set; }
 
@@ -567,8 +568,6 @@ namespace Neo.Debugger.Forms
         }
 
         #endregion
-
-        private bool lockDate;
 
         private void timestampBox_TextChanged(object sender, EventArgs e)
         {

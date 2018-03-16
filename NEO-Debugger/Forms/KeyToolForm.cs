@@ -1,6 +1,7 @@
 ﻿using Neo.Cryptography;
 using System;
 using System.Windows.Forms;
+using Neo.Debugger.Core.Utils;
 
 namespace Neo.Debugger.Forms
 {
@@ -30,29 +31,6 @@ namespace Neo.Debugger.Forms
         {
         }
 
-        public static string reverseHex(string hex)
-        {
-
-            string result = "";
-            for (var i = hex.Length - 2; i >= 0; i -= 2)
-            {
-                result += hex.Substring(i, 2);
-            }
-            return result;
-        }
-
-        private string ToByteArray(byte[] bytes)
-        {
-            var output = "";
-            foreach (var item in bytes)
-            {
-                if (output.Length > 0) output += ",";
-                output += $"{item.ToString().PadLeft(3)}";
-            }
-            output = $"[{output}]";
-            return output;
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
             KeyPair keyPair;
@@ -79,11 +57,11 @@ namespace Neo.Debugger.Forms
 
             keyDataGrid.Rows.Add(new object[] { "Address", keyPair.address });
             keyDataGrid.Rows.Add(new object[] { "Script Hash (RAW, hex) ", scriptHash.ToHexString() });
-            keyDataGrid.Rows.Add(new object[] { "Script Hash (RAW, bytes) ", ToByteArray(scriptHash) });
+            keyDataGrid.Rows.Add(new object[] { "Script Hash (RAW, bytes) ", Util.ToReadableByteArrayString(scriptHash) });
             keyDataGrid.Rows.Add(new object[] { "Public Key (RAW, hex)", keyPair.PublicKey.ToHexString() });
             keyDataGrid.Rows.Add(new object[] { "Private Key (RAW, hex)", keyPair.PrivateKey.ToHexString() });
             keyDataGrid.Rows.Add(new object[] { "Private Key (WIF, hex)", keyPair.WIF });
-            keyDataGrid.Rows.Add(new object[] { "Private Key (RAW, bytes)", ToByteArray(keyPair.PrivateKey) });
+            keyDataGrid.Rows.Add(new object[] { "Private Key (RAW, bytes)", Util.ToReadableByteArrayString(keyPair.PrivateKey) });
         }
 
         private void button2_Click(object sender, EventArgs e)

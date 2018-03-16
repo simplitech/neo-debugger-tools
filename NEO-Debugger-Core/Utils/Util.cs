@@ -122,5 +122,27 @@ namespace Neo.Debugger.Core.Utils
             s = $"[{s}]";
             return s;
         }
+
+        public static string ReverseHex(string hex)
+        {
+            string result = "";
+            for (var i = hex.Length - 2; i >= 0; i -= 2)
+            {
+                result += hex.Substring(i, 2);
+            }
+            return result;
+        }
+
+        public static string ToReadableByteArrayString(byte[] bytes)
+        {
+            var output = "";
+            foreach (var item in bytes)
+            {
+                if (output.Length > 0) output += ",";
+                output += $"{item.ToString().PadLeft(3)}";
+            }
+            output = $"[{output}]";
+            return output;
+        }
     }
 }
