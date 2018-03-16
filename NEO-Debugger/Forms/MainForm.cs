@@ -48,6 +48,7 @@ namespace Neo.Debugger.Forms
                 else
                 {
                     //Let's create a new file since we have nothing loaded from the command line and we haven't opened any files before
+                    LoadContractTemplate("HelloWorld.cs");
                 }
                 
             }
