@@ -32,7 +32,14 @@ namespace Neo.Emulator.API
 
             var storageNode = root.GetNode("storage");
 
-            this.storage.Load(storageNode);
+            if (storageNode != null)
+            {
+                this.storage.Load(storageNode);
+            }
+            else
+            {
+                this.storage = null;
+            }
 
             this.balances.Clear();
             var balanceNode = root.GetNode("balance");
