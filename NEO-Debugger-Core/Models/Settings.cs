@@ -20,9 +20,9 @@ namespace Neo.Debugger.Core.Models
         public readonly string path;
 
 
-        public Settings()
+        public Settings(string settingsFolderPath)
         {
-            this.path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Neo Contracts";
+            this.path = settingsFolderPath + @"\Neo Contracts";
 
             this.fileName = path + @"\debugger.settings.json";
 
