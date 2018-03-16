@@ -72,23 +72,6 @@ namespace Neo.Compiler
             var options = new CSharpParseOptions(kind: SourceCodeKind.Regular, languageVersion: LanguageVersion.Latest);
             SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(code, options, fileName,  System.Text.Encoding.UTF8);
 
-            /*var assemblyPath = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")).Split(Path.PathSeparator);
-            var neededAssemblies = new[]
-            {
-            "mscorlib",
-            "System.Runtime",
-            "System.Core",
-            "System.Numerics",
-            "Neo.SmartContract.Framework",
-            };
-            
-            IEnumerable<MetadataReference> references = assemblyPath
-                .Where(p => neededAssemblies.Contains(Path.GetFileNameWithoutExtension(p)))
-                .Select(p => MetadataReference.CreateFromFile(p))
-                .ToList();
-
-             */
-
             // note - This path must patch the .NET framework version used to build the Neo.SmartContract.Framework.dll
             string programFilesX86 = Environment.ExpandEnvironmentVariables("%ProgramFiles(x86)%");
             string assemblyPath = programFilesX86  + @"\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.1\";
