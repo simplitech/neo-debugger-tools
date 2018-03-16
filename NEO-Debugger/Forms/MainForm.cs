@@ -6,10 +6,7 @@ using System.IO;
 using ScintillaNET;
 using Neo.Debugger.Utils;
 using System.Text;
-using System.Collections.Generic;
-using Neo.Emulator.API;
 using Neo.Emulator.Utils;
-using Neo.Emulator.Dissambler;
 using Neo.Emulator;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
@@ -30,6 +27,16 @@ namespace Neo.Debugger.Forms
         public MainForm(string argumentsAvmFile)
         {
             InitializeComponent();
+
+            if (!string.IsNullOrEmpty(argumentsAvmFile))
+            {
+                argumentsAvmFile = argumentsAvmFile.Replace("\\", "/");
+                if (!argumentsAvmFile.Contains("/"))
+                {
+                    argumentsAvmFile = Directory.GetCurrentDirectory().Replace("\\", "/") + "/" + argumentsAvmFile;
+                }
+            }
+
             _argumentsAvmFile = argumentsAvmFile;
             _sourceAvmPath = argumentsAvmFile;
         }
