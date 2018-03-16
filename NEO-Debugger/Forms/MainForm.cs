@@ -14,6 +14,7 @@ using Neo.Emulator;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
 using Neo.Debugger.Core.Data;
+using System.Text.RegularExpressions;
 
 namespace Neo.Debugger.Forms
 {
@@ -35,11 +36,21 @@ namespace Neo.Debugger.Forms
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            _settings = new Settings();
+            //Use settings from the My Documents folder
+            _settings = new Settings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
 
             if (string.IsNullOrEmpty(_sourceAvmPath))
             {
-                _sourceAvmPath = _settings.lastOpenedFile;
+                if (!String.IsNullOrEmpty(_settings.lastOpenedFile))
+                {
+                    _sourceAvmPath = _settings.lastOpenedFile;
+                }
+                else
+                {
+                    //Let's create a new file since we have nothing loaded from the command line and we haven't opened any files before
+                    LoadContractTemplate("HelloWorld.cs");
+                }
+                
             }
 
             //Init the UI controls
@@ -691,36 +702,13 @@ namespace Neo.Debugger.Forms
             LoadContractTemplate("HelloWorld.cs");
         }
 
-        private void helloWorldToolStripMenuItem_Click(object sender, EventArgs e)
+        private void newFromTemplateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            LoadContractTemplate("HelloWorld.cs");
-        }
+            ToolStripMenuItem item = (ToolStripMenuItem)sender;
+            var templateFileName = String.Format("{0}.cs", Regex.Replace(item.Text, @"\s+", ""));
 
-        private void domainToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            LoadContractTemplate("Domain.cs");
+            LoadContractTemplate(templateFileName);
         }
-
-        private void agencyTransactionToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            LoadContractTemplate("AgencyTransaction.cs");
-        }
-
-        private void iCOTemplateToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            LoadContractTemplate("ICOTemplate.cs");
-        }
-
-        private void lockToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            LoadContractTemplate("Lock.cs");
-        }
-
-        private void structExampleToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            LoadContractTemplate("StructExample.cs");
-        }
-
 
         #endregion
 
