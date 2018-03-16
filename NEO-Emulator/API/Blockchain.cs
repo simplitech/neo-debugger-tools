@@ -56,7 +56,7 @@ namespace Neo.Emulator.API
             _addresses.Add(new Address() { name = "Genesis", balances = balances, byteCode = null, keys = keypair, storage = null });
 
             _blocks.Clear();
-            var block = CreateBlock();
+            var block = GenerateBlock();
 
             var hash = new UInt160(Helper.AddressToScriptHash(keypair.address));
 
@@ -67,13 +67,59 @@ namespace Neo.Emulator.API
                 BigInteger total = (BigInteger)amount * Asset.Decimals;
                 tx.outputs.Add(new TransactionOutput(Asset.GetAssetId(entry.Key), total, hash));
             }
+
+            ConfirmBlock(block);
         }
 
-        public Block CreateBlock()
+        public Block GenerateBlock()
         {
             var block = new Block(currentHeight + 1, DateTime.Now.ToTimestamp());
-            _blocks[block.height] = block;
             return block;
+        }
+
+        // this verifies that this block is valid as the next block in the chain
+        // if thats true, then it updates balances from all accounts in the included transactions
+        public bool ConfirmBlock(Block block)
+        {
+            if (block.height != currentHeight + 1)
+            {
+                return false;
+            }
+
+            if (block.TransactionCount == 0)
+            {
+                return false;
+            }
+
+            foreach (var tx in block.Transactions)
+            {
+                foreach (var output in tx.outputs)
+                {
+                    var address = FindAddressByHash(output.hash);
+                    if (address == null)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            _blocks[block.height] = block;
+            return true;
+        }
+
+        public Address FindAddressByHash(UInt160 hash)
+        {
+            foreach (var entry in _addresses)
+            {
+                var bytes = Emulator.Helper.AddressToScriptHash(entry.keys.address);
+                var temp = new UInt160(bytes);
+                if (temp.Equals(hash))
+                {
+                    return entry;
+                }
+            }
+
+            return null;
         }
 
         public Block GetBlockByHeight(uint height)

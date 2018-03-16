@@ -12,6 +12,8 @@ namespace Neo.Emulator.API
         private List<Transaction> _transactions = new List<Transaction>();
         public IEnumerable<Transaction> Transactions { get { return _transactions; } }
 
+        public int TransactionCount { get { return _transactions.Count; } }
+
         public Block(uint height, uint timestamp) : base(timestamp)
         {
             this.height = height;
