@@ -20,7 +20,7 @@ namespace ICO_Unit_Tests
             var chain = new Blockchain();
             emulator = new NeoEmulator(chain);
             var address = chain.DeployContract("test", avmBytes);
-            emulator.SetExecutingAddress(address);
+            emulator.SetExecutingAccount(address);
         }
 
         [Test]

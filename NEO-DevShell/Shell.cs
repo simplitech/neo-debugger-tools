@@ -164,7 +164,7 @@ namespace NEO_DevShell
 
         public override void Execute(string[] args)
         {
-            var storage = Shell.debugger.currentAddress.storage;
+            var storage = Shell.debugger.currentAccount.storage;
             foreach (var entry in storage.entries)
             {
                 Shell.Write(FormattingUtils.OutputData(entry.Key, false) + " => "+ FormattingUtils.OutputData(entry.Value, false));

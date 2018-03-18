@@ -28,14 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.treeView2 = new System.Windows.Forms.TreeView();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.treeView1 = new System.Windows.Forms.TreeView();
-            this.treeView2 = new System.Windows.Forms.TreeView();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.newAddressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.markAsFromToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sendAssetsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.nEOToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.gASToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -59,6 +67,14 @@
             this.tabPage1.Text = "Transactions";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // treeView2
+            // 
+            this.treeView2.Location = new System.Drawing.Point(6, 6);
+            this.treeView2.Name = "treeView2";
+            this.treeView2.Size = new System.Drawing.Size(926, 384);
+            this.treeView2.TabIndex = 0;
+            this.treeView2.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView2_NodeMouseClick);
+            // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.treeView1);
@@ -76,13 +92,53 @@
             this.treeView1.Name = "treeView1";
             this.treeView1.Size = new System.Drawing.Size(926, 384);
             this.treeView1.TabIndex = 0;
+            this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView1_NodeMouseClick);
             // 
-            // treeView2
+            // contextMenuStrip1
             // 
-            this.treeView2.Location = new System.Drawing.Point(6, 6);
-            this.treeView2.Name = "treeView2";
-            this.treeView2.Size = new System.Drawing.Size(926, 384);
-            this.treeView2.TabIndex = 0;
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newAddressToolStripMenuItem,
+            this.markAsFromToolStripMenuItem,
+            this.sendAssetsToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(157, 92);
+            // 
+            // newAddressToolStripMenuItem
+            // 
+            this.newAddressToolStripMenuItem.Name = "newAddressToolStripMenuItem";
+            this.newAddressToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.newAddressToolStripMenuItem.Text = "New Address";
+            this.newAddressToolStripMenuItem.Click += new System.EventHandler(this.newAddressToolStripMenuItem_Click);
+            // 
+            // markAsFromToolStripMenuItem
+            // 
+            this.markAsFromToolStripMenuItem.Name = "markAsFromToolStripMenuItem";
+            this.markAsFromToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.markAsFromToolStripMenuItem.Text = "Mark as \"From\"";
+            this.markAsFromToolStripMenuItem.Click += new System.EventHandler(this.markAsFromToolStripMenuItem_Click);
+            // 
+            // sendAssetsToolStripMenuItem
+            // 
+            this.sendAssetsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.nEOToolStripMenuItem,
+            this.gASToolStripMenuItem});
+            this.sendAssetsToolStripMenuItem.Name = "sendAssetsToolStripMenuItem";
+            this.sendAssetsToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.sendAssetsToolStripMenuItem.Text = "Send Assets";
+            // 
+            // nEOToolStripMenuItem
+            // 
+            this.nEOToolStripMenuItem.Name = "nEOToolStripMenuItem";
+            this.nEOToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.nEOToolStripMenuItem.Text = "NEO";
+            this.nEOToolStripMenuItem.Click += new System.EventHandler(this.nEOToolStripMenuItem_Click);
+            // 
+            // gASToolStripMenuItem
+            // 
+            this.gASToolStripMenuItem.Name = "gASToolStripMenuItem";
+            this.gASToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.gASToolStripMenuItem.Text = "GAS";
+            this.gASToolStripMenuItem.Click += new System.EventHandler(this.gASToolStripMenuItem_Click);
             // 
             // BlockchainForm
             // 
@@ -100,6 +156,7 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -111,5 +168,11 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.TreeView treeView2;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem newAddressToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem markAsFromToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem sendAssetsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem nEOToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem gASToolStripMenuItem;
     }
 }

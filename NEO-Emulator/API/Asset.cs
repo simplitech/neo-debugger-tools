@@ -41,6 +41,19 @@ namespace Neo.Emulator.API
             }
         }
 
+        public static string GetAssetName(byte[] id)
+        {
+            foreach (var entry in Entries)
+            {
+                if (entry.id == id)
+                {
+                    return entry.name;
+                }
+            }
+
+            throw new ArgumentException($"Unknown asset with id {id.ByteToHex()}");
+        }
+
         public static byte[] GetAssetId(string symbol)
         {
             foreach (var entry in Entries)

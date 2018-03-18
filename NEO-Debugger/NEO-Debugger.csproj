@@ -324,7 +324,7 @@
       <DependentUpon>StorageForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Utils\HotKeyManager.cs" />
-    <Compile Include="Utils\InputBox.cs" />
+    <Compile Include="Utils\InputUtils.cs" />
     <Compile Include="Utils\MouseHoverManager.cs" />
     <Compile Include="Utils\SearchManager.cs" />
     <EmbeddedResource Include="Forms\BlockchainForm.resx">

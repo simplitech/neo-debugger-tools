@@ -32,7 +32,7 @@ namespace Neo.Debugger.Forms
         {
             dataGridView1.Rows.Clear();
 
-            var storage = _debugger.currentAddress.storage;
+            var storage = _debugger.currentAccount.storage;
             foreach (var entry in storage.entries)
             {
                 string hintType = entry.Key.Length == 20 ? "Integer" : "Integer";

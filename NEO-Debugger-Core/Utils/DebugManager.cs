@@ -220,7 +220,7 @@ namespace Neo.Debugger.Core.Utils
         //Context
         private string _contractName { get; set; }
         private byte[] _contractByteCode { get; set; }
-        private Address _contractAddress
+        private Account _contractAddress
         {
             get
             {
@@ -371,7 +371,7 @@ namespace Neo.Debugger.Core.Utils
             return true;
         }
 
-        public bool LoadContract()
+        public bool DeployContract()
         {
             if (String.IsNullOrEmpty(_contractName) || _contractByteCode == null || _contractByteCode.Length == 0)
             {
@@ -385,12 +385,17 @@ namespace Neo.Debugger.Core.Utils
                 Log($"Deployed contract {_contractName} on virtual blockchain at address {address.keys.address}.");
             }
             else
+            if (address.byteCode.SequenceEqual(_contractByteCode))
+            {
+                return true;
+            }
+            else
             {
                 address.byteCode = _contractByteCode;
                 Log($"Updated bytecode for {_contractName} on virtual blockchain.");
             }
 
-            _emulator.SetExecutingAddress(_contractAddress);
+            _emulator.SetExecutingAccount(_contractAddress);
             return true;
         }
 

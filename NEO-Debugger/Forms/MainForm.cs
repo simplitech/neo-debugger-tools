@@ -148,7 +148,7 @@ namespace Neo.Debugger.Forms
             if (!_debugger.LoadEmulator())
                 return false;
 
-            if (!_debugger.LoadContract())
+            if (!_debugger.DeployContract())
                 return false;
 
             _debugger.LoadTests();
@@ -249,6 +249,8 @@ namespace Neo.Debugger.Forms
                 MessageBox.Show("Please load an .avm file first!");
                 return false;
             }
+
+            _debugger.DeployContract();
 
             //Get the parameters to execute the debugger
             if (!GetDebugParameters())

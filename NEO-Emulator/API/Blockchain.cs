@@ -12,13 +12,13 @@ namespace Neo.Emulator.API
     public class Blockchain
     {
         public uint currentHeight { get { return (uint)_blocks.Count; } }
-        public IEnumerable<Address> Addresses { get { return _addresses; } }
-        public int AddressCount { get { return _addresses.Count; } }
+        public IEnumerable<Account> Accounts { get { return _accounts; } }
+        public int AddressCount { get { return _accounts.Count; } }
 
         public IEnumerable<Block> Blocks { get { return _blocks.Values; } }
 
         private Dictionary<uint, Block> _blocks = new Dictionary<uint, Block>();
-        private List<Address> _addresses = new List<Address>();
+        private List<Account> _accounts = new List<Account>();
 
         public string fileName { get; set; }
 
@@ -52,8 +52,8 @@ namespace Neo.Emulator.API
             balances["NEO"] = amount;
             balances["GAS"] = amount;
 
-            _addresses.Clear();
-            _addresses.Add(new Address() { name = "Genesis", balances = balances, byteCode = null, keys = keypair, storage = null });
+            _accounts.Clear();
+            _accounts.Add(new Account() { name = "Genesis", balances = balances, byteCode = null, keys = keypair, storage = null });
 
             _blocks.Clear();
             var block = GenerateBlock();
@@ -95,7 +95,7 @@ namespace Neo.Emulator.API
             {
                 foreach (var output in tx.outputs)
                 {
-                    var address = FindAddressByHash(output.hash);
+                    var address = FindAccountByHash(output.hash);
                     if (address == null)
                     {
                         return false;
@@ -107,13 +107,26 @@ namespace Neo.Emulator.API
             return true;
         }
 
-        public Address FindAddressByHash(UInt160 hash)
+        public Account FindAccountByHash(UInt160 hash)
         {
-            foreach (var entry in _addresses)
+            foreach (var entry in _accounts)
             {
                 var bytes = Emulator.Helper.AddressToScriptHash(entry.keys.address);
                 var temp = new UInt160(bytes);
                 if (temp.Equals(hash))
+                {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+
+        public Account FindAccountByAddress(string address)
+        {
+            foreach (var entry in _accounts)
+            {
+                if (entry.keys.address == address)
                 {
                     return entry;
                 }
@@ -147,7 +160,7 @@ namespace Neo.Emulator.API
             root = root["blockchain"];
 
             _blocks.Clear();
-            _addresses.Clear();
+            _accounts.Clear();
 
             foreach (var child in root.Children)
             {
@@ -162,15 +175,27 @@ namespace Neo.Emulator.API
                 }
                 if (child.Name.Equals("address"))
                 {
-                    var address = new Address();
+                    var address = new Account();
                     if (address.Load(child))
                     {
-                        _addresses.Add(address);
+                        _accounts.Add(address);
                     }
                 }
             }
 
             return true;
+        }
+
+        public void CreateAddress(string name)
+        {
+            var bytes = new byte[32];
+            var rnd = new Random();
+            rnd.NextBytes(bytes);
+
+            var keypair = new KeyPair(bytes);
+            var address = new Account() { keys = keypair, balances = new Dictionary<string, decimal>(), byteCode = null, name = name, storage = null };
+            
+            _accounts.Add(address);
         }
 
         public void Save()
@@ -194,7 +219,7 @@ namespace Neo.Emulator.API
                 result.AddNode(block.Save());
             }
 
-            foreach (var address in _addresses)
+            foreach (var address in _accounts)
             {
                 result.AddNode(address.Save());
             }
@@ -203,7 +228,7 @@ namespace Neo.Emulator.API
             File.WriteAllText(fileName, json);
         }
 
-        private Address GenerateAddress(string name)
+        private Account GenerateAddress(string name)
         {
             byte[] array = new byte[32];
             var random = new Random();
@@ -211,16 +236,16 @@ namespace Neo.Emulator.API
 
             var keys = new KeyPair(array);
 
-            var address = new Address();
+            var address = new Account();
             address.name = name;
             address.keys = keys;
 
-            this._addresses.Add(address);
+            this._accounts.Add(address);
 
             return address;
         }
 
-        public Address DeployContract(string name, byte[] byteCode)
+        public Account DeployContract(string name, byte[] byteCode)
         {
             var address = GenerateAddress(name);
             address.byteCode = byteCode;
@@ -280,9 +305,9 @@ namespace Neo.Emulator.API
             // returns Header
         }
 
-        public Address FindAddressByName(string name)
+        public Account FindAddressByName(string name)
         {
-            foreach (var addr in _addresses)
+            foreach (var addr in _accounts)
             {
                 if (addr.name.Equals(name))
                 {

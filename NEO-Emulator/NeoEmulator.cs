@@ -49,10 +49,10 @@ namespace Neo.Emulator
             return tx.emulator;
         }
 
-        public static Address GetAddress(this ExecutionEngine engine)
+        public static Account GetAccount(this ExecutionEngine engine)
         {
             var emulator = engine.GetEmulator();
-            return emulator.currentAddress;
+            return emulator.currentAccount;
         }
 
         public static Blockchain GetBlockchain(this ExecutionEngine engine)
@@ -64,7 +64,7 @@ namespace Neo.Emulator
         public static Storage GetStorage(this ExecutionEngine engine)
         {
             var emulator = engine.GetEmulator();
-            return emulator.currentAddress.storage;
+            return emulator.currentAccount.storage;
         }
     }
 
@@ -82,7 +82,7 @@ namespace Neo.Emulator
 
         private DebuggerState lastState = new DebuggerState(DebuggerState.State.Invalid, -1);
 
-        public Address currentAddress { get; private set; }
+        public Account currentAccount { get; private set; }
         public Transaction currentTransaction { get; private set; }
 
         private UInt160 currentHash;
@@ -110,9 +110,9 @@ namespace Neo.Emulator
             return engine.CurrentContext.InstructionPointer;
         }
 
-        public void SetExecutingAddress(Address address)
+        public void SetExecutingAccount(Account address)
         {
-            this.currentAddress = address;
+            this.currentAccount = address;
             this.contractBytes = address.byteCode;
 
             var assembly = typeof(Neo.Emulator.Helper).Assembly;
@@ -430,7 +430,7 @@ namespace Neo.Emulator
             var bytes = key != null ? Helper.AddressToScriptHash(key.address) : new byte[20];
 
             var src_hash = new UInt160(bytes);
-            var dst_hash = new UInt160(Helper.AddressToScriptHash(this.currentAddress.keys.address));
+            var dst_hash = new UInt160(Helper.AddressToScriptHash(this.currentAccount.keys.address));
             this.currentHash = dst_hash;
 
             BigInteger asset_decimals = 100000000;
