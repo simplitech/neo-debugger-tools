@@ -35,12 +35,6 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newFromTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.agencyTransactionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.iCOTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.domainToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helloWorldToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.lockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.structExampleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -150,58 +144,9 @@
             // 
             // newFromTemplateToolStripMenuItem
             // 
-            this.newFromTemplateToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.agencyTransactionToolStripMenuItem,
-            this.iCOTemplateToolStripMenuItem,
-            this.domainToolStripMenuItem,
-            this.helloWorldToolStripMenuItem,
-            this.lockToolStripMenuItem,
-            this.structExampleToolStripMenuItem});
             this.newFromTemplateToolStripMenuItem.Name = "newFromTemplateToolStripMenuItem";
             this.newFromTemplateToolStripMenuItem.Size = new System.Drawing.Size(200, 24);
             this.newFromTemplateToolStripMenuItem.Text = "New From Template";
-            // 
-            // agencyTransactionToolStripMenuItem
-            // 
-            this.agencyTransactionToolStripMenuItem.Name = "agencyTransactionToolStripMenuItem";
-            this.agencyTransactionToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
-            this.agencyTransactionToolStripMenuItem.Text = "Agency Transaction";
-            this.agencyTransactionToolStripMenuItem.Click += new System.EventHandler(this.newFromTemplateToolStripMenuItem_Click);
-            // 
-            // iCOTemplateToolStripMenuItem
-            // 
-            this.iCOTemplateToolStripMenuItem.Name = "iCOTemplateToolStripMenuItem";
-            this.iCOTemplateToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
-            this.iCOTemplateToolStripMenuItem.Text = "ICO Template";
-            this.iCOTemplateToolStripMenuItem.Click += new System.EventHandler(this.newFromTemplateToolStripMenuItem_Click);
-            // 
-            // domainToolStripMenuItem
-            // 
-            this.domainToolStripMenuItem.Name = "domainToolStripMenuItem";
-            this.domainToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
-            this.domainToolStripMenuItem.Text = "Domain";
-            this.domainToolStripMenuItem.Click += new System.EventHandler(this.newFromTemplateToolStripMenuItem_Click);
-            // 
-            // helloWorldToolStripMenuItem
-            // 
-            this.helloWorldToolStripMenuItem.Name = "helloWorldToolStripMenuItem";
-            this.helloWorldToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
-            this.helloWorldToolStripMenuItem.Text = "Hello World";
-            this.helloWorldToolStripMenuItem.Click += new System.EventHandler(this.newFromTemplateToolStripMenuItem_Click);
-            // 
-            // lockToolStripMenuItem
-            // 
-            this.lockToolStripMenuItem.Name = "lockToolStripMenuItem";
-            this.lockToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
-            this.lockToolStripMenuItem.Text = "Lock";
-            this.lockToolStripMenuItem.Click += new System.EventHandler(this.newFromTemplateToolStripMenuItem_Click);
-            // 
-            // structExampleToolStripMenuItem
-            // 
-            this.structExampleToolStripMenuItem.Name = "structExampleToolStripMenuItem";
-            this.structExampleToolStripMenuItem.Size = new System.Drawing.Size(196, 24);
-            this.structExampleToolStripMenuItem.Text = "Struct Example";
-            this.structExampleToolStripMenuItem.Click += new System.EventHandler(this.newFromTemplateToolStripMenuItem_Click);
             // 
             // openToolStripMenuItem
             // 
@@ -688,12 +633,6 @@
         private System.Windows.Forms.ToolStripMenuItem keyDecoderToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newFromTemplateToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem helloWorldToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem domainToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem agencyTransactionToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem iCOTemplateToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem lockToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem structExampleToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem blockchainToolStripMenuItem1;

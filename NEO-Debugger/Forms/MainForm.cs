@@ -108,9 +108,24 @@ namespace Neo.Debugger.Forms
 
             foreach (var language in templates.Keys)
             {
-                var temp = language.ToString().Replace("Sharp", "#");
-                var item = newToolStripMenuItem.DropDownItems.Add(temp);
-                item.Click += newToolStripMenuItem_Click;
+                {
+                    var temp = language.ToString().Replace("Sharp", "#");
+                    var item = newToolStripMenuItem.DropDownItems.Add(temp);
+                    item.Click += newToolStripMenuItem_Click;
+                }
+
+                {
+                    var temp = language.ToString().Replace("Sharp", "#");
+                    var item = (ToolStripMenuItem) newFromTemplateToolStripMenuItem.DropDownItems.Add(temp);
+
+                    var list = templates[language];
+                    foreach (var entry in list)
+                    {
+                        var templateName = Path.GetFileNameWithoutExtension(entry);
+                        var subItem = item.DropDownItems.Add(templateName);
+                        subItem.Click += newFromTemplateToolStripMenuItem_Click;
+                    }
+                }
             }
         }
 
@@ -756,13 +771,18 @@ namespace Neo.Debugger.Forms
             TextArea.Text = template;
         }
 
+        private SourceLanguage FromMenuItem(ToolStripItem item)
+        {
+            var language = (item.Text == "C#") ? SourceLanguage.CSharp : (SourceLanguage)Enum.Parse(typeof(SourceLanguage), item.Text);
+            return language;
+        }
+
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem item = (ToolStripMenuItem)sender;
 
 
-            var language = (item.Text == "C#") ? SourceLanguage.CSharp : (SourceLanguage)Enum.Parse(typeof(SourceLanguage), item.Text);
-
+            var language = FromMenuItem(item);
             string extension = LanguageSupport.GetExtension(language);
 
 
@@ -773,7 +793,13 @@ namespace Neo.Debugger.Forms
         private void newFromTemplateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ToolStripMenuItem item = (ToolStripMenuItem)sender;
-            var templateFileName = String.Format("{0}.cs", Regex.Replace(item.Text, @"\s+", ""));
+
+
+            var parent = (ToolStripMenuItem)item.OwnerItem;
+            var language = FromMenuItem(parent);
+            var extension = LanguageSupport.GetExtension(language);
+
+            var templateFileName = String.Format("{0}{1}", Regex.Replace(item.Text, @"\s+", ""), extension);
 
             LoadContractTemplate(templateFileName);
         }
