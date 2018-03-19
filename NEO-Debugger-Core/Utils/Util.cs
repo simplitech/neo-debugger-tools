@@ -2,10 +2,7 @@
 using LunarParser.JSON;
 using Neo.Cryptography;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace Neo.Debugger.Core.Utils
 {
@@ -15,6 +12,22 @@ namespace Neo.Debugger.Core.Utils
         {
             var node = JSONReader.ReadFromString("{\"params\": [" + argList + "]}");
             return node.GetNode("params");
+        }
+
+        public static string FindExecutablePath(string exeName)
+        {
+            string envPath = Environment.ExpandEnvironmentVariables("%PATH%");
+            var paths = envPath.Split(';');
+            foreach (var path in paths)
+            {
+                var fullPath = path + "\\" + exeName;
+                if (File.Exists(fullPath))
+                {
+                    return path;
+                }
+            }
+
+            return null;
         }
 
         public static bool IsValidWallet(string address)

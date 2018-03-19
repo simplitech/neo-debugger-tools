@@ -229,9 +229,37 @@ namespace Neo.Debugger.Forms
             {
                 string compilerPath = "";
 
-                if (InputUtils.ShowInputDialog($"Insert path to {_sourceLanguage} compiler", ref compilerPath) != DialogResult.OK)
+                switch (_sourceLanguage)
                 {
-                    return false;
+                    case SourceLanguage.CSharp:
+                        {
+                            compilerPath = Util.FindExecutablePath("neon.exe");
+                            if (!string.IsNullOrEmpty(compilerPath))
+                            {
+                                SendLogToPanel("Found C# Neo compiler: " + compilerPath);
+                            }
+                            break;
+                        }
+
+                    case SourceLanguage.Python:
+                        {
+                            string pythonPath = Util.FindExecutablePath("python.exe");
+                            if (string.IsNullOrEmpty(pythonPath))
+                            {
+                                SendLogToPanel("To compile smart contracts written in Python you need to have Python.exe installed");
+                                return false;
+                            }
+
+                            break;
+                        }
+                }
+
+                if (string.IsNullOrEmpty(compilerPath))
+                {
+                    if (InputUtils.ShowInputDialog($"Insert path to {_sourceLanguage} compiler", ref compilerPath) != DialogResult.OK)
+                    {
+                        return false;
+                    }
                 }
 
                 if (string.IsNullOrEmpty(compilerPath))
