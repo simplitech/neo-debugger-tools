@@ -81,7 +81,6 @@ namespace Neo.SmartContract
         }
 
         // initialization parameters, only once
-        // 初始化参数
         public static bool Deploy()
         {
             byte[] total_supply = Storage.Get(Storage.CurrentContext, "totalSupply");
@@ -92,11 +91,8 @@ namespace Neo.SmartContract
             return true;
         }
 
-        // The function MintTokens is only usable by the chosen wallet
-        // contract to mint a number of tokens proportional to the
-        // amount of neo sent to the wallet contract. The function
-        // can only be called during the tokenswap period
-        // 将众筹的neo转化为等价的ico代币
+        // The function MintTokens is only usable by the chosen wallet contract to mint a number of tokens proportional to the amount of neo sent to the wallet contract. 
+		// The function can only be called during the tokenswap period
         public static bool MintTokens()
         {
             byte[] sender = GetSender();
@@ -107,10 +103,9 @@ namespace Neo.SmartContract
             }
             ulong contribute_value = GetContributeValue();
             // the current exchange rate between ico tokens and neo during the token swap period
-            // 获取众筹期间ico token和neo间的转化率
+
             ulong swap_rate = CurrentSwapRate();
             // crowdfunding failure
-            // 众筹失败
             if (swap_rate == 0)
             {
                 Refund(sender, contribute_value);
@@ -123,7 +118,6 @@ namespace Neo.SmartContract
                 return false;
             }
             // crowdfunding success
-            // 众筹成功
             BigInteger balance = Storage.Get(Storage.CurrentContext, sender).AsBigInteger();
             Storage.Put(Storage.CurrentContext, sender, token + balance);
             BigInteger totalSupply = Storage.Get(Storage.CurrentContext, "totalSupply").AsBigInteger();
@@ -133,14 +127,12 @@ namespace Neo.SmartContract
         }
 
         // get the total token supply
-        // 获取已发行token总量
         public static BigInteger TotalSupply()
         {
             return Storage.Get(Storage.CurrentContext, "totalSupply").AsBigInteger();
         }
 
         // function that is always called when someone wants to transfer tokens.
-        // 流转token调用
         public static bool Transfer(byte[] from, byte[] to, BigInteger value)
         {
             if (value <= 0) return false;
@@ -159,7 +151,6 @@ namespace Neo.SmartContract
         }
 
         // get the account balance of another account with address
-        // 根据地址获取token的余额
         public static BigInteger BalanceOf(byte[] address)
         {
             return Storage.Get(Storage.CurrentContext, address).AsBigInteger();
@@ -231,7 +222,6 @@ namespace Neo.SmartContract
             TransactionOutput[] outputs = tx.GetOutputs();
             ulong value = 0;
             // get the total amount of Neo
-            // 获取转入智能合约地址的Neo总量
             foreach (TransactionOutput output in outputs)
             {
                 if (output.ScriptHash == GetReceiver() && output.AssetId == neo_asset_id)

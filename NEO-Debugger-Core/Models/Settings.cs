@@ -1,5 +1,6 @@
 ﻿using LunarParser;
 using LunarParser.JSON;
+using Neo.Debugger.Core.Data;
 using Neo.Emulator.API;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,8 @@ namespace Neo.Debugger.Core.Models
         public string lastPrivateKey;
 
         public string lastFunction;
+
+        public Dictionary<SourceLanguage, string> compilerPaths = new Dictionary<SourceLanguage, string>();
 
         public Dictionary<string, string> lastParams = new Dictionary<string, string>();
 
@@ -45,6 +48,23 @@ namespace Neo.Debugger.Core.Models
                         var key = child.GetString("key");
                         var value = child.GetString("value");
                         this.lastParams[key] = value;
+                    }
+                }
+
+                var compilersNode = root.GetNode("lastparams");
+                if (compilersNode != null)
+                {
+                    foreach (var child in compilersNode.Children)
+                    {
+                        var key = child.GetString("language");
+                        var value = child.GetString("path");
+
+                        SourceLanguage language;
+                        
+                        if (Enum.TryParse<SourceLanguage>(key, out language))
+                        {
+                            this.compilerPaths[language] = value;
+                        }                        
                     }
                 }
             }

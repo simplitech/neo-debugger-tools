@@ -30,6 +30,12 @@ namespace Neo.Debugger.Core.Utils
 
         public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language)
         {
+            if (!_settings.compilerPaths.ContainsKey(language))
+            {
+                Log($"{language} compiler is not configured.");
+                return false;
+            }
+
             bool success = false;
 
             if (string.IsNullOrEmpty(outputFilePath))
@@ -56,7 +62,6 @@ namespace Neo.Debugger.Core.Utils
                         var loadCode = $"from boa.compiler import Compiler;Compiler.load_and_save('{outputFilePath}')";
                         info.FileName = "python.exe";
                         info.Arguments = $"-c \"{loadCode}\"";
-                        info.WorkingDirectory = @"D:\code\Crypto\neo-boa";
                         break;
                     }
 
@@ -66,6 +71,8 @@ namespace Neo.Debugger.Core.Utils
                         return false;
                     }
             }
+
+            info.WorkingDirectory = _settings.compilerPaths[language];
 
             info.UseShellExecute = false;
             info.RedirectStandardInput = false;

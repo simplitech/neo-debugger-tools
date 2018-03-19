@@ -223,6 +223,29 @@ namespace Neo.Debugger.Forms
 
         #region Debugger Actions
 
+        private bool PreCompile()
+        {
+            if (!_settings.compilerPaths.ContainsKey(_sourceLanguage))
+            {
+                string compilerPath = "";
+
+                if (InputUtils.ShowInputDialog($"Insert path to {_sourceLanguage} compiler", ref compilerPath) != DialogResult.OK)
+                {
+                    return false;
+                }
+
+                if (string.IsNullOrEmpty(compilerPath))
+                {
+                    return false;
+                }
+
+                _settings.compilerPaths[_sourceLanguage] = compilerPath;
+                _settings.Save();
+            }
+
+            return _debugger.PrecompileContract(TextArea.Text, _sourceLanguage);
+        }
+
         private void RunDebugger()
         {
             //We need to make sure there is a file loaded
@@ -236,8 +259,10 @@ namespace Neo.Debugger.Forms
             {
                 ClearLog();
 
-                if (!_debugger.PrecompileContract(TextArea.Text, this._sourceLanguage))
+                if (!PreCompile())
+                {
                     return;
+                }
 
                 LoadDebugFile(_debugger.AvmFilePath);
             }
@@ -267,7 +292,7 @@ namespace Neo.Debugger.Forms
             {
                 ClearLog();
 
-                if (!_debugger.PrecompileContract(TextArea.Text, this._sourceLanguage))
+                if (!PreCompile())
                     return;
 
                 LoadDebugFile(_debugger.AvmFilePath);
@@ -1248,7 +1273,7 @@ namespace Neo.Debugger.Forms
         {
             ClearLog();
 
-            if (!_debugger.PrecompileContract(TextArea.Text, this._sourceLanguage))
+            if (!PreCompile())
                 return;
 
             LoadDebugFile(_debugger.AvmFilePath);
