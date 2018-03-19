@@ -1,10 +1,17 @@
-﻿<form id="compile_form" action="/Compiler/Compile" method="post" class="ui form">
+﻿<style type="text/css" media="screen">
+    #source_code {
+        width: 800px;
+        height: 300px;
+    }
+</style>
+
+<form id="compile_form" action="/Compiler/Compile" method="post" class="ui form">
     <div class="ui segment basic">
-        <img src="~/Content/Images/NEO_Logo.png" style="height:50px; float:left;" /><div style="display:inline-table; margin-top: 15px; margin-left: 10px;">NEO C# Smart Contract Compiler</div>
+        <img src="~/Content/Images/NEO_Logo.png" style="height:50px; float:left;" /><div style="display:inline-table; margin-top: 15px; margin-left: 10px; font-weight:bold;">NEO Web Debugger</div>
         <div class="field">
             <label>Source Code</label>
 
-<textarea id="source_code" name="source_code" style="width:800px; height:300px;">
+<div id="source_code" name="source_code">
 using Neo.SmartContract.Framework.Services.Neo;
 using Neo.SmartContract.Framework.Services.System;
 using Neo.SmartContract.Framework;
@@ -21,7 +28,7 @@ namespace Neo.SmartContract
         }
     }
 }
-</textarea>
+</div>
 
         </div>
         <div class="field">
@@ -64,6 +71,7 @@ namespace Neo.SmartContract
 
     <script type="text/javascript">
         $(function () {
+            //Wireup compile
             $("#compile_form").submit(function (event) {
                 $("#event_log").html("");
                 // Stop form from submitting normally
@@ -71,7 +79,7 @@ namespace Neo.SmartContract
 
                 // Get some values from elements on the page:
                 var $form = $(this),
-                    source = $("#source_code").val(),
+                    source = editor.getValue(),
                     url = $form.attr("action");
 
                 // Send the data using post
@@ -79,9 +87,14 @@ namespace Neo.SmartContract
 
                 // Put the results in a div
                 posting.done(function (data) {
-                    
+
                 });
             });
+
+            //Bind the editor
+            var editor = ace.edit("source_code");
+            editor.setTheme("ace/theme/tomorrow_night_bright");
+            editor.session.setMode("ace/mode/csharp");
         });
     </script>
 }
