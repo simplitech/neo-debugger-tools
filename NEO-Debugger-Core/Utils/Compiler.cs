@@ -23,9 +23,15 @@ namespace Neo.Debugger.Core.Utils
             _settings = settings;
         }
 
+        private string[] FetchLog(string content)
+        {
+            return content.Split('\n').Where(x => !string.IsNullOrEmpty(x)).ToArray();
+        }
+
         public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language)
         {
             bool success = false;
+
             if (string.IsNullOrEmpty(outputFilePath))
                 throw new ArgumentNullException("outputFilePath");
 
@@ -40,6 +46,17 @@ namespace Neo.Debugger.Core.Utils
                 case SourceLanguage.CSharp:
                     {
                         info.FileName = "neon.exe";
+                        info.Arguments = "\"" + outputFilePath + "\"";
+                        break;
+                    }
+
+                case SourceLanguage.Python:
+                    {
+                        outputFilePath = outputFilePath.Replace("\\", "/");
+                        var loadCode = $"from boa.compiler import Compiler;Compiler.load_and_save('{outputFilePath}')";
+                        info.FileName = "python.exe";
+                        info.Arguments = $"-c \"{loadCode}\"";
+                        info.WorkingDirectory = @"D:\code\Crypto\neo-boa";
                         break;
                     }
 
@@ -50,7 +67,6 @@ namespace Neo.Debugger.Core.Utils
                     }
             }
 
-            info.Arguments = "\"" + outputFilePath + "\"";
             info.UseShellExecute = false;
             info.RedirectStandardInput = false;
             info.RedirectStandardOutput = true;
@@ -67,7 +83,7 @@ namespace Neo.Debugger.Core.Utils
                 proc.Start();
                 proc.WaitForExit();
 
-                var log = proc.StandardOutput.ReadToEnd().Split('\n');
+                var log = FetchLog(proc.StandardOutput.ReadToEnd());
                 string last = null;
                 foreach (var temp in log)
                 {
@@ -80,14 +96,35 @@ namespace Neo.Debugger.Core.Utils
                     last = line;
                 }
 
-                if (proc.ExitCode != 0 || last != "SUCC")
+                switch (language)
                 {
-                    log = proc.StandardError.ReadToEnd().Split('\n');
-                    foreach (var line in log)
-                    {
-                        Log(line);
-                    }
+                    case SourceLanguage.CSharp:
+                        {
+                            if (last == "SUCC")
+                            {
+                                success = true;
+                            }
+                            break;
+                        }
 
+                    case SourceLanguage.Python:
+                        {
+                            if (log.Length == 0)
+                            {
+                                success = true;
+                            }
+                            break;
+                        }
+                }
+
+                log = FetchLog(proc.StandardError.ReadToEnd());
+                foreach (var line in log)
+                {
+                    Log(line);
+                }
+
+                if (proc.ExitCode != 0 || !success)
+                {
                     Log("Error during compilation.");
                 }
                 else
