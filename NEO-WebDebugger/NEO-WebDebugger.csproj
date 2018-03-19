@@ -47,6 +47,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Humanizer, Version=2.2.0.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Humanizer.Core.2.2.0\lib\netstandard1.0\Humanizer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.2.3\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
     </Reference>
@@ -164,8 +167,28 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Resource Include="Contracts\CSharp\AgencyTransaction.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Content Include="Contracts\CSharp\Domain.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Contracts\CSharp\HelloWorld.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Contracts\CSharp\ICOTemplate.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Contracts\CSharp\Lock.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Contracts\CSharp\StructExample.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Compile Include="Controllers\CompilerController.cs" />
+    <Compile Include="Controllers\ContractController.cs" />
     <Compile Include="Controllers\IDEController.cs" />
+    <Compile Include="Logic\ContractsHelper.cs" />
     <Compile Include="SignalR\DebuggerHub.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -175,6 +198,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Images\NEO_Logo.png" />
+    <Content Include="Contracts\Python\HelloWorld.py">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css">
@@ -760,6 +786,7 @@
     <Content Include="Scripts\SemanticUI\themes\default\assets\fonts\icons.woff" />
     <Content Include="Scripts\SemanticUI\themes\default\assets\fonts\icons.woff2" />
     <Content Include="Views\IDE\Index.cshtml" />
+    <Content Include="Views\Contract\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
