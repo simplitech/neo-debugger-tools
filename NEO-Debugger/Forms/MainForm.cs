@@ -13,6 +13,7 @@ using Neo.Debugger.Core.Utils;
 using Neo.Debugger.Core.Data;
 using System.Text.RegularExpressions;
 using Neo.VM;
+using System.Collections.Generic;
 
 namespace Neo.Debugger.Forms
 {
@@ -24,6 +25,11 @@ namespace Neo.Debugger.Forms
         private Settings _settings;
         private DebugManager _debugger;
         private Scintilla TextArea;
+
+        private string _sourceFileName;
+        private SourceLanguage _sourceLanguage { get { return _debugger.Language; } }
+
+        private Dictionary<SourceLanguage, List<string>> templates = new Dictionary<SourceLanguage, List<string>>();
 
         public MainForm(string argumentsAvmFile)
         {
@@ -64,11 +70,48 @@ namespace Neo.Debugger.Forms
             //Init the UI controls
             InitUI();
 
+            // load all templates in the Contracts folder and sort them by languuage
+            LoadTemplates();
+
             //Setup emulator log
             Emulator.API.Runtime.OnLogMessage = SendLogToPanel;
 
             //Init the debugger
             InitDebugger();
+        }
+
+        private void LoadTemplates()
+        {
+
+            string[] filePaths = Directory.GetFiles("Contracts", "*.*", SearchOption.TopDirectoryOnly);
+            foreach (var fileName in filePaths)
+            {
+                var language = LanguageSupport.DetectLanguage(fileName);
+                if (language == SourceLanguage.Other)
+                {
+                    continue;
+                }
+
+                List<string> templateList;
+                if (templates.ContainsKey(language))
+                {
+                    templateList = templates[language];
+                }
+                else
+                {
+                    templateList = new List<string>();
+                    templates[language] = templateList;
+                }
+
+                templateList.Add(fileName);
+            }
+
+            foreach (var language in templates.Keys)
+            {
+                var temp = language.ToString().Replace("Sharp", "#");
+                var item = newToolStripMenuItem.DropDownItems.Add(temp);
+                item.Click += newToolStripMenuItem_Click;
+            }
         }
 
         #region Initializers
@@ -178,7 +221,7 @@ namespace Neo.Debugger.Forms
             {
                 ClearLog();
 
-                if (!_debugger.PrecompileContract(TextArea.Text, "DebugContract.cs"))
+                if (!_debugger.PrecompileContract(TextArea.Text, this._sourceLanguage))
                     return;
 
                 LoadDebugFile(_debugger.AvmFilePath);
@@ -209,7 +252,7 @@ namespace Neo.Debugger.Forms
             {
                 ClearLog();
 
-                if (!_debugger.PrecompileContract(TextArea.Text, "DebugContract.cs"))
+                if (!_debugger.PrecompileContract(TextArea.Text, this._sourceLanguage))
                     return;
 
                 LoadDebugFile(_debugger.AvmFilePath);
@@ -694,13 +737,20 @@ namespace Neo.Debugger.Forms
 
         private void LoadContractTemplate(string fileName)
         {
-            //If we are creating a new file, we assume C# since that's all the compiler currently supports
-            if (_debugger.Language == SourceLanguage.Other)
-                _debugger.Language = SourceLanguage.CSharp;
+            _debugger.Language = LanguageSupport.DetectLanguage(fileName);
 
             string templatePath = Path.Combine(System.Environment.CurrentDirectory, "Contracts", fileName);
+
+            if (!File.Exists(templatePath))
+            {
+                SendLogToPanel("Could not load template: "+templatePath);
+                return;
+            }
+
             string template = File.ReadAllText(templatePath);
 
+            _sourceFileName = fileName;
+            
             ClearTextArea();
             FileName.Text = fileName;
             TextArea.Text = template;
@@ -708,8 +758,16 @@ namespace Neo.Debugger.Forms
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //We can default to whatever...
-            LoadContractTemplate("HelloWorld.cs");
+            ToolStripMenuItem item = (ToolStripMenuItem)sender;
+
+
+            var language = (item.Text == "C#") ? SourceLanguage.CSharp : (SourceLanguage)Enum.Parse(typeof(SourceLanguage), item.Text);
+
+            string extension = LanguageSupport.GetExtension(language);
+
+
+            var templateFileName = $"HelloWorld{extension}";
+            LoadContractTemplate(templateFileName);
         }
 
         private void newFromTemplateToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1164,7 +1222,7 @@ namespace Neo.Debugger.Forms
         {
             ClearLog();
 
-            if (!_debugger.PrecompileContract(TextArea.Text, "DebugContract.cs"))
+            if (!_debugger.PrecompileContract(TextArea.Text, this._sourceLanguage))
                 return;
 
             LoadDebugFile(_debugger.AvmFilePath);

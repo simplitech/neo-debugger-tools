@@ -1,4 +1,5 @@
-﻿using Neo.Debugger.Core.Models;
+﻿using Neo.Debugger.Core.Data;
+using Neo.Debugger.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,7 +23,7 @@ namespace Neo.Debugger.Core.Utils
             _settings = settings;
         }
 
-        public bool CompileContract(string sourceCode, string outputFilePath)
+        public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language)
         {
             bool success = false;
             if (string.IsNullOrEmpty(outputFilePath))
@@ -31,14 +32,33 @@ namespace Neo.Debugger.Core.Utils
             File.WriteAllText(outputFilePath, sourceCode);
 
             var proc = new Process();
-            proc.StartInfo.FileName = "neon.exe";
-            proc.StartInfo.Arguments = "\"" + outputFilePath + "\"";
-            proc.StartInfo.UseShellExecute = false;
-            proc.StartInfo.RedirectStandardInput = false;
-            proc.StartInfo.RedirectStandardOutput = true;
-            proc.StartInfo.RedirectStandardError = true;
-            proc.StartInfo.CreateNoWindow = true;
+
+            var info = new ProcessStartInfo();
+
+            switch (language)
+            {
+                case SourceLanguage.CSharp:
+                    {
+                        info.FileName = "neon.exe";
+                        break;
+                    }
+
+                default:
+                    {
+                        Log("Unsupported languuge...");
+                        return false;
+                    }
+            }
+
+            info.Arguments = "\"" + outputFilePath + "\"";
+            info.UseShellExecute = false;
+            info.RedirectStandardInput = false;
+            info.RedirectStandardOutput = true;
+            info.RedirectStandardError = true;
+            info.CreateNoWindow = true;
             proc.EnableRaisingEvents = true;
+
+            proc.StartInfo = info;
 
             try
             {

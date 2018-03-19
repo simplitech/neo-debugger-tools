@@ -587,20 +587,23 @@ namespace Neo.Debugger.Core.Utils
             return true;
         }
 
-        public bool PrecompileContract(string sourceCode, string sourceFile)
+        public bool PrecompileContract(string sourceCode, SourceLanguage language)
         {
             Compiler compiler = new Compiler(_settings);
             compiler.SendToLog += Compiler_SendToLog;
 
+            var extension = LanguageSupport.GetExtension(language);
+            var sourceFile = "TempContract" + extension;
+
             Directory.CreateDirectory(_settings.path);
             var fileName = Path.Combine(_settings.path, sourceFile);
 
-            bool success = compiler.CompileContract(sourceCode, fileName);
+            bool success = compiler.CompileContract(sourceCode, fileName, language);
 
             if (success)
             {
                 _srcFileName = sourceFile;
-                _avmFilePath = fileName.Replace(".cs", ".avm");
+                _avmFilePath = fileName.Replace(extension, ".avm");
             }
 
             //Reset the flag

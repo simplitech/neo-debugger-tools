@@ -48,5 +48,17 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
+        public static string GetExtension(SourceLanguage language)
+        {
+            switch (language)
+            {
+                case SourceLanguage.CSharp: return ".cs";
+                case SourceLanguage.Assembly: return ".asm";
+                case SourceLanguage.Java: return ".java";
+                case SourceLanguage.Python: return ".py";
+                default: return null;
+            }
+        }
+
     }
 }
