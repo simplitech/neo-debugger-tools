@@ -284,14 +284,9 @@ namespace Neo.Debugger.Core.Utils
             {
                 Log("File not found. " + avmPath);
                 return false;
-            }            
-            else if (File.Exists(_oldMapFilePath))
-            {
-                Log("Old map file format found.  Please recompile your avm with the latest compiler.");
-                return false;
             }
 
-            _debugContent = new Dictionary<DebugMode, string>();
+           _debugContent = new Dictionary<DebugMode, string>();
             _mode = DebugMode.Assembly;
             _language = SourceLanguage.Other;
             _contractName = Path.GetFileNameWithoutExtension(_avmFilePath);
@@ -328,8 +323,15 @@ namespace Neo.Debugger.Core.Utils
             else
             {
                 _map = null;
-                Log($"Warning: Could not find {_mapFilePath}");
-                //return false;
+
+                if (File.Exists(_oldMapFilePath))
+                {
+                    Log("Old map file format found.  Please recompile your avm with the latest compiler.");
+                }
+                else
+                {
+                    Log($"Warning: Could not find {_mapFilePath}");
+                }
             }
 
             if (_map != null && _map.Entries.Any())
