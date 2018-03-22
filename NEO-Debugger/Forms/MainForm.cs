@@ -1130,7 +1130,7 @@ namespace Neo.Debugger.Forms
             }
 
             TextArea.ReadOnly = false;
-            TextArea.Text = _debugger.DebugContent[_debugger.Mode];
+            TextArea.Text = _debugger.DebugContent != null &&_debugger.DebugContent.ContainsKey(_debugger.Mode) ? _debugger.DebugContent[_debugger.Mode] : "";
             _debugger.Precompile = false;
         }
 
