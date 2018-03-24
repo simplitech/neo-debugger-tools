@@ -16,7 +16,7 @@ namespace Neo.WebDebugger
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Compiler", action = "Index", id = UrlParameter.Optional }
+                defaults: new { controller = "IDE", action = "Index", id = UrlParameter.Optional }
             );
         }
     }

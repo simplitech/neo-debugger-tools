@@ -10,11 +10,6 @@ namespace Neo.WebDebugger.Controllers
 {
     public class CompilerController : Controller
     {
-        public ActionResult Index()
-        {
-            return View();
-        }
-
         [HttpPost]
         public ActionResult Compile(string source)
         {
