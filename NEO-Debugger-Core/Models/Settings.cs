@@ -51,7 +51,7 @@ namespace Neo.Debugger.Core.Models
                     }
                 }
 
-                var compilersNode = root.GetNode("lastparams");
+                var compilersNode = root.GetNode("compilers");
                 if (compilersNode != null)
                 {
                     foreach (var child in compilersNode.Children)
@@ -85,6 +85,16 @@ namespace Neo.Debugger.Core.Models
                 paramsNode.AddNode(node);
             }
             root.AddNode(paramsNode);
+
+            var compilersNode = DataNode.CreateArray("compilers");
+            foreach (var entry in this.compilerPaths)
+            {
+                var node = DataNode.CreateObject();
+                node.AddField("language", entry.Key);
+                node.AddField("path", entry.Value);
+                compilersNode.AddNode(node);
+            }
+            root.AddNode(compilersNode);
 
             var json = JSONWriter.WriteToString(root);
 

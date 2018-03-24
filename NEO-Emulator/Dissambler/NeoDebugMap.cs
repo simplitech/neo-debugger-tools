@@ -27,6 +27,10 @@ namespace Neo.Emulator.Dissambler
 
         public string contractName { get; private set; }
 
+        public IEnumerable<string> FileNames => _fileNames;
+        private HashSet<string> _fileNames = new HashSet<string>();
+
+
         public void LoadFromFile(string path, byte[] bytes)
         {
             if (!File.Exists(path))
@@ -55,6 +59,8 @@ namespace Neo.Emulator.Dissambler
                 this.contractName = Path.GetFileNameWithoutExtension(path);
             }
 
+            _fileNames.Clear();
+
             var files = new Dictionary<int, string>();
             var fileNode = root["files"];
             foreach (var temp in fileNode.Children)
@@ -79,6 +85,11 @@ namespace Neo.Emulator.Dissambler
                 entry.line = temp.GetInt32("line");
                 entry.url = files[fileID];
                 _entries.Add(entry);
+
+                if (!string.IsNullOrEmpty(entry.url))
+                {
+                    _fileNames.Add(entry.url);
+                }
             }
         }
 

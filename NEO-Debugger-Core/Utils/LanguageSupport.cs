@@ -42,6 +42,7 @@ namespace Neo.Debugger.Core.Utils
                 case ".java": return SourceLanguage.Java;
                 case ".py": return SourceLanguage.Python;
                 case ".js": return SourceLanguage.Javascript;
+                case ".avm": 
                 case ".asm": return SourceLanguage.Assembly;
 
                 default: return SourceLanguage.Other;

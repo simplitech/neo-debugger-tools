@@ -15,10 +15,4 @@ namespace Neo.Debugger.Core.Data
         Python,
         Javascript
     }
-
-    public enum DebugMode
-    {
-        Assembly,
-        Source
-    }
 }

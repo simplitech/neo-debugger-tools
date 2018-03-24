@@ -27,7 +27,7 @@ namespace Neo.Debugger.Forms
         private Scintilla TextArea;
 
         private string _sourceFileName;
-        private SourceLanguage _sourceLanguage { get { return _debugger.Language; } }
+        private SourceLanguage _sourceLanguage;
 
         private Dictionary<SourceLanguage, List<string>> templates = new Dictionary<SourceLanguage, List<string>>();
 
@@ -181,7 +181,7 @@ namespace Neo.Debugger.Forms
             bool success = false;
             try
             {
-                success = LoadDebugFile(_sourceAvmPath);
+                success = LoadContract(_sourceAvmPath);
             }
             catch (Exception)
             {
@@ -198,7 +198,7 @@ namespace Neo.Debugger.Forms
             }
         }
 
-        private bool LoadDebugFile(string avmFilePath)
+        private bool LoadContract(string avmFilePath)
         {
             if (!_debugger.LoadAvmFile(avmFilePath))
                 return false;
@@ -212,10 +212,14 @@ namespace Neo.Debugger.Forms
             _debugger.LoadTests();
 
             //Set the UI
-            FileName.Text = _debugger.AvmFileName;
             this.Text += " - " + FileName.Text;
-            UpdateSourceViewMenus();
-            ReloadTextArea();
+
+            _debugger.IsCompiled = false;
+
+            ReloadProjectTree();
+
+            ReloadTextArea(_debugger.CurrentFile);
+
             return true;
         }
 
@@ -223,7 +227,7 @@ namespace Neo.Debugger.Forms
 
         #region Debugger Actions
 
-        private bool PreCompile()
+        private bool CompileContract()
         {
             if (!_settings.compilerPaths.ContainsKey(_sourceLanguage))
             {
@@ -271,7 +275,7 @@ namespace Neo.Debugger.Forms
                 _settings.Save();
             }
 
-            return _debugger.PrecompileContract(TextArea.Text, _sourceLanguage);
+            return _debugger.CompileContract(TextArea.Text, _sourceLanguage);
         }
 
         private void RunDebugger()
@@ -283,16 +287,16 @@ namespace Neo.Debugger.Forms
                 return;
             }
 
-            if (_debugger.Precompile)
+            if (!_debugger.IsCompiled)
             {
                 ClearLog();
 
-                if (!PreCompile())
+                if (!CompileContract())
                 {
                     return;
                 }
 
-                LoadDebugFile(_debugger.AvmFilePath);
+                LoadContract(_debugger.AvmFilePath);
             }
 
             if (_debugger.ResetFlag && !ResetDebugger())
@@ -316,14 +320,14 @@ namespace Neo.Debugger.Forms
                 return;
             }
 
-            if (_debugger.Precompile)
+            if (!_debugger.IsCompiled)
             {
                 ClearLog();
 
-                if (!PreCompile())
+                if (!CompileContract())
                     return;
 
-                LoadDebugFile(_debugger.AvmFilePath);
+                LoadContract(_debugger.AvmFilePath);
             }
 
             if (_debugger.ResetFlag && !ResetDebugger())
@@ -582,8 +586,7 @@ namespace Neo.Debugger.Forms
             HotKeyManager.AddHotKey(this, RunDebugger, Keys.F5);
             HotKeyManager.AddHotKey(this, OpenStorage, Keys.F6);
             HotKeyManager.AddHotKey(this, StepDebugger, Keys.F10);
-            HotKeyManager.AddHotKey(this, ToggleDebuggerSource, Keys.F12);
-        }
+       }
 
         public void InitDragDropFile()
         {
@@ -607,7 +610,7 @@ namespace Neo.Debugger.Forms
                     {
                         string path = a.GetValue(0).ToString();
 
-                        LoadDebugFile(path);
+                        LoadContract(path);
                     }
                 }
             };
@@ -666,13 +669,15 @@ namespace Neo.Debugger.Forms
             stackLabel.Left = stackPanel.Left;
             stackLabel.Top = logLabel.Top;
 
+            projectTree.Height = stackPanel.Top - (projectTree.Top + padding);
+
             gasCostLabel.Left = this.ClientSize.Width - 105;
         }
 
         private void TextArea_OnTextChanged(object sender, EventArgs e)
         {
             //Document is dirty, we will need to force a recompile before next debug
-            _debugger.Precompile = true;
+            _debugger.IsCompiled = false;
         }
 
         #endregion
@@ -684,7 +689,7 @@ namespace Neo.Debugger.Forms
             openFileDialog.Filter = "NEO AVM files|*.avm";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                LoadDebugFile(openFileDialog.FileName);
+                LoadContract(openFileDialog.FileName);
             }
         }
 
@@ -805,8 +810,6 @@ namespace Neo.Debugger.Forms
 
         private void LoadContractTemplate(string fileName)
         {
-            _debugger.Language = LanguageSupport.DetectLanguage(fileName);
-
             string templatePath = Path.Combine(System.Environment.CurrentDirectory, "Contracts", fileName);
 
             if (!File.Exists(templatePath))
@@ -815,13 +818,23 @@ namespace Neo.Debugger.Forms
                 return;
             }
 
-            string template = File.ReadAllText(templatePath);
-
             _sourceFileName = fileName;
-            
-            ClearTextArea();
-            FileName.Text = fileName;
-            TextArea.Text = template;
+            _debugger.Clear();
+
+            string templateCode = File.ReadAllText(templatePath);
+
+            var language = LanguageSupport.DetectLanguage(fileName);
+
+            ReloadTextArea(fileName, templateCode);
+
+            if (!this.CompileContract())
+            {
+                SendLogToPanel("Could not compile template!");
+                return;
+            }
+
+            // We force reload of the avm in order to initialize everything properly (eg: build the project file explorer)
+            LoadContract(_debugger.AvmFilePath);
         }
 
         private SourceLanguage FromMenuItem(ToolStripItem item)
@@ -1119,9 +1132,45 @@ namespace Neo.Debugger.Forms
             }
         }
 
-        private void ClearTextArea()
+        private TreeNode selectedNode = null;
+        
+        private void ReloadTextArea(string filePath)
         {
-            var keywords = LanguageSupport.GetLanguageKeywords(_debugger.Language);
+            string content;
+
+            try
+            {
+                content = _debugger.GetContentFor(filePath);
+            }
+            catch
+            {
+                if (File.Exists(filePath))
+                {
+                    content = File.ReadAllText(filePath);
+                }
+                else
+                {
+                    SendLogToPanel($"Could not load file: {filePath}");
+                    return;
+                }
+            }
+
+            ReloadTextArea(filePath, content);
+        }
+
+        // file path must exist in current project!
+        private void ReloadTextArea(string filePath, string content)
+        {
+            if (selectedNode != null)
+            {
+                selectedNode.NodeFont = new Font(this.Font, FontStyle.Regular);
+            }
+
+            FileName.Text = filePath;
+
+            _sourceLanguage = LanguageSupport.DetectLanguage(filePath);
+
+            var keywords = LanguageSupport.GetLanguageKeywords(_sourceLanguage);
 
             if (keywords.Length == 2)
             {
@@ -1130,54 +1179,40 @@ namespace Neo.Debugger.Forms
             }
 
             TextArea.ReadOnly = false;
-            TextArea.Text = _debugger.DebugContent != null &&_debugger.DebugContent.ContainsKey(_debugger.Mode) ? _debugger.DebugContent[_debugger.Mode] : "";
-            _debugger.Precompile = false;
+            TextArea.Text = content;
+            TextArea.ReadOnly = filePath == _debugger.AvmFilePath;
+
+            foreach (TreeNode node in projectTree.Nodes)
+            {
+                if (node.Name == filePath)
+                {
+                    node.NodeFont = new Font(this.Font, FontStyle.Bold);
+                    selectedNode = node;
+                    break;
+                }
+            }
         }
 
-        private void ReloadTextArea()
+        private void AddNodeToProjectTree(string path)
         {
-            var keywords = LanguageSupport.GetLanguageKeywords(_debugger.Language);
-
-            if (keywords.Length == 2)
-            {
-                TextArea.SetKeywords(0, keywords[0]);
-                TextArea.SetKeywords(1, keywords[1]);
-            }
-
-            TextArea.ReadOnly = false;
-            TextArea.Text = _debugger.DebugContent[_debugger.Mode];
-            _debugger.Precompile = false;
+            var fileName = Path.GetFileName(path);
+            var node = projectTree.Nodes.Add(path, fileName);
         }
 
-        private void ToggleDebuggerSource()
+        private void ReloadProjectTree()
         {
-            if (!_debugger.MapLoaded)
+            selectedNode = null;
+            projectTree.Nodes.Clear();
+
+            AddNodeToProjectTree(_debugger.AvmFilePath);
+
+            if (_debugger.MapLoaded)
             {
-                MessageBox.Show("Map file not available for this .avm");
-                return;
+                foreach (var path in _debugger.Map.FileNames)
+                {
+                    AddNodeToProjectTree(path);
+                }
             }
-
-            //Toggle debug mode
-            _debugger.ToggleDebugMode();
-
-            ReloadTextArea();
-
-            var breakpointLines = _debugger.GetBreakPointLineNumbers();
-            foreach(var line in breakpointLines)
-            {
-                TextArea.Lines[line].MarkerAdd(BREAKPOINT_MARKER);
-            }
-
-            if (_debugger.IsSteppingOrOnBreakpoint)
-                TextArea.Lines[_debugger.CurrentLine].MarkerAdd(STEP_BG);
-
-            UpdateSourceViewMenus();
-        }
-
-        private void UpdateSourceViewMenus()
-        {
-            assemblyToolStripMenuItem.Enabled = _debugger.Mode != DebugMode.Assembly;
-            originalToolStripMenuItem.Enabled = _debugger.Mode != DebugMode.Source;
         }
 
         private void OpenStorage()
@@ -1265,24 +1300,10 @@ namespace Neo.Debugger.Forms
 
         private void originalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!_debugger.AvmFileLoaded)
-                return;
-
-            if (_debugger.Mode != DebugMode.Source)
-            {
-                ToggleDebuggerSource();
-            }
         }
 
         private void assemblyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!_debugger.AvmFileLoaded)
-                return;
-
-            if (_debugger.Mode != DebugMode.Assembly)
-            {
-                ToggleDebuggerSource();
-            }
         }
 
         private void blockchainToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1301,15 +1322,15 @@ namespace Neo.Debugger.Forms
         {
             ClearLog();
 
-            if (!PreCompile())
+            if (!CompileContract())
                 return;
 
-            LoadDebugFile(_debugger.AvmFilePath);
+            LoadContract(_debugger.AvmFilePath);
         }
 
         private void Form_LoadCompiledContract(object sender, LoadCompiledContractEventArgs e)
         {
-            LoadDebugFile(e.AvmPath);
+            LoadContract(e.AvmPath);
         }
 
         private void keyDecoderToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1381,6 +1402,15 @@ namespace Neo.Debugger.Forms
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 _debugger.Blockchain.Load(openFileDialog.FileName);
+            }
+        }
+
+        private void projectTree_DoubleClick(object sender, EventArgs e)
+        {
+            var node = projectTree.GetNodeAt(projectTree.PointToClient(Cursor.Position));
+            if (node != null)
+            {
+                ReloadTextArea(node.Name);
             }
         }
     }

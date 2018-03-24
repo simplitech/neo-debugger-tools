@@ -81,6 +81,7 @@
             this.stackPanel = new System.Windows.Forms.RichTextBox();
             this.stackLabel = new System.Windows.Forms.Label();
             this.gasCostLabel = new System.Windows.Forms.Label();
+            this.projectTree = new System.Windows.Forms.TreeView();
             this.menuStrip1.SuspendLayout();
             this.PanelSearch.SuspendLayout();
             this.SuspendLayout();
@@ -90,10 +91,10 @@
             this.TextPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.TextPanel.Location = new System.Drawing.Point(8, 95);
+            this.TextPanel.Location = new System.Drawing.Point(208, 95);
             this.TextPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.TextPanel.Name = "TextPanel";
-            this.TextPanel.Size = new System.Drawing.Size(749, 345);
+            this.TextPanel.Size = new System.Drawing.Size(549, 345);
             this.TextPanel.TabIndex = 0;
             // 
             // FileName
@@ -551,12 +552,21 @@
             this.gasCostLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.gasCostLabel.Visible = false;
             // 
+            // projectTree
+            // 
+            this.projectTree.Location = new System.Drawing.Point(12, 95);
+            this.projectTree.Name = "projectTree";
+            this.projectTree.Size = new System.Drawing.Size(181, 345);
+            this.projectTree.TabIndex = 16;
+            this.projectTree.DoubleClick += new System.EventHandler(this.projectTree_DoubleClick);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(769, 628);
+            this.Controls.Add(this.projectTree);
             this.Controls.Add(this.gasCostLabel);
             this.Controls.Add(this.stackLabel);
             this.Controls.Add(this.stackPanel);
@@ -639,6 +649,7 @@
         private System.Windows.Forms.ToolStripMenuItem viewToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem1;
+        private System.Windows.Forms.TreeView projectTree;
     }
 }
 

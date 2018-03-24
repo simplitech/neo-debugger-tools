@@ -43,11 +43,11 @@ namespace Neo.Debugger.Core.Utils
                 return _emulator.usedGas;
             }
         }
-        public DebugMode Mode
+        public string CurrentFile
         {
             get
             {
-                return _mode;
+                return _currentFile;
             }
         }
         public bool ResetFlag
@@ -71,36 +71,12 @@ namespace Neo.Debugger.Core.Utils
                 return _state.offset;
             }
         }
+
         public int CurrentLine
         {
             get
             {
                 return _currentLine;
-            }
-        }
-        public SourceLanguage Language
-        {
-            get
-            {
-                return _language;
-            }
-            set
-            {
-                _language = value;
-            }
-        }
-        public Dictionary<DebugMode, string> DebugContent
-        {
-            get
-            {
-                return _debugContent;
-            }
-        }
-        public string AvmFileName
-        {
-            get
-            {
-                return Path.GetFileName(_avmFilePath);
             }
         }
 
@@ -160,6 +136,8 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
+        public NeoMapFile Map => _map;
+
         public bool SmartContractDeployed
         {
             get
@@ -176,21 +154,15 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
-        public string SourceFile
-        {
-            get { return _srcFileName; }
-            set { _srcFileName = value; }
-        }
-
-        public bool Precompile
+        public bool IsCompiled
         {
             get
             {
-                return _precompile;
+                return _isCompiled;
             }
             set
             {
-                _precompile = value;
+                _isCompiled = value;
             }
         }
 
@@ -205,17 +177,16 @@ namespace Neo.Debugger.Core.Utils
         //Debugger State
         private bool _resetFlag;
         private int _currentLine;
-        private DebugMode _mode;
+        private string _currentFile;
         private DebuggerState _state;
-        private SourceLanguage _language;
 
         //Debugging Emulator and Content
         private NeoEmulator _emulator { get; set; }
-        private Dictionary<DebugMode, string> _debugContent { get; set; }
+        private Dictionary<string, string> _debugContent = new Dictionary<string, string>();
         private ABI _aBI { get; set; }
         private NeoMapFile _map { get; set; }
         private AVMDisassemble _avmAsm { get; set; }
-        private bool _precompile { get; set; }
+        private bool _isCompiled { get; set; }
 
         //Context
         private string _contractName { get; set; }
@@ -262,11 +233,27 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
-        private string _srcFileName;
-
         public DebugManager(Settings settings)
         {
             _settings = settings;
+        }
+
+        public void Clear()
+        {
+            _isCompiled = false;
+            _map = null;
+            _avmFileLoaded = false;
+            _avmFilePath = null;
+        }
+
+        public string GetContentFor(string path)
+        {
+            if (_debugContent.ContainsKey(path))
+            {
+                return _debugContent[path];
+            }
+
+            throw new ArgumentException("Invalid path: " + path);
         }
 
         public bool LoadAvmFile(string avmPath)
@@ -286,9 +273,9 @@ namespace Neo.Debugger.Core.Utils
                 return false;
             }
 
-           _debugContent = new Dictionary<DebugMode, string>();
-            _mode = DebugMode.Assembly;
-            _language = SourceLanguage.Other;
+            _currentFile = null;   // Initialize to null, we set it later to proper value depending on the available source files
+            _debugContent.Clear();
+            
             _contractName = Path.GetFileNameWithoutExtension(_avmFilePath);
             _contractByteCode = File.ReadAllBytes(_avmFilePath);
             _map = new NeoMapFile();
@@ -312,9 +299,6 @@ namespace Neo.Debugger.Core.Utils
                 Log($"Warning: {_abiFilePath} was not found. Please recompile your AVM with the latest compiler.");
             }
 
-            //We always should have the assembly content
-            _debugContent[DebugMode.Assembly] = _avmAsm.ToString();
-
             //Let's see if we have source code we can map
             if (File.Exists(_mapFilePath))
             {
@@ -334,18 +318,41 @@ namespace Neo.Debugger.Core.Utils
                 }
             }
 
-            if (_map != null && _map.Entries.Any())
+            if (_map != null)
             {
-                _srcFileName = _map.Entries.FirstOrDefault().url;
-                if (string.IsNullOrEmpty(_srcFileName))
-                    throw new Exception("Error: Could not load the debug map correctly, no source file specified in map.");
-                if (!File.Exists(_srcFileName))
-                    throw new Exception($"Error: Could not load the source code, check that this file exists: {_srcFileName}");
+                foreach (var entry in _map.FileNames)
+                {
+                    if (string.IsNullOrEmpty(entry))
+                    {
+                        continue; 
+                    }
 
-                _debugContent[DebugMode.Source] = File.ReadAllText(_srcFileName);
-                _language = LanguageSupport.DetectLanguage(_srcFileName);
-                _mode = DebugMode.Source;
+                    if (!File.Exists(entry))
+                    {
+                        Log($"Warning: Could not load the source code, check that this file exists: {entry}");
+                        continue;
+                    }
+
+                    var sourceCode = File.ReadAllText(entry);
+                    _debugContent[entry] = sourceCode;
+
+                    if (string.IsNullOrEmpty(_currentFile))
+                    {
+                        _currentFile = entry;
+                    }
+
+                    //_emulator.SetProfilerFilenameSource(entry, sourceCode);
+                }
             }
+
+            // if not source code is available, default to assembly file
+            if (string.IsNullOrEmpty(_currentFile))
+            {
+                _currentFile = _avmFilePath;
+            }
+
+            //We always should have the assembly content
+            _debugContent[_avmFilePath] = _avmAsm.ToString();
 
             //Save the settings
             _settings.lastOpenedFile = avmPath;
@@ -364,11 +371,6 @@ namespace Neo.Debugger.Core.Utils
             var blockchain = new Blockchain();
             blockchain.Load(_blockchainFilePath);
             _emulator = new NeoEmulator(blockchain);
-
-            if (_debugContent.Keys.Contains(DebugMode.Source) && !String.IsNullOrEmpty(_debugContent[DebugMode.Source]))
-            {
-                _emulator.SetProfilerFilenameSource(_srcFileName, _debugContent[DebugMode.Source]);
-            }
 
             return true;
         }
@@ -411,25 +413,16 @@ namespace Neo.Debugger.Core.Utils
         {
             try
             {
-                switch (_mode)
+                if (_currentFile == _avmFilePath)
                 {
-                    case DebugMode.Source:
-                        {
-                            var line = _map.ResolveLine(ofs);
-                            _emulator.SetProfilerLineno(line - 1);
-                            return line - 1;
-                        }
-
-                    case DebugMode.Assembly:
-                        {
-                            var line = _avmAsm.ResolveLine(ofs);
-                            return line + 1;
-                        }
-
-                    default:
-                        {
-                            return -1;
-                        }
+                    var line = _avmAsm.ResolveLine(ofs);
+                    return line + 1;
+                }
+                else
+                {
+                    var line = _map.ResolveLine(ofs);
+                    _emulator.SetProfilerLineno(line - 1);
+                    return line - 1;
                 }
             }
             catch
@@ -442,36 +435,22 @@ namespace Neo.Debugger.Core.Utils
         {
             try
             {
-                switch (_mode)
+                if (_currentFile == _avmFilePath)
                 {
-                    case DebugMode.Source:
-                        {
-                            var ofs = _map.ResolveOffset(line + 1);
-                            _emulator.SetProfilerLineno(line + 1);
-                            return ofs;
-                        }
-
-                    case DebugMode.Assembly:
-                        {
-                            var ofs = _avmAsm.ResolveOffset(line);
-                            return ofs;
-                        }
-
-                    default: return -1;
+                    var ofs = _avmAsm.ResolveOffset(line);
+                    return ofs;
+                }
+                else 
+                {
+                    var ofs = _map.ResolveOffset(line + 1);
+                    _emulator.SetProfilerLineno(line + 1);
+                    return ofs;
                 }
             }
             catch
             {
                 return -1;
             }
-        }
-
-        public void ToggleDebugMode()
-        {
-            if (_mode == DebugMode.Assembly)
-                _mode = DebugMode.Source;
-            else
-                _mode = DebugMode.Assembly;
         }
 
         public List<int> GetBreakPointLineNumbers()
@@ -589,13 +568,16 @@ namespace Neo.Debugger.Core.Utils
             return true;
         }
 
-        public bool PrecompileContract(string sourceCode, SourceLanguage language)
+        public static readonly string TempContractName = "TempContract";
+
+
+        public bool CompileContract(string sourceCode, SourceLanguage language)
         {
             Compiler compiler = new Compiler(_settings);
             compiler.SendToLog += Compiler_SendToLog;
 
             var extension = LanguageSupport.GetExtension(language);
-            var sourceFile = "TempContract" + extension;
+            var sourceFile = TempContractName + extension;
 
             Directory.CreateDirectory(_settings.path);
             var fileName = Path.Combine(_settings.path, sourceFile);
@@ -604,12 +586,10 @@ namespace Neo.Debugger.Core.Utils
 
             if (success)
             {
-                _srcFileName = sourceFile;
                 _avmFilePath = fileName.Replace(extension, ".avm");
             }
 
-            //Reset the flag
-            _precompile = false;
+            _isCompiled = true;
             return success;
         }
 
