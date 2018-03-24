@@ -22,7 +22,7 @@ namespace Neo.WebDebugger.Controllers
             Directory.CreateDirectory(settings.path);
             var fileName = Path.Combine(settings.path, "DebugContract.cs");
 
-            bool success = compiler.CompileContract(source, fileName);
+            bool success = compiler.CompileContract(source, fileName, Debugger.Core.Data.SourceLanguage.CSharp);
 
             if (success)
             {
