@@ -17,13 +17,24 @@ namespace Neo.Compiler.AVM
             var fileMap = new Dictionary<string, int>();
 
             List<byte> bytes = new List<byte>();
+
             foreach (var c in module.total_Codes.Values)
             {
                 if (c.debugcode != null && c.debugline > 0 && c.debugline < 2000)
                 {
+                    var previousDebugEntry = currentDebugEntry;
+
                     currentDebugEntry = new DebugMapEntry();
-                    currentDebugEntry.startOfs = debugMap.Count > 0 ? bytes.Count : 0;
-                    currentDebugEntry.endOfs = currentDebugEntry.startOfs;
+                    if (previousDebugEntry != null)
+                    {
+                        currentDebugEntry.startOfs = bytes.Count;
+                        currentDebugEntry.endOfs = previousDebugEntry.startOfs + 1;
+                    }
+                    else
+                    {
+                        currentDebugEntry.startOfs = 0;
+                        currentDebugEntry.endOfs = bytes.Count;
+                    }
                     currentDebugEntry.url = c.debugcode;
                     currentDebugEntry.line = c.debugline;
 
