@@ -3,17 +3,17 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
-using ScintillaNET;
-using Neo.Debugger.Utils;
+using System.Text.RegularExpressions;
+using System.Collections.Generic;
 using System.Text;
+using ScintillaNET;
 using Neo.Emulator.Utils;
 using Neo.Emulator;
+using Neo.Debugger.Utils;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
 using Neo.Debugger.Core.Data;
-using System.Text.RegularExpressions;
 using Neo.VM;
-using System.Collections.Generic;
 
 namespace Neo.Debugger.Forms
 {
@@ -232,16 +232,13 @@ namespace Neo.Debugger.Forms
             if (!_settings.compilerPaths.ContainsKey(_sourceLanguage))
             {
                 string compilerPath = "";
+                string compilerFile = null;
 
                 switch (_sourceLanguage)
                 {
                     case SourceLanguage.CSharp:
                         {
-                            compilerPath = Util.FindExecutablePath("neon.exe");
-                            if (!string.IsNullOrEmpty(compilerPath))
-                            {
-                                SendLogToPanel("Found C# Neo compiler: " + compilerPath);
-                            }
+                            compilerFile = "neon.exe";
                             break;
                         }
 
@@ -254,17 +251,49 @@ namespace Neo.Debugger.Forms
                                 return false;
                             }
 
+                            compilerFile = "boa/compiler.py";
+
                             break;
+                        }
+
+                    default: {
+                            SendLogToPanel($"Compilation of {_sourceAvmPath} is currently not supported.");
+                            return false;
                         }
                 }
 
+                compilerPath = Util.FindExecutablePath(compilerFile);
+
+                browserFolder:
+
                 if (string.IsNullOrEmpty(compilerPath))
                 {
-                    if (InputUtils.ShowInputDialog($"Insert path to {_sourceLanguage} compiler", ref compilerPath) != DialogResult.OK)
+
+                    using (var fbd = new FolderBrowserDialog())
                     {
-                        return false;
+                        fbd.Description = "Select location of " + compilerFile;
+                        DialogResult result = fbd.ShowDialog();
+
+                        if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                        {
+                            compilerPath = fbd.SelectedPath;
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
                 }
+
+                var fullPath = compilerPath + "/" + compilerFile;
+                if (!File.Exists(fullPath))
+                {
+                    SendLogToPanel($"{compilerFile} not found at {compilerPath}");
+                    compilerPath = null;
+                    goto browserFolder;
+                }
+
+                SendLogToPanel($"Found {_sourceLanguage} Neo compiler: " + compilerPath);
 
                 if (string.IsNullOrEmpty(compilerPath))
                 {
@@ -761,7 +790,6 @@ namespace Neo.Debugger.Forms
 
         private void wordWrapToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-
             // toggle word wrap
             wordWrapItem.Checked = !wordWrapItem.Checked;
             TextArea.WrapMode = wordWrapItem.Checked ? WrapMode.Word : WrapMode.None;
@@ -769,7 +797,6 @@ namespace Neo.Debugger.Forms
 
         private void indentGuidesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             // toggle indent guides
             indentGuidesItem.Checked = !indentGuidesItem.Checked;
             TextArea.IndentationGuides = indentGuidesItem.Checked ? IndentView.LookBoth : IndentView.None;
@@ -777,7 +804,6 @@ namespace Neo.Debugger.Forms
 
         private void hiddenCharactersToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             // toggle view whitespace
             hiddenCharactersItem.Checked = !hiddenCharactersItem.Checked;
             TextArea.ViewWhitespace = hiddenCharactersItem.Checked ? WhitespaceMode.VisibleAlways : WhitespaceMode.Invisible;

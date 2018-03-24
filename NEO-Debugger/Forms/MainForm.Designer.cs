@@ -59,9 +59,6 @@
             this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stepToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.sourceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.originalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.assemblyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.blockchainToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -310,7 +307,6 @@
             this.runToolStripMenuItem,
             this.stepToolStripMenuItem,
             this.resetToolStripMenuItem,
-            this.sourceToolStripMenuItem,
             this.toolStripMenuItem2});
             this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
             this.debugToolStripMenuItem.Size = new System.Drawing.Size(62, 23);
@@ -338,30 +334,6 @@
             this.resetToolStripMenuItem.Size = new System.Drawing.Size(151, 24);
             this.resetToolStripMenuItem.Text = "Reset";
             this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
-            // 
-            // sourceToolStripMenuItem
-            // 
-            this.sourceToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.originalToolStripMenuItem,
-            this.assemblyToolStripMenuItem});
-            this.sourceToolStripMenuItem.Name = "sourceToolStripMenuItem";
-            this.sourceToolStripMenuItem.ShortcutKeyDisplayString = "F12";
-            this.sourceToolStripMenuItem.Size = new System.Drawing.Size(151, 24);
-            this.sourceToolStripMenuItem.Text = "Source";
-            // 
-            // originalToolStripMenuItem
-            // 
-            this.originalToolStripMenuItem.Name = "originalToolStripMenuItem";
-            this.originalToolStripMenuItem.Size = new System.Drawing.Size(136, 24);
-            this.originalToolStripMenuItem.Text = "Original";
-            this.originalToolStripMenuItem.Click += new System.EventHandler(this.originalToolStripMenuItem_Click);
-            // 
-            // assemblyToolStripMenuItem
-            // 
-            this.assemblyToolStripMenuItem.Name = "assemblyToolStripMenuItem";
-            this.assemblyToolStripMenuItem.Size = new System.Drawing.Size(136, 24);
-            this.assemblyToolStripMenuItem.Text = "Assembly";
-            this.assemblyToolStripMenuItem.Click += new System.EventHandler(this.assemblyToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
@@ -633,9 +605,6 @@
         private System.Windows.Forms.ToolStripMenuItem runToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem stepToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem sourceToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem originalToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem assemblyToolStripMenuItem;
         private System.Windows.Forms.Label gasCostLabel;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
