@@ -92,7 +92,7 @@ namespace Neo.Debugger.Core.Utils
         {
             get
             {
-                return _aBI;
+                return _ABI;
             }
         }
         public string ContractName
@@ -183,7 +183,7 @@ namespace Neo.Debugger.Core.Utils
         //Debugging Emulator and Content
         private NeoEmulator _emulator { get; set; }
         private Dictionary<string, string> _debugContent = new Dictionary<string, string>();
-        private ABI _aBI { get; set; }
+        private ABI _ABI { get; set; }
         private NeoMapFile _map { get; set; }
         private AVMDisassemble _avmAsm { get; set; }
         private bool _isCompiled { get; set; }
@@ -291,11 +291,11 @@ namespace Neo.Debugger.Core.Utils
 
             if (File.Exists(_abiFilePath))
             {
-                _aBI = new ABI(_abiFilePath);
+                _ABI = new ABI(_abiFilePath);
             }
             else
             {
-                _aBI = new ABI();
+                _ABI = new ABI();
                 Log($"Warning: {_abiFilePath} was not found. Please recompile your AVM with the latest compiler.");
             }
 

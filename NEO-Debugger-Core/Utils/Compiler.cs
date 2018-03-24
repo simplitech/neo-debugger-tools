@@ -130,6 +130,18 @@ namespace Neo.Debugger.Core.Utils
                     Log(line);
                 }
 
+                switch (language)
+                {
+                    case SourceLanguage.Python:
+                        {
+                            if (log.Length > 0)
+                            {
+                                success = false;
+                            }
+                            break;
+                        }
+                }
+
                 if (proc.ExitCode != 0 || !success)
                 {
                     Log("Error during compilation.");
