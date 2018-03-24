@@ -71,7 +71,7 @@ namespace Neo.Emulator
     public class NeoEmulator 
     {
         private ExecutionEngine engine;
-        private byte[] contractBytes;
+        public byte[] contractByteCode { get; private set; }
 
         private InteropService interop;
 
@@ -113,7 +113,7 @@ namespace Neo.Emulator
         public void SetExecutingAccount(Account address)
         {
             this.currentAccount = address;
-            this.contractBytes = address.byteCode;
+            this.contractByteCode = address.byteCode;
 
             var assembly = typeof(Neo.Emulator.Helper).Assembly;
             var methods = assembly.GetTypes()
@@ -198,7 +198,7 @@ namespace Neo.Emulator
 
         public void Reset(DataNode inputs)
         {
-            if (contractBytes == null || contractBytes.Length == 0)
+            if (contractByteCode == null || contractByteCode.Length == 0)
             {
                 throw new Exception("Contract bytecode is not set yet!");
             }
@@ -219,7 +219,7 @@ namespace Neo.Emulator
 
             currentTransaction.emulator = this;
             engine = new ExecutionEngine(currentTransaction, Crypto.Default, null, interop);
-            engine.LoadScript(contractBytes);
+            engine.LoadScript(contractByteCode);
 
             foreach (var output in currentTransaction.outputs)
             {
@@ -527,6 +527,18 @@ namespace Neo.Emulator
             else
             {
                 return item.Value;
+            }
+        }
+
+        public byte[] GetExecutingByteCode()
+        {
+            try
+            {
+                return engine.CurrentContext.Script;
+            }
+            catch
+            {
+                return null;
             }
         }
 

@@ -275,6 +275,7 @@ namespace Neo.Debugger.Core.Utils
             try
             {
                 avmDisassemble = NeoDisassembler.Disassemble(_contractByteCode);
+                _disassembles[_contractByteCode] = avmDisassemble;
             }
             catch (DisassembleException e)
             {
@@ -389,6 +390,8 @@ namespace Neo.Debugger.Core.Utils
             return true;
         }
 
+        private Dictionary<byte[], AVMDisassemble> _disassembles = new Dictionary<byte[], AVMDisassemble>(new ByteArrayComparer());
+
         public int ResolveLine(int ofs, bool useMap, out string filePath)
         {
             if (useMap)
@@ -399,8 +402,36 @@ namespace Neo.Debugger.Core.Utils
             }
             else
             {
-                var line = avmDisassemble.ResolveLine(ofs);
-                filePath = AvmFilePath;
+                AVMDisassemble disasm;
+
+                var executingBytecode = _emulator.GetExecutingByteCode();
+                if (executingBytecode == null)
+                {
+                    throw new Exception("Cannot resolve line");
+                }
+
+                if (executingBytecode.SequenceEqual(_emulator.contractByteCode))
+                {
+                    filePath = AvmFilePath;
+                }
+                else
+                {
+                    filePath = "Input.avm";
+                }
+
+                if (_disassembles.ContainsKey(executingBytecode))
+                {
+                    disasm = _disassembles[executingBytecode];
+                }
+                else
+                {
+                    disasm = NeoDisassembler.Disassemble(executingBytecode);
+                    _disassembles[executingBytecode] = disasm;
+                    _debugContent[filePath] = disasm.ToString();
+                }
+
+                var line = disasm.ResolveLine(ofs);
+                
                 return line + 1;
             }
         }

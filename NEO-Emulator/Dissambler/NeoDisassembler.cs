@@ -70,7 +70,7 @@ namespace Neo.Emulator.Dissambler
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.AppendLine(FormattingUtils.OutputLine("Offset", "Opcode", "Comment"));
+            //sb.AppendLine(FormattingUtils.OutputLine("Offset", "Opcode", "Comment"));
             foreach (var entry in this.lines)
             {
                 string ofsStr = entry.startOfs.ToString();
@@ -280,11 +280,12 @@ namespace Neo.Emulator.Dissambler
                         var entry = new DisassembleEntry();
                         output.Add(entry);
 
+                        entry.startOfs = (int)reader.BaseStream.Position;
+
                         var opcode = (OpCode)reader.ReadByte();
 
                         entry.opcode = opcode;
                         entry.name = opcode.ToString();
-                        entry.startOfs = (int)reader.BaseStream.Position;
 
                         entry.comment = hints.ContainsKey(opcode) ? hints[opcode] : "";
 
@@ -483,7 +484,7 @@ namespace Neo.Emulator.Dissambler
                                     }
                             }
 
-                        entry.endOfs = (int)reader.BaseStream.Position;
+                        entry.endOfs = (int)(reader.BaseStream.Position-1);
                     }
                 }
             }

@@ -1085,6 +1085,12 @@ namespace Neo.Debugger.Forms
         {
             RemoveCurrentHighlight();
 
+            if (_debugger.CurrentFilePath != activeFilePath)
+            {
+                ReloadTextArea(_debugger.CurrentFilePath);
+                JumpToLine(_debugger.CurrentLine);
+            }
+
             //Update the UI to reflect the debugger state
             switch (_debugger.State)
             {
@@ -1125,11 +1131,6 @@ namespace Neo.Debugger.Forms
 
                 case DebuggerState.State.Break:
                     {
-                        if (_debugger.CurrentFilePath != activeFilePath)
-                        {
-                            ReloadTextArea(_debugger.CurrentFilePath);
-                        }
-
                         JumpToLine(_debugger.CurrentLine);
                         TextArea.Lines[TextArea.CurrentLine].MarkerAdd(BREAKPOINT_BG);
                         break;
@@ -1175,6 +1176,7 @@ namespace Neo.Debugger.Forms
         }
 
         private TreeNode selectedNode = null;
+        private Dictionary<string, TreeNode> nodeMap = new Dictionary<string, TreeNode>();
 
         // use to compare with debugger current file, to check if something changed when stepping through code
         private string activeFilePath;
@@ -1201,6 +1203,11 @@ namespace Neo.Debugger.Forms
             }
 
             ReloadTextArea(filePath, content);
+
+            if (!nodeMap.ContainsKey(filePath))
+            {
+                AddNodeToProjectTree(filePath);
+            }
         }
 
         // file path must exist in current project!
@@ -1291,6 +1298,7 @@ namespace Neo.Debugger.Forms
         {
             var fileName = Path.GetFileName(path);
             var node = projectTree.Nodes.Add(path, fileName);
+            nodeMap[path] = node;
         }
 
         private void ReloadProjectTree()
