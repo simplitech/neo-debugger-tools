@@ -198,6 +198,10 @@ namespace Neo.Emulator
 
         public void Reset(DataNode inputs)
         {
+            if (contractBytes == null || contractBytes.Length == 0)
+            {
+                throw new Exception("Contract bytecode is not set yet!");
+            }
             
             if (lastState.state == DebuggerState.State.Reset)
             {

@@ -214,7 +214,7 @@ namespace Neo.Debugger.Forms
             //Set the UI
             this.Text += " - " + FileName.Text;
 
-            _debugger.IsCompiled = false;
+            _debugger.IsCompiled = true;
 
             ReloadProjectTree();
 
@@ -394,7 +394,11 @@ namespace Neo.Debugger.Forms
                 return false;
             }
 
-            _debugger.DeployContract();
+            if (!_debugger.DeployContract())
+            {
+                MessageBox.Show("Failed to deploy the contract in the virtual blockchain!");
+                return false;
+            }
 
             //Get the parameters to execute the debugger
             if (!GetDebugParameters())
@@ -422,8 +426,7 @@ namespace Neo.Debugger.Forms
                 _settings.lastFunction = runForm.currentMethod.name;
             }
 
-            _debugger.SetDebugParameters(debugParams);
-            return true;
+           return _debugger.SetDebugParameters(debugParams);
         }
 
         #endregion
@@ -703,8 +706,15 @@ namespace Neo.Debugger.Forms
             gasCostLabel.Left = this.ClientSize.Width - 105;
         }
 
+        private bool ignoreTextChanges;
+
         private void TextArea_OnTextChanged(object sender, EventArgs e)
         {
+            if (ignoreTextChanges)
+            {
+                return;
+            }
+
             //Document is dirty, we will need to force a recompile before next debug
             _debugger.IsCompiled = false;
         }
@@ -855,7 +865,7 @@ namespace Neo.Debugger.Forms
 
             if (!this.CompileContract())
             {
-                SendLogToPanel("Could not compile template!");
+                MessageBox.Show($"Could not compile {language} template!");
                 return;
             }
 
@@ -1204,9 +1214,11 @@ namespace Neo.Debugger.Forms
                 TextArea.SetKeywords(1, keywords[1]);
             }
 
+            ignoreTextChanges = true;
             TextArea.ReadOnly = false;
             TextArea.Text = content;
             TextArea.ReadOnly = filePath == _debugger.AvmFilePath;
+            ignoreTextChanges = false;
 
             foreach (TreeNode node in projectTree.Nodes)
             {
@@ -1438,6 +1450,38 @@ namespace Neo.Debugger.Forms
             {
                 ReloadTextArea(node.Name);
             }
+        }
+
+        private void rebuildToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_debugger.IsCompiled)
+            {
+                _debugger.IsCompiled = false;
+
+                var fileList = new List<string>();
+                fileList.Add(_debugger.AvmFilePath);
+                fileList.Add(_debugger.AvmFilePath.Replace(".avm", ".debug.json"));
+                fileList.Add(_debugger.AvmFilePath.Replace(".avm", ".abi.json"));
+                fileList.Add(_debugger.AvmFilePath.Replace(".avm", ".test.json"));
+
+                foreach (var file in fileList)
+                {
+                    if (File.Exists(file))
+                    {
+                        try
+                        {
+                            File.Delete(file);
+                            SendLogToPanel("Deleted " + file);
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            CompileContract();
         }
     }
 }

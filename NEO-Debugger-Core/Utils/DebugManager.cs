@@ -389,11 +389,7 @@ namespace Neo.Debugger.Core.Utils
                 Log($"Deployed contract {_contractName} on virtual blockchain at address {address.keys.address}.");
             }
             else
-            if (address.byteCode.SequenceEqual(_contractByteCode))
-            {
-                return true;
-            }
-            else
+            if (!address.byteCode.SequenceEqual(_contractByteCode))
             {
                 address.byteCode = _contractByteCode;
                 Log($"Updated bytecode for {_contractName} on virtual blockchain.");
@@ -563,7 +559,15 @@ namespace Neo.Debugger.Core.Utils
                 _emulator.SetTransaction(transaction.Key, transaction.Value);
             }
 
-            _emulator.Reset(debugParams.ArgList);
+            try
+            {
+                _emulator.Reset(debugParams.ArgList);
+            }
+            catch
+            {
+                return false;
+            }
+
             Reset();
             return true;
         }

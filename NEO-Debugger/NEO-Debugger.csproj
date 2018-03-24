@@ -337,9 +337,7 @@
       <Name>NEO-Emulator</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Contracts\HelloWorld.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
