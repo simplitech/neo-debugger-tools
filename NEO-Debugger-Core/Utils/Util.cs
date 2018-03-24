@@ -3,6 +3,7 @@ using LunarParser.JSON;
 using Neo.Cryptography;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Neo.Debugger.Core.Utils
 {
@@ -17,7 +18,9 @@ namespace Neo.Debugger.Core.Utils
         public static string FindExecutablePath(string exeName)
         {
             string envPath = Environment.ExpandEnvironmentVariables("%PATH%");
-            var paths = envPath.Split(';');
+            var paths = envPath.Split(';').ToList();
+            paths.Add(AppDomain.CurrentDomain.BaseDirectory);
+
             foreach (var path in paths)
             {
                 var fullPath = path + "\\" + exeName;

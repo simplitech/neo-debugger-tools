@@ -27,8 +27,8 @@ namespace Neo.Compiler.AVM
                     currentDebugEntry = new DebugMapEntry();
                     if (previousDebugEntry != null)
                     {
-                        currentDebugEntry.startOfs = bytes.Count;
-                        currentDebugEntry.endOfs = previousDebugEntry.startOfs + 1;
+                        currentDebugEntry.startOfs = previousDebugEntry.endOfs + 1;
+                        currentDebugEntry.endOfs = bytes.Count;
                     }
                     else
                     {

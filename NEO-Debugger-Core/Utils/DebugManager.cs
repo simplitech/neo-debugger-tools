@@ -43,13 +43,7 @@ namespace Neo.Debugger.Core.Utils
                 return _emulator.usedGas;
             }
         }
-        public string CurrentFile
-        {
-            get
-            {
-                return _currentFile;
-            }
-        }
+
         public bool ResetFlag
         {
             get
@@ -150,7 +144,7 @@ namespace Neo.Debugger.Core.Utils
         {
             get
             {
-                return (_currentLine > 0 && (_state.state != DebuggerState.State.Running || _state.state == DebuggerState.State.Break));
+                return (_state.state != DebuggerState.State.Running || _state.state == DebuggerState.State.Break);
             }
         }
 
@@ -177,16 +171,16 @@ namespace Neo.Debugger.Core.Utils
         //Debugger State
         private bool _resetFlag;
         private int _currentLine;
-        private string _currentFile;
         private DebuggerState _state;
 
         //Debugging Emulator and Content
         private NeoEmulator _emulator { get; set; }
         private Dictionary<string, string> _debugContent = new Dictionary<string, string>();
         private ABI _ABI { get; set; }
-        private NeoMapFile _map { get; set; }
-        private AVMDisassemble _avmAsm { get; set; }
+        private NeoMapFile _map { get; set; }        
         private bool _isCompiled { get; set; }
+
+        public AVMDisassemble avmDisassemble { get; private set; }
 
         //Context
         private string _contractName { get; set; }
@@ -273,7 +267,6 @@ namespace Neo.Debugger.Core.Utils
                 return false;
             }
 
-            _currentFile = null;   // Initialize to null, we set it later to proper value depending on the available source files
             _debugContent.Clear();
             
             _contractName = Path.GetFileNameWithoutExtension(_avmFilePath);
@@ -281,7 +274,7 @@ namespace Neo.Debugger.Core.Utils
             _map = new NeoMapFile();
             try
             {
-                _avmAsm = NeoDisassembler.Disassemble(_contractByteCode);
+                avmDisassemble = NeoDisassembler.Disassemble(_contractByteCode);
             }
             catch (DisassembleException e)
             {
@@ -336,23 +329,12 @@ namespace Neo.Debugger.Core.Utils
                     var sourceCode = File.ReadAllText(entry);
                     _debugContent[entry] = sourceCode;
 
-                    if (string.IsNullOrEmpty(_currentFile))
-                    {
-                        _currentFile = entry;
-                    }
-
                     //_emulator.SetProfilerFilenameSource(entry, sourceCode);
                 }
             }
 
-            // if not source code is available, default to assembly file
-            if (string.IsNullOrEmpty(_currentFile))
-            {
-                _currentFile = _avmFilePath;
-            }
-
             //We always should have the assembly content
-            _debugContent[_avmFilePath] = _avmAsm.ToString();
+            _debugContent[_avmFilePath] = avmDisassemble.ToString();
 
             //Save the settings
             _settings.lastOpenedFile = avmPath;
@@ -361,6 +343,8 @@ namespace Neo.Debugger.Core.Utils
 
             //Force a reset now that we're loaded
             _resetFlag = true;
+
+            _currentFilePath = avmPath;
 
             return true;
         }
@@ -405,40 +389,34 @@ namespace Neo.Debugger.Core.Utils
             return true;
         }
 
-        public int ResolveLine(int ofs)
+        public int ResolveLine(int ofs, bool useMap, out string filePath)
         {
-            try
+            if (useMap)
             {
-                if (_currentFile == _avmFilePath)
-                {
-                    var line = _avmAsm.ResolveLine(ofs);
-                    return line + 1;
-                }
-                else
-                {
-                    var line = _map.ResolveLine(ofs);
-                    _emulator.SetProfilerLineno(line - 1);
-                    return line - 1;
-                }
+                var line = _map.ResolveLine(ofs, out filePath);
+                _emulator.SetProfilerLineno(line - 1);
+                return line - 1;
             }
-            catch
+            else
             {
-                return -1;
+                var line = avmDisassemble.ResolveLine(ofs);
+                filePath = AvmFilePath;
+                return line + 1;
             }
         }
 
-        public int ResolveOffset(int line)
+        public int ResolveOffset(int line, string filePath)
         {
             try
             {
-                if (_currentFile == _avmFilePath)
+                if (filePath == _avmFilePath)
                 {
-                    var ofs = _avmAsm.ResolveOffset(line);
+                    var ofs = avmDisassemble.ResolveOffset(line);
                     return ofs;
                 }
                 else 
                 {
-                    var ofs = _map.ResolveOffset(line + 1);
+                    var ofs = _map.ResolveOffset(line + 1, filePath);
                     _emulator.SetProfilerLineno(line + 1);
                     return ofs;
                 }
@@ -449,36 +427,70 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
-        public List<int> GetBreakPointLineNumbers()
+        public List<int> GetBreakPointLineNumbers(string fileName)
         {
             List<int> breakpointLineNumbers = new List<int>();
             if (_emulator == null)
                 return breakpointLineNumbers;
 
+            bool useMap = fileName != AvmFilePath;
             foreach (var ofs in _emulator.Breakpoints)
             {
-                var line = ResolveLine(ofs);
+                string temp;
+                var line = ResolveLine(ofs, useMap, out temp);
+
+                if (temp != fileName)
+                {
+                    continue;
+                }
+
                 if (line >= 0)
+                {
                     breakpointLineNumbers.Add(line);
+                }
             }
 
             return breakpointLineNumbers;
         }
 
+        public string CurrentFilePath
+        {
+            get { return _currentFilePath; }
+            set
+            {
+                _currentFilePath = value;
+            }
+        }
+        private string _currentFilePath;
+
+        public class Breakpoint
+        {
+            public string filePath;
+            public int lineNumber;
+            public int offset;
+        }
+
+        public IEnumerable<Breakpoint> Breakpoints => _breakpoints;
+        private List<Breakpoint> _breakpoints = new List<Breakpoint>();
+
         public bool AddBreakpoint(int lineNumber)
         {
-            var ofs = ResolveOffset(lineNumber);
-            if (ofs < 0)
+            var ofs = ResolveOffset(lineNumber, _currentFilePath);
+            if (ofs < 0) 
                 return false;
 
             _emulator.SetBreakpointState(ofs, true);
+
+            _breakpoints.Add(new Breakpoint() { filePath = _currentFilePath, lineNumber = lineNumber, offset = ofs });
 
             return true;
         }
 
         public bool RemoveBreakpoint(int lineNumber)
         {
-            var ofs = ResolveOffset(lineNumber);
+            _breakpoints.RemoveAll(x => x.lineNumber == lineNumber && x.filePath == _currentFilePath);
+
+            var ofs = ResolveOffset(lineNumber, _currentFilePath);
             if (ofs < 0)
                 return false;
 
@@ -493,7 +505,7 @@ namespace Neo.Debugger.Core.Utils
                 Reset();
 
             _state = _emulator.Run();
-            UpdateState();
+            UpdateState(ref _currentFilePath, out _currentLine);
         }
 
         public void Step()
@@ -503,12 +515,12 @@ namespace Neo.Debugger.Core.Utils
 
             //STEP
             _state = Emulator.Step();
-            UpdateState();
+            UpdateState(ref _currentFilePath, out _currentLine);
         }
 
-        public void UpdateState()
+        public void UpdateState(ref string filePath, out int currentLine)
         {
-            _currentLine = ResolveLine(_state.offset);
+            currentLine = ResolveLine(_state.offset, filePath != AvmFilePath, out filePath);
             _emulator.SetProfilerLineno(_currentLine);
             switch (_state.state)
             {

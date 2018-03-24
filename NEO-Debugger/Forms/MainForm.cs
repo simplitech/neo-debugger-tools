@@ -218,7 +218,7 @@ namespace Neo.Debugger.Forms
 
             ReloadProjectTree();
 
-            ReloadTextArea(_debugger.CurrentFile);
+            ReloadTextArea(_debugger.CurrentFilePath);
 
             return true;
         }
@@ -363,6 +363,7 @@ namespace Neo.Debugger.Forms
                 return;
 
             Line previousLine = TextArea.Lines[TextArea.CurrentLine];
+            var previousFile = _debugger.CurrentFilePath;
             do
             {
                 _debugger.Step();
@@ -1124,6 +1125,11 @@ namespace Neo.Debugger.Forms
 
                 case DebuggerState.State.Break:
                     {
+                        if (_debugger.CurrentFilePath != activeFilePath)
+                        {
+                            ReloadTextArea(_debugger.CurrentFilePath);
+                        }
+
                         JumpToLine(_debugger.CurrentLine);
                         TextArea.Lines[TextArea.CurrentLine].MarkerAdd(BREAKPOINT_BG);
                         break;
@@ -1169,7 +1175,10 @@ namespace Neo.Debugger.Forms
         }
 
         private TreeNode selectedNode = null;
-        
+
+        // use to compare with debugger current file, to check if something changed when stepping through code
+        private string activeFilePath;
+
         private void ReloadTextArea(string filePath)
         {
             string content;
@@ -1202,7 +1211,13 @@ namespace Neo.Debugger.Forms
                 selectedNode.NodeFont = new Font(this.Font, FontStyle.Regular);
             }
 
+            if (_debugger.CurrentFilePath != filePath)
+            {
+                _debugger.CurrentFilePath = filePath;
+            }
+
             FileName.Text = filePath;
+            activeFilePath = filePath;
 
             _sourceLanguage = LanguageSupport.DetectLanguage(filePath);
 
@@ -1227,6 +1242,47 @@ namespace Neo.Debugger.Forms
                     node.NodeFont = new Font(this.Font, FontStyle.Bold);
                     selectedNode = node;
                     break;
+                }
+            }
+
+            // here we iterate over all breakpoints set by the user in the current file
+            foreach (var breakpoint in _debugger.Breakpoints)
+            {
+                if (breakpoint.filePath != filePath)
+                {
+                    continue;
+                }
+
+                var line = TextArea.Lines[breakpoint.lineNumber];
+                line.MarkerAdd(BREAKPOINT_MARKER);
+            }
+
+            if (_debugger.State != DebuggerState.State.Reset)
+            {
+                try
+                {
+                    if (filePath == _debugger.AvmFilePath)
+                    {
+                        int currentLine = _debugger.avmDisassemble.ResolveLine(_debugger.Offset);
+
+                        JumpToLine(_debugger.CurrentLine);
+                        TextArea.Lines[TextArea.CurrentLine].MarkerAdd(STEP_BG);
+                    }
+                    else
+                    {
+                        string temp;
+                        int currentLine = _debugger.Map.ResolveLine(_debugger.Offset, out temp);
+
+                        if (temp == filePath)
+                        {
+                            JumpToLine(_debugger.CurrentLine);
+                            TextArea.Lines[TextArea.CurrentLine].MarkerAdd(STEP_BG);
+                        }
+                    }
+                }
+                catch
+                {
+                    // ignore
                 }
             }
         }
