@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NEO_Emulator</RootNamespace>
     <AssemblyName>NEO-Emulator</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -61,7 +61,6 @@
     <Compile Include="Cryptography\Murmur3.cs" />
     <Compile Include="Cryptography\ProtectedMemoryContext.cs" />
     <Compile Include="Cryptography\RIPEMD160Managed.cs" />
-    <Compile Include="Cryptography\SCrypt.cs" />
     <Compile Include="Cryptography\UInt160.cs" />
     <Compile Include="Cryptography\UInt256.cs" />
     <Compile Include="Cryptography\UIntBase.cs" />
@@ -87,8 +86,10 @@
     <Compile Include="IApiInterface.cs" />
     <Compile Include="Dissambler\NeoDebugMap.cs" />
     <Compile Include="Dissambler\NeoDisassembler.cs" />
+    <Compile Include="IncrementalHash.cs" />
     <Compile Include="NeoEmulator.cs" />
     <Compile Include="Profiler\ProfilerContext.cs" />
+    <Compile Include="Scrypt.cs" />
     <Compile Include="StorageContext.cs" />
     <Compile Include="TestCases.cs" />
     <Compile Include="TriggerType.cs" />
