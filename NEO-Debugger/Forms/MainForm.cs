@@ -35,6 +35,9 @@ namespace Neo.Debugger.Forms
         {
             InitializeComponent();
 
+            stackPanel.Columns.Add("Eval", "Eval");
+            stackPanel.Columns.Add("Alt", "Alt");
+
             if (!string.IsNullOrEmpty(argumentsAvmFile))
             {
                 argumentsAvmFile = argumentsAvmFile.Replace("\\", "/");
@@ -217,6 +220,11 @@ namespace Neo.Debugger.Forms
             _debugger.IsCompiled = true;
 
             ReloadProjectTree();
+            
+            if (_debugger.MapLoaded && _debugger.Map.FileNames.Any())
+            {
+                _debugger.CurrentFilePath = _debugger.Map.FileNames.FirstOrDefault();
+            }
 
             ReloadTextArea(_debugger.CurrentFilePath);
 
@@ -408,7 +416,7 @@ namespace Neo.Debugger.Forms
             //Reset the UI
             RemoveCurrentHighlight();
             logView.Clear();
-            stackPanel.Clear();
+            stackPanel.Rows.Clear();
             UpdateGasCost(_debugger.UsedGasCost);
             return true;
         }
@@ -1347,15 +1355,19 @@ namespace Neo.Debugger.Forms
         {
             var sb = new StringBuilder();
 
-            var items = _debugger.Emulator.GetStack();
+            var evalStack = _debugger.Emulator.GetEvaluationStack().ToArray();
+            var altStack = _debugger.Emulator.GetAltStack().ToArray();
 
-            foreach (var item in items)
+            stackPanel.Rows.Clear();
+
+            int index = 0;
+            while (index < evalStack.Length || index < altStack.Length)
             {
-                string s = FormattingUtils.StackItemAsString(item);
-                sb.AppendLine(s);
+                string a = index < evalStack.Length ? FormattingUtils.StackItemAsString(evalStack[index]) : "";
+                string b = index < altStack.Length ? FormattingUtils.StackItemAsString(altStack[index]) : "";
+                stackPanel.Rows.Add(new object[] { a,b });
+                index++;
             }
-
-            stackPanel.Text = sb.ToString();
         }
 
         private void UpdateGasCost(double gasUsed)

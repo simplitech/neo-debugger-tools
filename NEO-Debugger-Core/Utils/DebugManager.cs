@@ -74,6 +74,8 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
+        public const string inputAVMPath = "Input.avm";
+
         public string AvmFilePath
         {
             get
@@ -416,7 +418,7 @@ namespace Neo.Debugger.Core.Utils
                 }
                 else
                 {
-                    filePath = "Input.avm";
+                    filePath = inputAVMPath;
                 }
 
                 if (_disassembles.ContainsKey(executingBytecode))
@@ -431,8 +433,8 @@ namespace Neo.Debugger.Core.Utils
                 }
 
                 var line = disasm.ResolveLine(ofs);
-                
-                return line + 1;
+
+                return line;
             }
         }
 
@@ -551,7 +553,9 @@ namespace Neo.Debugger.Core.Utils
 
         public void UpdateState(ref string filePath, out int currentLine)
         {
-            currentLine = ResolveLine(_state.offset, filePath != AvmFilePath, out filePath);
+            var useMap = (_currentFilePath != AvmFilePath && _currentFilePath != inputAVMPath);
+
+            currentLine = ResolveLine(_state.offset, useMap, out filePath);
             _emulator.SetProfilerLineno(_currentLine);
             switch (_state.state)
             {

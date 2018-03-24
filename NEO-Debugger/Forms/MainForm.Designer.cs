@@ -75,13 +75,14 @@
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.logView = new System.Windows.Forms.RichTextBox();
             this.logLabel = new System.Windows.Forms.Label();
-            this.stackPanel = new System.Windows.Forms.RichTextBox();
             this.stackLabel = new System.Windows.Forms.Label();
             this.gasCostLabel = new System.Windows.Forms.Label();
             this.projectTree = new System.Windows.Forms.TreeView();
             this.rebuildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stackPanel = new System.Windows.Forms.DataGridView();
             this.menuStrip1.SuspendLayout();
             this.PanelSearch.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.stackPanel)).BeginInit();
             this.SuspendLayout();
             // 
             // TextPanel
@@ -496,15 +497,6 @@
             this.logLabel.TabIndex = 12;
             this.logLabel.Text = "Log";
             // 
-            // stackPanel
-            // 
-            this.stackPanel.Location = new System.Drawing.Point(375, 463);
-            this.stackPanel.Name = "stackPanel";
-            this.stackPanel.ReadOnly = true;
-            this.stackPanel.Size = new System.Drawing.Size(361, 153);
-            this.stackPanel.TabIndex = 13;
-            this.stackPanel.Text = "";
-            // 
             // stackLabel
             // 
             this.stackLabel.AutoSize = true;
@@ -541,16 +533,31 @@
             this.rebuildToolStripMenuItem.Text = "Rebuild";
             this.rebuildToolStripMenuItem.Click += new System.EventHandler(this.rebuildToolStripMenuItem_Click);
             // 
+            // stackPanel
+            // 
+            this.stackPanel.AllowUserToAddRows = false;
+            this.stackPanel.AllowUserToDeleteRows = false;
+            this.stackPanel.AllowUserToResizeRows = false;
+            this.stackPanel.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.stackPanel.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.stackPanel.Location = new System.Drawing.Point(375, 463);
+            this.stackPanel.MultiSelect = false;
+            this.stackPanel.Name = "stackPanel";
+            this.stackPanel.ReadOnly = true;
+            this.stackPanel.RowHeadersVisible = false;
+            this.stackPanel.Size = new System.Drawing.Size(382, 153);
+            this.stackPanel.TabIndex = 17;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(769, 628);
+            this.Controls.Add(this.stackPanel);
             this.Controls.Add(this.projectTree);
             this.Controls.Add(this.gasCostLabel);
             this.Controls.Add(this.stackLabel);
-            this.Controls.Add(this.stackPanel);
             this.Controls.Add(this.logLabel);
             this.Controls.Add(this.logView);
             this.Controls.Add(this.PanelSearch);
@@ -570,6 +577,7 @@
             this.menuStrip1.PerformLayout();
             this.PanelSearch.ResumeLayout(false);
             this.PanelSearch.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.stackPanel)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -608,7 +616,6 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.RichTextBox logView;
         private System.Windows.Forms.Label logLabel;
-        private System.Windows.Forms.RichTextBox stackPanel;
         private System.Windows.Forms.Label stackLabel;
         private System.Windows.Forms.ToolStripMenuItem debugToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem runToolStripMenuItem;
@@ -629,6 +636,7 @@
         private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem1;
         private System.Windows.Forms.TreeView projectTree;
         private System.Windows.Forms.ToolStripMenuItem rebuildToolStripMenuItem;
+        private System.Windows.Forms.DataGridView stackPanel;
     }
 }
 

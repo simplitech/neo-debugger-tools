@@ -421,10 +421,16 @@ namespace Neo.Emulator
             return result;
         }
 
-        public IEnumerable<StackItem> GetStack()
+        public IEnumerable<StackItem> GetEvaluationStack()
         {
             return engine.EvaluationStack;
         }
+
+        public IEnumerable<StackItem> GetAltStack()
+        {
+            return engine.AltStack;
+        }
+
 
         #region TRANSACTIONS
         public void SetTransaction(byte[] assetID, BigInteger amount)
