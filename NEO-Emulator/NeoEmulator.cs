@@ -217,6 +217,8 @@ namespace Neo.Emulator
             usedGas = 0;
             usedOpcodeCount = 0;
 
+            _variables.Clear();
+
             currentTransaction.emulator = this;
             engine = new ExecutionEngine(currentTransaction, Crypto.Default, null, interop);
             engine.LoadScript(contractByteCode);
@@ -301,12 +303,38 @@ namespace Neo.Emulator
             if (this.lastState.state == DebuggerState.State.Reset)
             {
                 engine.State = VMState.NONE;
+
+                var initialContext = engine.CurrentContext;
+                while (engine.CurrentContext == initialContext)
+                {
+                    engine.StepInto();
+                }
             }
 
             var shouldContinue = GetRunningState();
             if (shouldContinue)
             {
                 engine.StepInto();
+
+                if (engine.State == VMState.NONE)
+                {
+                    int currentOffset = engine.CurrentContext.InstructionPointer;
+
+                    if (_assigments.ContainsKey(currentOffset))
+                    {
+                        var varName = _assigments[currentOffset];
+                        try
+                        {
+                            var val = engine.EvaluationStack.Peek();
+                            _variables[varName] = val;
+                        }
+                        catch
+                        {
+                            // ignore for now
+                        }
+                    }
+                }
+
                 return GetRunningState();
             }
             else
@@ -548,6 +576,28 @@ namespace Neo.Emulator
             }
         }
 
+        private Dictionary<int, string> _assigments = new Dictionary<int, string>();
+        private Dictionary<string, StackItem> _variables = new Dictionary<string, StackItem>();
 
+        public void ClearAssignments()
+        {
+            _assigments.Clear();
+            _variables.Clear();
+        }
+
+        public void AddAssigment(int offset, string name)
+        {
+            _assigments[offset] = name;
+        }
+
+        public StackItem GetVariableValue(string name)
+        {
+            if (_variables.ContainsKey(name))
+            {
+                return _variables[name];
+            }
+
+            return null;
+        }
     }
 }

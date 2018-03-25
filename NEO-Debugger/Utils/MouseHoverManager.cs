@@ -31,7 +31,9 @@ namespace Neo.Debugger.Utils
         public CodeHoverEventHandler CodeHovered;
         public delegate void CodeHoverEventHandler(object sender, CodeHoverEventArgs e);
 
-        public MouseHoverManager(Scintilla textForm, int hoverTimerInterval)
+        private Func<string, string> mapper;
+
+        public MouseHoverManager(Scintilla textForm, int hoverTimerInterval, Func<string, string> mapper)
         {
             //Set the hover timer interval
             _hoverTimerInterval = hoverTimerInterval;
@@ -40,6 +42,8 @@ namespace Neo.Debugger.Utils
             _textForm = textForm;
             _textForm.MouseDwellTime = hoverTimerInterval;
             _textForm.MouseMove += _textForm_MouseMove;
+
+            this.mapper = mapper;
         }
 
         private void _textForm_MouseMove(object sender, MouseEventArgs e)
@@ -59,8 +63,9 @@ namespace Neo.Debugger.Utils
 
         private void _textForm_DwellStart(object sender, DwellEventArgs e)
         {
-            if (!String.IsNullOrEmpty(_lastWord))
-                _textForm.CallTipShow(_textForm.CurrentPosition, _lastWord);
+            var result = mapper(_lastWord);
+            if (!String.IsNullOrEmpty(result))
+                _textForm.CallTipShow(_textForm.CurrentPosition, result);
             else
                 _textForm.CallTipCancel();
         }

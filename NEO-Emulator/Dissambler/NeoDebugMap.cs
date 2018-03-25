@@ -113,13 +113,26 @@ namespace Neo.Emulator.Dissambler
         /// <summary>
         /// Calculates the script offset that maps to the specificed source code line 
         /// </summary>
-        public int ResolveOffset(int line, string filePath)
+        public int ResolveStartOffset(int line, string filePath)
         {
             foreach (var entry in this.Entries)
             {
                 if (entry.line == line && entry.url == filePath)
                 {
                     return entry.startOfs;
+                }
+            }
+
+            throw new Exception("Line cannot be mapped");
+        }
+
+        public int ResolveEndOffset(int line, string filePath)
+        {
+            foreach (var entry in this.Entries)
+            {
+                if (entry.line == line && entry.url == filePath)
+                {
+                    return entry.endOfs;
                 }
             }
 

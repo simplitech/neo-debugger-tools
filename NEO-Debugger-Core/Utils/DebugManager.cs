@@ -146,7 +146,7 @@ namespace Neo.Debugger.Core.Utils
         {
             get
             {
-                return (_state.state != DebuggerState.State.Running || _state.state == DebuggerState.State.Break);
+                return (_state.state == DebuggerState.State.Exception || _state.state == DebuggerState.State.Break);
             }
         }
 
@@ -449,7 +449,7 @@ namespace Neo.Debugger.Core.Utils
                 }
                 else 
                 {
-                    var ofs = _map.ResolveOffset(line + 1, filePath);
+                    var ofs = _map.ResolveStartOffset(line + 1, filePath);
                     _emulator.SetProfilerLineno(line + 1);
                     return ofs;
                 }
@@ -538,7 +538,7 @@ namespace Neo.Debugger.Core.Utils
                 Reset();
 
             _state = _emulator.Run();
-            UpdateState(ref _currentFilePath, out _currentLine);
+            UpdateState();
         }
 
         public void Step()
@@ -548,15 +548,23 @@ namespace Neo.Debugger.Core.Utils
 
             //STEP
             _state = Emulator.Step();
-            UpdateState(ref _currentFilePath, out _currentLine);
+            UpdateState();
         }
 
-        public void UpdateState(ref string filePath, out int currentLine)
+        public void UpdateState()
         {
             var useMap = (_currentFilePath != AvmFilePath && _currentFilePath != inputAVMPath);
 
-            currentLine = ResolveLine(_state.offset, useMap, out filePath);
-            _emulator.SetProfilerLineno(_currentLine);
+            try
+            {
+                _currentLine = ResolveLine(_state.offset, useMap, out _currentFilePath);
+                _emulator.SetProfilerLineno(_currentLine);
+            }
+            catch
+            {
+                // ignore
+            }
+
             switch (_state.state)
             {
                 case DebuggerState.State.Finished:

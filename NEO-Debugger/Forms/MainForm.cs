@@ -31,6 +31,8 @@ namespace Neo.Debugger.Forms
 
         private Dictionary<SourceLanguage, List<string>> templates = new Dictionary<SourceLanguage, List<string>>();
 
+        private MouseHoverManager hoverManager;
+
         public MainForm(string argumentsAvmFile)
         {
             InitializeComponent();
@@ -168,6 +170,8 @@ namespace Neo.Debugger.Forms
 
             // INIT HOTKEYS
             InitHotkeys();
+
+            hoverManager = new MouseHoverManager(TextArea, 2, ValidateHover);
         }
 
         private void TextArea_MouseClick(object sender, MouseEventArgs e)
@@ -370,8 +374,8 @@ namespace Neo.Debugger.Forms
             if (_debugger.ResetFlag && !ResetDebugger())
                 return;
 
-            Line previousLine = TextArea.Lines[TextArea.CurrentLine];
-            var previousFile = _debugger.CurrentFilePath;
+            var previousLine = _debugger.CurrentLine;
+            var previousFilePath = _debugger.CurrentFilePath;
             do
             {
                 _debugger.Step();
@@ -381,7 +385,7 @@ namespace Neo.Debugger.Forms
                 if (_debugger.ResetFlag)
                     return;
 
-            } while (_debugger.CurrentLine <= 0 || previousLine.Index == _debugger.CurrentLine);
+            } while (previousLine == _debugger.CurrentLine && previousFilePath == _debugger.CurrentFilePath);
 
             //Update UI
             UpdateStackPanel();
@@ -1104,8 +1108,7 @@ namespace Neo.Debugger.Forms
             {
                 case DebuggerState.State.Running:
                     {
-                        JumpToLine(_debugger.CurrentLine);
-                        TextArea.Lines[TextArea.CurrentLine].MarkerAdd(STEP_BG);
+                        HighlightLine(_debugger.CurrentLine);
                         break;
                     }
 
@@ -1146,10 +1149,42 @@ namespace Neo.Debugger.Forms
             }
         }
 
+        private Dictionary<string, int> _currentHightlight = new Dictionary<string, int>();
+
+        private int GetHighlightedLine()
+        {
+            if (string.IsNullOrEmpty(activeFilePath))
+            {
+                return -1;
+            }
+
+            if (_currentHightlight.ContainsKey(activeFilePath))
+            {
+                return _currentHightlight[activeFilePath];
+            }
+
+            return -1;
+        }
+
         private void RemoveCurrentHighlight()
         {
-            TextArea.Lines[TextArea.CurrentLine].MarkerDelete(BREAKPOINT_BG);
-            TextArea.Lines[TextArea.CurrentLine].MarkerDelete(STEP_BG);
+            int line = GetHighlightedLine();
+            if (line != -1)
+            {
+                TextArea.Lines[line].MarkerDelete(BREAKPOINT_BG);
+                TextArea.Lines[line].MarkerDelete(STEP_BG);
+
+                _currentHightlight.Remove(activeFilePath);
+            }
+        }
+
+        private void HighlightLine(int line)
+        {
+            RemoveCurrentHighlight();
+            JumpToLine(_debugger.CurrentLine);
+
+            TextArea.Lines[line].MarkerAdd(STEP_BG);
+            _currentHightlight[activeFilePath] = line;
         }
 
         private void JumpToLine(int line)
@@ -1211,11 +1246,6 @@ namespace Neo.Debugger.Forms
             }
 
             ReloadTextArea(filePath, content);
-
-            if (!nodeMap.ContainsKey(filePath))
-            {
-                AddNodeToProjectTree(filePath);
-            }
         }
 
         // file path must exist in current project!
@@ -1272,7 +1302,12 @@ namespace Neo.Debugger.Forms
                 line.MarkerAdd(BREAKPOINT_MARKER);
             }
 
-            if (_debugger.State != DebuggerState.State.Reset)
+            if (_debugger.IsSteppingOrOnBreakpoint)
+            {
+                HighlightLine(_debugger.CurrentLine);
+            }
+
+            if (_debugger.State == DebuggerState.State.Break || _debugger.State == DebuggerState.State.Exception)
             {
                 try
                 {
@@ -1280,8 +1315,7 @@ namespace Neo.Debugger.Forms
                     {
                         int currentLine = _debugger.avmDisassemble.ResolveLine(_debugger.Offset);
 
-                        JumpToLine(_debugger.CurrentLine);
-                        TextArea.Lines[TextArea.CurrentLine].MarkerAdd(STEP_BG);
+                        HighlightLine(currentLine);
                     }
                     else
                     {
@@ -1290,8 +1324,7 @@ namespace Neo.Debugger.Forms
 
                         if (temp == filePath)
                         {
-                            JumpToLine(_debugger.CurrentLine);
-                            TextArea.Lines[TextArea.CurrentLine].MarkerAdd(STEP_BG);
+                            HighlightLine(currentLine);
                         }
                     }
                 }
@@ -1299,6 +1332,12 @@ namespace Neo.Debugger.Forms
                 {
                     // ignore
                 }
+            }
+
+
+            if (!nodeMap.ContainsKey(filePath))
+            {
+                AddNodeToProjectTree(filePath);
             }
         }
 
@@ -1316,13 +1355,43 @@ namespace Neo.Debugger.Forms
 
             AddNodeToProjectTree(_debugger.AvmFilePath);
 
+            _debugger.Emulator.ClearAssignments();
+
             if (_debugger.MapLoaded)
             {
                 foreach (var path in _debugger.Map.FileNames)
                 {
                     AddNodeToProjectTree(path);
+
+                    var content = _debugger.GetContentFor(path);
+                    var lang = LanguageSupport.DetectLanguage(path);
+                    var assignments = InspectorSupport.ParseAssigments(content, lang);
+                    foreach (var entry in assignments)
+                    {
+                        try
+                        {
+                            var ofs = _debugger.Map.ResolveEndOffset(entry.lineNumber, path);
+                            _debugger.Emulator.AddAssigment(ofs, entry.varName);
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+                    }
+
                 }
             }
+        }
+
+        private string ValidateHover(string text)
+        {
+            var value = _debugger.Emulator.GetVariableValue(text);
+            if (value == null)
+            {
+                return null;
+            }
+
+            return text + " = " +FormattingUtils.StackItemAsString(value);
         }
 
         private void OpenStorage()
