@@ -6,12 +6,12 @@ namespace Neo.VM
     public class InteropCall
     {
         public Func<ExecutionEngine, bool> handler;
-        public double gasCost;
+        public decimal gasCost;
     }
 
     public class InteropService
     {
-        public const double defaultGasCost = 0.001;
+        public const decimal defaultGasCost = 0.001m;
 
         private Dictionary<string, InteropCall> dictionary = new Dictionary<string, InteropCall>();
 
@@ -29,7 +29,7 @@ namespace Neo.VM
             return dictionary[method];
         }
 
-        public void Register(string method, Func<ExecutionEngine, bool> handler, double gasCost)
+        public void Register(string method, Func<ExecutionEngine, bool> handler, decimal gasCost)
         {
             var call = new InteropCall();
             call.handler = handler;

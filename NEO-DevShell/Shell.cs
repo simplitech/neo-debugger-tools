@@ -1,8 +1,8 @@
 ﻿using LunarParser;
 using LunarParser.JSON;
+using Neo.Debugger.Dissambler;
 using Neo.Emulation;
 using Neo.Emulation.API;
-using Neo.Emulation.Dissambler;
 using Neo.Emulation.Utils;
 using System;
 using System.Collections.Generic;

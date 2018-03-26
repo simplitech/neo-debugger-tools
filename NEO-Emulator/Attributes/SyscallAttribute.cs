@@ -7,12 +7,12 @@ namespace Neo.Emulation
     public class SyscallAttribute : Attribute
     {
         public string Method { get; }
-        public double gasCost { get; }
+        public decimal gasCost { get; }
 
-        public SyscallAttribute(string method, double gasCost = InteropService.defaultGasCost)
+        public SyscallAttribute(string method, double gasCost = (double)InteropService.defaultGasCost)
         {
             this.Method = method;
-            this.gasCost = gasCost;
+            this.gasCost = (decimal)gasCost;
         }
     }
 }

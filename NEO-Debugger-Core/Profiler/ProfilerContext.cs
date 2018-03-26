@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Neo.Emulation.Profiler
+namespace Neo.Debugger.Profiler
 {
     public class SourceFileLine
     {
@@ -26,7 +23,7 @@ namespace Neo.Emulation.Profiler
         public SourceFileLine _filelineo;
         public string _sourceStmt;
         public int[] _stmtOpcodeCount = new int[MAXNOPTCODES];
-        public double[] _stmtOpcodeCost = new double[MAXNOPTCODES];
+        public decimal[] _stmtOpcodeCost = new decimal[MAXNOPTCODES];
     }
 
     public class ProfilerContext
@@ -39,11 +36,11 @@ namespace Neo.Emulation.Profiler
         public string _sourceString = "// No source code available";
 
         public string[] opcodeNames = new string[MAXNOPTCODES];
-        public double[] opcodeCosts = new double[MAXNOPTCODES];
+        public decimal[] opcodeCosts = new decimal[MAXNOPTCODES];
         public bool[] opcodeUsed = new bool[MAXNOPTCODES];
         public Dictionary<string, SourceStmtInfo> dictStmtInfo;
         public int[] totalTallyByOpcode = new int[MAXNOPTCODES];
-        public double[] totalCostByOpcode = new double[MAXNOPTCODES];
+        public decimal[] totalCostByOpcode = new decimal[MAXNOPTCODES];
 
         public ProfilerContext()
         {
@@ -71,7 +68,7 @@ namespace Neo.Emulation.Profiler
             }
         }
 
-        public void TallyOpcode(Neo.VM.OpCode opcode, double opCost)
+        public void TallyOpcode(Neo.VM.OpCode opcode, decimal opCost)
         {
             SourceFileLine sfl = new SourceFileLine(_filename, _lineno);
 
@@ -100,9 +97,9 @@ namespace Neo.Emulation.Profiler
             }
         }
 
-        public Exception DumpCSV()
+        public Exception DumpCSV(string avmFilePath)
         {
-            string csvfilename = _filename.Replace(".cs", "_cs") + ".csv";
+            string csvfilename = avmFilePath.Replace(".avm", ".csv");
             try
             {
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(csvfilename))
@@ -236,7 +233,7 @@ namespace Neo.Emulation.Profiler
                         }
                         file.WriteLine();
                     }
-                    double totalOpcodeCost = 0;
+                    decimal totalOpcodeCost = 0;
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "Costs by Opcode>" + "\"");

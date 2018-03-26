@@ -1,5 +1,4 @@
-﻿using Neo.Emulation.Dissambler;
-using System;
+﻿using System;
 using System.IO;
 
 namespace NEO_CLI_Disassembler

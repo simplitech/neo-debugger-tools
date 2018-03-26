@@ -84,10 +84,7 @@
     <Compile Include="Attributes\SyscallAttribute.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="IApiInterface.cs" />
-    <Compile Include="Dissambler\NeoDebugMap.cs" />
-    <Compile Include="Dissambler\NeoDisassembler.cs" />
     <Compile Include="Emulator.cs" />
-    <Compile Include="Profiler\ProfilerContext.cs" />
     <Compile Include="StorageContext.cs" />
     <Compile Include="TestCases.cs" />
     <Compile Include="TriggerType.cs" />

@@ -56,6 +56,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NEO-Debugger-Core\NEO-Debugger-Core.csproj">
+      <Project>{F034E57E-520B-4572-88F0-76E8D28D4E7B}</Project>
+      <Name>NEO-Debugger-Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NEO-Emulator\NEO-Emulator.csproj">
       <Project>{372429C2-71BE-41C2-92D0-5A9187BC238A}</Project>
       <Name>NEO-Emulator</Name>

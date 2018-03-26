@@ -352,11 +352,6 @@ namespace Neo.Debugger.Forms
 
             _debugger.Run();
             UpdateDebuggerStateUI();
-            Exception ex = _debugger.Emulator.ProfilerDumpCSV();
-            if (ex != null)
-            {
-                MessageBox.Show(ex.Message, "Profiler Dump CSV");
-            }
         }
 
         private void StepDebugger()
@@ -398,11 +393,6 @@ namespace Neo.Debugger.Forms
             UpdateStackPanel();
             UpdateGasCost(_debugger.Emulator.usedGas);
             UpdateDebuggerStateUI();
-            Exception ex = _debugger.Emulator.ProfilerDumpCSV();
-            if (ex != null)
-            {
-                MessageBox.Show(ex.Message, "Profiler Dump CSV");
-            }
         }
 
         private bool ResetDebugger()
@@ -1136,6 +1126,12 @@ namespace Neo.Debugger.Forms
                         var hintType = !string.IsNullOrEmpty(_settings.lastFunction) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(_settings.lastFunction) ? _debugger.ABI.functions[_settings.lastFunction].returnType : Emulator.Type.Unknown;
 
                         MessageBox.Show("Execution finished.\nGAS cost: " + gasStr + "\nInstruction count: "+_debugger.Emulator.usedOpcodeCount+"\nResult: " + FormattingUtils.StackItemAsString(val, false, hintType));
+
+                        Exception ex = _debugger.profiler.DumpCSV(_debugger.AvmFilePath);
+                        if (ex != null)
+                        {
+                            MessageBox.Show(ex.Message, "Profiler Dump CSV");
+                        }
                         break;
                     }
 
@@ -1446,7 +1442,7 @@ namespace Neo.Debugger.Forms
             }
         }
 
-        private void UpdateGasCost(double gasUsed)
+        private void UpdateGasCost(decimal gasUsed)
         {
             gasCostLabel.Visible = true;
             gasCostLabel.Text = "GAS used: " + gasUsed; 

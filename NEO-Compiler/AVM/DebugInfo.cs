@@ -1,4 +1,4 @@
-﻿using Neo.Emulation.Dissambler;
+﻿using Neo.Debugger.Dissambler;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Neo.Emulation.Dissambler
+namespace Neo.Debugger.Dissambler
 {
     public class DisassembleEntry
     {

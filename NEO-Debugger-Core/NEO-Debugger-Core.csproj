@@ -63,6 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\Enums.cs" />
+    <Compile Include="Dissambler\NeoDebugMap.cs" />
+    <Compile Include="Dissambler\NeoDisassembler.cs" />
+    <Compile Include="Profiler\ProfilerContext.cs" />
     <Compile Include="Utils\InspectorSupport.cs" />
     <Compile Include="Utils\LanguageSupport.cs" />
     <Compile Include="Models\DebugParameters.cs" />
@@ -78,10 +81,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NEO-Compiler\NEO-Compiler.csproj">
-      <Project>{36e1ccd1-3c95-459d-88d1-6f14e07eaec9}</Project>
-      <Name>NEO-Compiler</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NEO-Emulator\NEO-Emulator.csproj">
       <Project>{372429c2-71be-41c2-92d0-5a9187bc238a}</Project>
       <Name>NEO-Emulator</Name>

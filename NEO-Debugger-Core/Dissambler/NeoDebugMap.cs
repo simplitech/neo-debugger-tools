@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using LunarParser.JSON;
-using Neo.Cryptography;
+using Neo.Emulation;
 
-namespace Neo.Emulation.Dissambler
+namespace Neo.Debugger.Dissambler
 {
     public class DebugMapEntry
     {

@@ -1,14 +1,14 @@
 ﻿using Neo.Emulation;
 using Neo.Emulation.API;
-using Neo.Emulation.Dissambler;
 using Neo.Debugger.Core.Data;
 using Neo.Debugger.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Neo.Debugger.Dissambler;
+using Neo.Debugger.Profiler;
+using Neo.VM;
 
 namespace Neo.Debugger.Core.Utils
 {
@@ -36,7 +36,8 @@ namespace Neo.Debugger.Core.Utils
                 return EmulatorLoaded ? _emulator.blockchain : null;
             }
         }
-        public double UsedGasCost
+
+        public decimal UsedGasCost
         {
             get
             {
@@ -184,6 +185,9 @@ namespace Neo.Debugger.Core.Utils
 
         public AVMDisassemble avmDisassemble { get; private set; }
 
+        //Profiler context
+        public ProfilerContext profiler { get; private set; }
+
         //Context
         private string _contractName { get; set; }
         private byte[] _contractByteCode { get; set; }
@@ -232,6 +236,7 @@ namespace Neo.Debugger.Core.Utils
         public DebugManager(Settings settings)
         {
             _settings = settings;
+            this.profiler = new ProfilerContext();
         }
 
         public void Clear()
@@ -331,8 +336,6 @@ namespace Neo.Debugger.Core.Utils
 
                     var sourceCode = File.ReadAllText(entry);
                     _debugContent[entry] = sourceCode;
-
-                    //_emulator.SetProfilerFilenameSource(entry, sourceCode);
                 }
             }
 
@@ -359,7 +362,14 @@ namespace Neo.Debugger.Core.Utils
             blockchain.Load(_blockchainFilePath);
             _emulator = new Emulator(blockchain);
 
+            _emulator.stepDelegate = OnEmulatorStep;
+
             return true;
+        }
+
+        private void OnEmulatorStep(OpCode opcode, decimal gasCost)
+        {
+            this.profiler.TallyOpcode(opcode, gasCost);
         }
 
         public bool DeployContract()
@@ -399,7 +409,6 @@ namespace Neo.Debugger.Core.Utils
             if (useMap)
             {
                 var line = _map.ResolveLine(ofs, out filePath);
-                _emulator.SetProfilerLineno(line - 1);
                 return line - 1;
             }
             else
@@ -450,7 +459,6 @@ namespace Neo.Debugger.Core.Utils
                 else 
                 {
                     var ofs = _map.ResolveStartOffset(line + 1, filePath);
-                    _emulator.SetProfilerLineno(line + 1);
                     return ofs;
                 }
             }
@@ -558,7 +566,8 @@ namespace Neo.Debugger.Core.Utils
             try
             {
                 _currentLine = ResolveLine(_state.offset, useMap, out _currentFilePath);
-                _emulator.SetProfilerLineno(_currentLine);
+                this.profiler.SetLineno(_currentLine);
+                this.profiler.SetFilenameSource(_currentFilePath, GetContentFor(_currentFilePath));
             }
             catch
             {
@@ -582,7 +591,6 @@ namespace Neo.Debugger.Core.Utils
         public void Reset()
         {
             _currentLine = -1;
-            _emulator.SetProfilerLineno(_currentLine);
             _resetFlag = false;
         }
 

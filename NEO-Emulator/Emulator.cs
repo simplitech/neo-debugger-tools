@@ -8,7 +8,6 @@ using Neo.Emulation.API;
 using LunarParser;
 using Neo.Emulation.Utils;
 using System.Diagnostics;
-using Neo.Emulation.Profiler;
 
 namespace Neo.Emulation
 {
@@ -113,18 +112,16 @@ namespace Neo.Emulation
         public TriggerType currentTrigger = TriggerType.Application;
         public uint timestamp = DateTime.Now.ToTimestamp();
 
-        public double usedGas { get; private set; }
+        public decimal usedGas { get; private set; }
         public int usedOpcodeCount { get; private set; }
 
-        //Profiler context
-        public static ProfilerContext _pctx;
+        public delegate void StepDelegate(OpCode opcode, decimal gasCost);
+        public StepDelegate stepDelegate;
 
         public Emulator(Blockchain blockchain)
         {
             this.blockchain = blockchain;
-            this.interop = new InteropService();
-
-            _pctx = new ProfilerContext();
+            this.interop = new InteropService();            
         }
 
         public int GetInstructionPtr()
@@ -291,21 +288,6 @@ namespace Neo.Emulation
             this._ABI = ABI;
         }
 
-        public void SetProfilerFilenameSource(string filename, string source)
-        {
-            _pctx.SetFilenameSource(filename, source);
-        }
-
-        public void SetProfilerLineno(int lineno)
-        {
-            _pctx.SetLineno(lineno);
-        }
-
-        public Exception ProfilerDumpCSV()
-        {
-            return _pctx.DumpCSV();
-        }
-
         public void SetBreakpointState(int ofs, bool enabled)
         {
             if (enabled)
@@ -414,7 +396,7 @@ namespace Neo.Emulation
                 lastOffset = engine.CurrentContext.InstructionPointer;
 
                 var opcode = engine.lastOpcode;
-                double opCost;
+                decimal opCost;
 
                 if (opcode <= OpCode.PUSH16)
                 {
@@ -430,31 +412,34 @@ namespace Neo.Emulation
 
                                 if (engine.lastSysCall.EndsWith("Storage.Put"))
                                 {
-                                    opCost *= (Storage.lastStorageLength / 1024.0);
-                                    if (opCost < 1.0) opCost = 1.0;
-                                    _pctx.TallyOpcode(OpCode._STORAGE, opCost);
+                                    opCost *= (Storage.lastStorageLength / 1024.0m);
+                                    if (opCost < 1) opCost = 1;
                                 }
                                 break;
                             }
 
                         case OpCode.CHECKMULTISIG:
-                        case OpCode.CHECKSIG: opCost = 0.1; break;
+                        case OpCode.CHECKSIG: opCost = 0.1m; break;
 
                         case OpCode.APPCALL:
                         case OpCode.TAILCALL:
                         case OpCode.SHA256:
-                        case OpCode.SHA1: opCost = 0.01; break;
+                        case OpCode.SHA1: opCost = 0.01m; break;
 
                         case OpCode.HASH256:
-                        case OpCode.HASH160: opCost = 0.02; break;
+                        case OpCode.HASH160: opCost = 0.02m; break;
 
                         case OpCode.NOP: opCost = 0; break;
-                        default: opCost = 0.001; break;
+                        default: opCost = 0.001m; break;
                     }
 
                 usedGas += opCost;
                 usedOpcodeCount++;
-                _pctx.TallyOpcode(opcode, opCost);
+
+                if (stepDelegate != null)
+                {
+                    stepDelegate(opcode, opCost);
+                }
             }
             catch
             {
