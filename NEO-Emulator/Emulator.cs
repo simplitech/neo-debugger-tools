@@ -141,20 +141,6 @@ namespace Neo.Emulation
         {
             this.currentAccount = address;
             this.contractByteCode = address.byteCode;
-
-            var assembly = typeof(Neo.Emulation.Helper).Assembly;
-            var methods = assembly.GetTypes()
-                                  .SelectMany(t => t.GetMethods())
-                                  .Where(m => m.GetCustomAttributes(typeof(SyscallAttribute), false).Length > 0)
-                                  .ToArray();
-
-            foreach (var method in methods)
-            {
-                var attr = (SyscallAttribute)method.GetCustomAttributes(typeof(SyscallAttribute), false).FirstOrDefault();
-
-                interop.Register(attr.Method, (engine) => { return (bool)method.Invoke(null, new object[] { engine }); }, attr.gasCost);
-                Debug.WriteLine("interopRegister:\t" + attr.Method);
-            }
         }
 
         private int lastOffset = -1;

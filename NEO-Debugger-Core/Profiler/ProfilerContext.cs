@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Neo.VM;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -43,10 +44,18 @@ namespace Neo.Debugger.Profiler
         public int[] totalTallyByOpcode = new int[MAXNOPTCODES];
         public decimal[] totalCostByOpcode = new decimal[MAXNOPTCODES];
         public HashSet<string> sysCallUsed = new HashSet<string>();
+        public Dictionary<string, decimal> sysCallCost = new Dictionary<string, decimal>();
 
         public ProfilerContext()
         {
             dictStmtInfo = new Dictionary<string, SourceStmtInfo>();
+
+            var interopService = new InteropService();
+            foreach (var sysCall in interopService.Calls)
+            {
+                var name = sysCall.name.Replace("Neo.", "");
+                sysCallCost[name] = sysCall.gasCost;
+            }
         }
 
         public void TallyOpcode(Neo.VM.OpCode opcode, decimal opCost, int lineNumber, string fileName, string fileSource, string sysCall)
@@ -159,6 +168,13 @@ namespace Neo.Debugger.Profiler
                         }
                         totalTallyByOpcode[opcode] = 0;
                     }
+
+                    foreach (var sysCall in sysCallUsed)
+                    {
+                        var cost = sysCallCost.ContainsKey(sysCall) ? sysCallCost[sysCall] : 0;
+                        file.Write(",\"" + cost + "\"");
+                    }
+
                     file.WriteLine();
 
                     var entries = dictStmtInfo.Values.OrderBy(x => x._filelineo.fileName).ThenBy(x => x._filelineo.lineNumber);
@@ -199,6 +215,8 @@ namespace Neo.Debugger.Profiler
                             totalOpcodeTally += totalTallyByOpcode[opcode];
                         }
                     }
+
+
                     file.WriteLine();
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
@@ -231,6 +249,12 @@ namespace Neo.Debugger.Profiler
                             file.Write(",\"" + opcodeNames[opcode] + "\"");
                         }
                     }
+
+                    foreach (var sysCall in sysCallUsed)
+                    {
+                        file.Write(",\"" + sysCall + "\"");
+                    }
+
                     file.WriteLine();
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
@@ -243,9 +267,14 @@ namespace Neo.Debugger.Profiler
                         }
                         totalCostByOpcode[opcode] = 0;
                     }
+                    foreach (var sysCall in sysCallUsed)
+                    {
+                        var cost = sysCallCost.ContainsKey(sysCall) ? sysCallCost[sysCall] : 0;
+                        file.Write(",\"" + cost + "\"");
+                    }
                     file.WriteLine();
 
-                    foreach (SourceStmtInfo ssi in dictStmtInfo.Values)
+                    foreach (SourceStmtInfo ssi in entries)
                     {
                         file.Write("\"" + ssi._filelineo.fileName + "\"");
                         file.Write(",\"" + ssi._filelineo.lineNumber.ToString() + "\"");

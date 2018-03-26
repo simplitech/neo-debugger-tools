@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Neo.Emulation;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Neo.VM
 {
     public class InteropCall
     {
+        public string name;
         public Func<ExecutionEngine, bool> handler;
         public decimal gasCost;
     }
@@ -15,12 +18,27 @@ namespace Neo.VM
 
         private Dictionary<string, InteropCall> dictionary = new Dictionary<string, InteropCall>();
 
+        public IEnumerable<InteropCall> Calls => dictionary.Values;
+
         public InteropService()
         {
             Register("System.ExecutionEngine.GetScriptContainer", GetScriptContainer, defaultGasCost);
             Register("System.ExecutionEngine.GetExecutingScriptHash", GetExecutingScriptHash, defaultGasCost);
             Register("System.ExecutionEngine.GetCallingScriptHash", GetCallingScriptHash, defaultGasCost);
             Register("System.ExecutionEngine.GetEntryScriptHash", GetEntryScriptHash, defaultGasCost);
+
+            var assembly = typeof(Neo.Emulation.Helper).Assembly;
+            var methods = assembly.GetTypes()
+                                  .SelectMany(t => t.GetMethods())
+                                  .Where(m => m.GetCustomAttributes(typeof(SyscallAttribute), false).Length > 0)
+                                  .ToArray();
+
+            foreach (var method in methods)
+            {
+                var attr = (SyscallAttribute)method.GetCustomAttributes(typeof(SyscallAttribute), false).FirstOrDefault();
+
+                this.Register(attr.Method, (engine) => { return (bool)method.Invoke(null, new object[] { engine }); }, attr.gasCost);
+            }
         }
 
         public InteropCall FindCall(string method)
@@ -34,6 +52,7 @@ namespace Neo.VM
             var call = new InteropCall();
             call.handler = handler;
             call.gasCost = gasCost;
+            call.name = method;
             dictionary[method] = call;
         }
 
