@@ -21,11 +21,12 @@ namespace Neo.Debugger.Profiler
     public class SourceStmtInfo
     {
         private const int MAXNOPTCODES = 256;
+        private const int SYSCALLOPTCODES = 100; // Ten times as many as currently exists
 
         public SourceFileLine _filelineo;
         public string _sourceStmt;
-        public int[] _stmtOpcodeCount = new int[MAXNOPTCODES];
-        public decimal[] _stmtOpcodeCost = new decimal[MAXNOPTCODES];
+        public int[] _stmtOpcodeCount = new int[MAXNOPTCODES + SYSCALLOPTCODES];
+        public decimal[] _stmtOpcodeCost = new decimal[MAXNOPTCODES + SYSCALLOPTCODES];
 
         public Dictionary<string, int> _sysCallCount = new Dictionary<string, int>();
         public Dictionary<string, decimal> _sysCallCost= new Dictionary<string, decimal>();
@@ -34,16 +35,17 @@ namespace Neo.Debugger.Profiler
     public class ProfilerContext
     {
         private const int MAXNOPTCODES = 256;
+        private const int SYSCALLOPTCODES = 100; // Ten times as many as currently exists
 
         public Dictionary<string, string[]> sourceLines = new Dictionary<string, string[]>();
 
-        public string[] opcodeNames = new string[MAXNOPTCODES];
-        public decimal[] opcodeCosts = new decimal[MAXNOPTCODES];
-        public bool[] opcodeUsed = new bool[MAXNOPTCODES];
+        public string[] opcodeNames = new string[MAXNOPTCODES + SYSCALLOPTCODES];
+        public decimal[] opcodeCosts = new decimal[MAXNOPTCODES + SYSCALLOPTCODES];
+        public bool[] opcodeUsed = new bool[MAXNOPTCODES + SYSCALLOPTCODES];
         public Dictionary<string, SourceStmtInfo> dictStmtInfo;
-        public int[] totalTallyByOpcode = new int[MAXNOPTCODES];
-        public decimal[] totalCostByOpcode = new decimal[MAXNOPTCODES];
-        public HashSet<string> sysCallUsed = new HashSet<string>();
+        public int[] totalTallyByOpcode = new int[MAXNOPTCODES + SYSCALLOPTCODES];
+        public decimal[] totalCostByOpcode = new decimal[MAXNOPTCODES + SYSCALLOPTCODES];
+        public HashSet<string> sysCallNamesUsed = new HashSet<string>();
         public Dictionary<string, decimal> sysCallCost = new Dictionary<string, decimal>();
 
         public ProfilerContext()
@@ -58,7 +60,7 @@ namespace Neo.Debugger.Profiler
             }
         }
 
-        public void TallyOpcode(Neo.VM.OpCode opcode, decimal opCost, int lineNumber, string fileName, string fileSource, string sysCall)
+        public void TallyOpcode(Neo.VM.OpCode opcode, decimal opCost, int lineNumber, string fileName, string fileSource, string sysCallName)
         {
             SourceFileLine sfl = new SourceFileLine(fileName, lineNumber);
 
@@ -98,19 +100,19 @@ namespace Neo.Debugger.Profiler
                 dictStmtInfo[key] = ssi;
             }
 
-            if (opcode == VM.OpCode.SYSCALL && sysCall != null)
+            if (opcode == VM.OpCode.SYSCALL && sysCallName != null)
             {
-                sysCall = sysCall.Replace("Neo.", "");
-                sysCallUsed.Add(sysCall);
+                sysCallName = sysCallName.Replace("Neo.", "");
+                sysCallNamesUsed.Add(sysCallName);
 
-                if (!ssi._sysCallCost.ContainsKey(sysCall))
+                if (!ssi._sysCallCost.ContainsKey(sysCallName))
                 {
-                    ssi._sysCallCost[sysCall] = 0;
-                    ssi._sysCallCount[sysCall] = 0;
+                    ssi._sysCallCost[sysCallName] = 0;
+                    ssi._sysCallCount[sysCallName] = 0;
                 }
 
-                ssi._sysCallCount[sysCall] += 1;
-                ssi._sysCallCost[sysCall] += opCost;
+                ssi._sysCallCount[sysCallName] += 1;
+                ssi._sysCallCost[sysCallName] += opCost;
             }
 
             ssi._stmtOpcodeCount[(int)opcode]++;
@@ -123,16 +125,29 @@ namespace Neo.Debugger.Profiler
             string csvfilename = avmFilePath.Replace(".avm", ".csv");
             try
             {
+                int offset = 0;
+                foreach (var sysCallName in sysCallNamesUsed)
+                {
+                    opcodeUsed[MAXNOPTCODES + offset] = true;
+                    opcodeNames[MAXNOPTCODES + offset] = sysCallName;
+
+                    decimal cost = sysCallCost[sysCallName];
+                    opcodeCosts[MAXNOPTCODES + offset] = cost;
+                    offset++;
+                }
+
                 using (System.IO.StreamWriter file = new System.IO.StreamWriter(csvfilename))
                 {
                     file.WriteLine();
                     file.WriteLine("\"Tally by Opcode\"");
                     file.WriteLine();
 
+                    // Dump opcodes (header)
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "Opcode (Hex) >" + "\"");
-                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
                         {
@@ -140,27 +155,27 @@ namespace Neo.Debugger.Profiler
                         }
                     }
                     file.WriteLine();
+
+                    // Dump opcodeNames (header)
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "Opcode >" + "\"");
-                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
                         {
                             file.Write(",\"" + opcodeNames[opcode] + "\"");
                         }
                     }
-
-                    foreach (var sysCall in sysCallUsed)
-                    {
-                        file.Write(",\"" + sysCall + "\"");
-                    }
-
                     file.WriteLine();
+
+                    // Dump opcodeCosts (header)
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
-                    file.Write(",\"" + "Cost >" + "\"");
-                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "V Stmt Opcode Tally / Opcode Cost >" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
                         {
@@ -168,46 +183,55 @@ namespace Neo.Debugger.Profiler
                         }
                         totalTallyByOpcode[opcode] = 0;
                     }
-
-                    foreach (var sysCall in sysCallUsed)
-                    {
-                        var cost = sysCallCost.ContainsKey(sysCall) ? sysCallCost[sysCall] : 0;
-                        file.Write(",\"" + cost + "\"");
-                    }
-
                     file.WriteLine();
 
                     var entries = dictStmtInfo.Values.OrderBy(x => x._filelineo.fileName).ThenBy(x => x._filelineo.lineNumber);
 
+                    // Dump opcode tally for each (source line x opcode)
                     foreach (SourceStmtInfo ssi in entries)
                     {
                         file.Write("\"" + ssi._filelineo.fileName + "\"");
                         file.Write(",\"" + ssi._filelineo.lineNumber.ToString() + "\"");
                         file.Write(",\"" + ssi._sourceStmt.Replace("\"", "''") + "\"");
 
-                        for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                        offset = 0;
+                        foreach (var sysCallName in sysCallNamesUsed)
+                        {
+                            int count = ssi._sysCallCount.ContainsKey(sysCallName) ? ssi._sysCallCount[sysCallName] : 0;
+                            ssi._stmtOpcodeCount[MAXNOPTCODES + offset] = count;
+                            offset++;
+                        }
+
+                        int stmtTally = 0;
+                        for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                         {
                             if (opcodeUsed[opcode])
                             {
-                                file.Write(",\"" + ssi._stmtOpcodeCount[opcode].ToString() + "\"");
-
+                                stmtTally += ssi._stmtOpcodeCount[opcode];
                                 totalTallyByOpcode[opcode] += ssi._stmtOpcodeCount[opcode];
                             }
                         }
 
-                        foreach (var sysCall in sysCallUsed)
+                        file.Write(",\"" + stmtTally.ToString() + "\""); // Column D = total opcode tally for this stmt
+
+                        for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                         {
-                            int count  = ssi._sysCallCount.ContainsKey(sysCall) ? ssi._sysCallCount[sysCall] :0;
-                            file.Write(",\"" + count + "\"");
+                            if (opcodeUsed[opcode])
+                            {
+                                file.Write(",\"" + ssi._stmtOpcodeCount[opcode].ToString() + "\"");
+                            }
                         }
 
                         file.WriteLine();
                     }
+
+                    // Tally and dump opcode tallies (footer) / tally grand total tally
                     int totalOpcodeTally = 0;
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
-                    file.Write(",\"" + "Tally by Opcode>" + "\"");
-                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Tally by Opcode >" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
                         {
@@ -215,12 +239,13 @@ namespace Neo.Debugger.Profiler
                             totalOpcodeTally += totalTallyByOpcode[opcode];
                         }
                     }
-
-
                     file.WriteLine();
+
+                    // Dump grand total tally (footer)
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
-                    file.Write(",\"" + "Total Tally>" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Total Tally >" + "\"");
                     file.Write(",\"" + totalOpcodeTally.ToString() + "\"");
                     file.WriteLine();
 
@@ -228,10 +253,12 @@ namespace Neo.Debugger.Profiler
                     file.WriteLine("\"Costs by Opcode\"");
                     file.WriteLine();
 
+                    // Dump opcodes (header)
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "Opcode (Hex) >" + "\"");
-                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
                         {
@@ -239,27 +266,27 @@ namespace Neo.Debugger.Profiler
                         }
                     }
                     file.WriteLine();
+
+                    // Dump opcodeNames (header)
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "Opcode >" + "\"");
-                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
                         {
                             file.Write(",\"" + opcodeNames[opcode] + "\"");
                         }
                     }
-
-                    foreach (var sysCall in sysCallUsed)
-                    {
-                        file.Write(",\"" + sysCall + "\"");
-                    }
-
                     file.WriteLine();
+
+                    // Dump opcodeCosts (header)
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
-                    file.Write(",\"" + "Cost >" + "\"");
-                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "V Stmt Cost / Opcode Cost >" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
                         {
@@ -267,42 +294,52 @@ namespace Neo.Debugger.Profiler
                         }
                         totalCostByOpcode[opcode] = 0;
                     }
-                    foreach (var sysCall in sysCallUsed)
-                    {
-                        var cost = sysCallCost.ContainsKey(sysCall) ? sysCallCost[sysCall] : 0;
-                        file.Write(",\"" + cost + "\"");
-                    }
                     file.WriteLine();
 
+                    // Dump opcode cost for each (source line x opcode)
                     foreach (SourceStmtInfo ssi in entries)
                     {
                         file.Write("\"" + ssi._filelineo.fileName + "\"");
                         file.Write(",\"" + ssi._filelineo.lineNumber.ToString() + "\"");
                         file.Write(",\"" + ssi._sourceStmt.Replace("\"", "''") + "\"");
 
-                        for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                        offset = 0;
+                        foreach (var sysCallName in sysCallNamesUsed)
+                        {
+                            decimal cost = ssi._sysCallCost.ContainsKey(sysCallName) ? ssi._sysCallCost[sysCallName] : 0;
+                            ssi._stmtOpcodeCost[MAXNOPTCODES + offset] = cost;
+                            offset++;
+                        }
+
+                        decimal stmtCost = 0;
+                        for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                         {
                             if (opcodeUsed[opcode])
                             {
-                                file.Write(",\"" + ssi._stmtOpcodeCost[opcode].ToString() + "\"");
-
+                                stmtCost += ssi._stmtOpcodeCost[opcode];
                                 totalCostByOpcode[opcode] += ssi._stmtOpcodeCost[opcode];
                             }
                         }
 
-                        foreach (var sysCall in sysCallUsed)
-                        {
-                            decimal cost = ssi._sysCallCost.ContainsKey(sysCall) ? ssi._sysCallCost[sysCall]: 0;
-                            file.Write(",\"" + cost + "\"");
-                        }
+                        file.Write(",\"" + stmtCost.ToString() + "\""); // Column D = total opcode cost for this stmt
 
+                        for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
+                        {
+                            if (opcodeUsed[opcode])
+                            {
+                                file.Write(",\"" + ssi._stmtOpcodeCost[opcode].ToString() + "\"");
+                            }
+                        }
                         file.WriteLine();
                     }
+
+                    // Tally and dump opcode costs (footer) / Tally grad total cost
                     decimal totalOpcodeCost = 0;
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
-                    file.Write(",\"" + "Costs by Opcode>" + "\"");
-                    for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Costs by Opcode >" + "\"");
+                    for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
                         {
@@ -311,9 +348,12 @@ namespace Neo.Debugger.Profiler
                         }
                     }
                     file.WriteLine();
+
+                    // Dump grand total cost (footer)
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
-                    file.Write(",\"" + "Total Cost>" + "\"");
+                    file.Write(",\"" + "" + "\"");
+                    file.Write(",\"" + "Total Cost >" + "\"");
                     file.Write(",\"" + totalOpcodeCost.ToString() + "\"");
                     file.WriteLine();
                 }
