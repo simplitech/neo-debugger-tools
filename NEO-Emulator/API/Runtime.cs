@@ -92,7 +92,7 @@ namespace Neo.Emulator.API
                 matchType += " / Forced";
             }
 
-            DoLog($"Checking Witness [{matchType}]: {FormattingUtils.OutputData(hashOrPubkey, false, null)} => {result}");
+            DoLog($"Checking Witness [{matchType}]: {FormattingUtils.OutputData(hashOrPubkey, false)} => {result}");
 
             engine.EvaluationStack.Push(new VM.Types.Boolean(result));
             return true;

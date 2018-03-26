@@ -4,30 +4,49 @@ using System.Collections.Generic;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Neo.Emulator.NeoEmulator;
+using Neo.Emulator;
 
 namespace Neo.Debugger.Core.Utils
 {
-    public class VariableAssignement
-    {
-        public string varName;
-        public int lineNumber;
-
-        public override string ToString()
-        {
-            return lineNumber + " => " + varName;
-        }
-    }
-
     public class InspectorWalker : CSharpSyntaxWalker
     {
-        private List<VariableAssignement> assignements;
+        private Dictionary<int, Assignment> assignements;
 
-        public InspectorWalker(List<VariableAssignement> assignements) : base(SyntaxWalkerDepth.Node)
+        public InspectorWalker(Dictionary<int, Assignment> assignements) : base(SyntaxWalkerDepth.Node)
         {
             this.assignements = assignements;
         }
 
-        private void AddLine(SyntaxNode node, string name)
+        private NeoEmulator.Type ConvertType(string typeName)
+        {
+            if (string.IsNullOrEmpty(typeName))
+            {
+                return NeoEmulator.Type.Unknown;
+            }
+            else
+            switch (typeName.ToLower())
+            {
+                    case "byte[]": return NeoEmulator.Type.ByteArray;
+                    case "string": return NeoEmulator.Type.String;
+                    case "bool": return NeoEmulator.Type.Boolean;
+                    case "int":
+                    case "uint":
+                    case "long":
+                    case "ulong":
+                    case "biginteger":
+                        return NeoEmulator.Type.ByteArray;
+                    default:
+                        if (typeName.EndsWith("[]"))
+                        {
+                            return NeoEmulator.Type.Array;
+                        }
+                        return NeoEmulator.Type.Unknown;
+            }
+
+        }
+
+        private void AddLine(SyntaxNode node, string name, NeoEmulator.Type type)
         {
             var position = node.SpanStart;
             var text = node.GetText();
@@ -36,12 +55,17 @@ namespace Neo.Debugger.Core.Utils
             var lineSpan = loc.SourceTree.GetLineSpan(loc.SourceSpan);
             var line = lineSpan.StartLinePosition.Line + 1;
 
-            assignements.Add(new VariableAssignement() { lineNumber = line, varName = name });
+            assignements[line] = new Assignment() { name = name, type = type };
         }
 
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
             base.VisitMethodDeclaration(node);
+
+            if (node.Body == null)
+            {
+                return;
+            }
 
             foreach (var st in node.Body.Statements)
             {
@@ -54,11 +78,14 @@ namespace Neo.Debugger.Core.Utils
         {
             base.VisitLocalDeclarationStatement(node);
 
+
             foreach (VariableDeclaratorSyntax entry in node.Declaration.Variables)
             {
                 if (entry.Initializer != null)
                 {
-                    AddLine(entry, entry.Identifier.ToString());
+                    var typeNode = entry.Parent as VariableDeclarationSyntax;
+                    
+                    AddLine(entry, entry.Identifier.ToString(), ConvertType(typeNode!=null ? typeNode.Type.ToString(): null));
                 }
             }
         }
@@ -67,18 +94,21 @@ namespace Neo.Debugger.Core.Utils
         {
             base.VisitExpressionStatement(node);
 
-            var s = (AssignmentExpressionSyntax)node.Expression;
+            var s = node.Expression as AssignmentExpressionSyntax;
 
-            AddLine(node, s.Left.ToString());
+            if (s != null)
+            {
+                AddLine(node, s.Left.ToString(), NeoEmulator.Type.Unknown);
+            }
         }
 
     }
 
     public static class InspectorSupport
     {
-        public static List<VariableAssignement> ParseAssigments(string sourceCode, SourceLanguage language)
+        public static Dictionary<int, Assignment> ParseAssigments(string sourceCode, SourceLanguage language)
         {
-            var result = new List<VariableAssignement>();
+            var result = new Dictionary<int, Assignment>();
             switch (language)
             {
                 case SourceLanguage.CSharp:

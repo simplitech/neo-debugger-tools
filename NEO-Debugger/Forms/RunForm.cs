@@ -153,7 +153,7 @@ namespace Neo.Debugger.Forms
                         argList += ",";
                     }
 
-                    if (p.type.Contains("Array"))
+                    if (p.type == NeoEmulator.Type.Array || p.type == NeoEmulator.Type.ByteArray)
                     {
                         var s = val.ToString();
 
@@ -190,9 +190,9 @@ namespace Neo.Debugger.Forms
                         }
                     }
                     else
-                        switch (p.type.ToLower())
+                        switch (p.type)
                         {
-                            case "string":
+                            case NeoEmulator.Type.String:
                                 {
                                     var s = val.ToString();
                                     if (!s.StartsWith("\"") || !s.EndsWith("\""))
@@ -204,7 +204,7 @@ namespace Neo.Debugger.Forms
                                     break;
                                 }
 
-                            case "integer":
+                            case NeoEmulator.Type.Integer:
                                 {
                                     BigInteger n;
                                     var s = val.ToString();
@@ -217,7 +217,7 @@ namespace Neo.Debugger.Forms
                                     break;
                                 }
 
-                            case "boolean":
+                            case NeoEmulator.Type.Boolean:
                                 {
                                     switch (val.ToString().ToLower())
                                     {
@@ -439,9 +439,9 @@ namespace Neo.Debugger.Forms
 
         private void EnablePlaceholderText(int row, int col, AVMInput p)
         {
-            var s = p.type;
+            var s = p.type.ToString();
 
-            if (p.type.Contains("Array"))
+            if (p.type == NeoEmulator.Type.Array || p.type == NeoEmulator.Type.ByteArray)
             {
                 s += " (Eg: [1, 2, \"something\"]";
             }

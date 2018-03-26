@@ -1126,7 +1126,7 @@ namespace Neo.Debugger.Forms
                         
                         var gasStr = string.Format("{0:N4}", _debugger.Emulator.usedGas);
 
-                        string hintType = !string.IsNullOrEmpty(_settings.lastFunction) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(_settings.lastFunction) ? _debugger.ABI.functions[_settings.lastFunction].returnType : null;
+                        var hintType = !string.IsNullOrEmpty(_settings.lastFunction) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(_settings.lastFunction) ? _debugger.ABI.functions[_settings.lastFunction].returnType : NeoEmulator.Type.Unknown;
 
                         MessageBox.Show("Execution finished.\nGAS cost: " + gasStr + "\nInstruction count: "+_debugger.Emulator.usedOpcodeCount+"\nResult: " + FormattingUtils.StackItemAsString(val, false, hintType));
                         break;
@@ -1370,8 +1370,8 @@ namespace Neo.Debugger.Forms
                     {
                         try
                         {
-                            var ofs = _debugger.Map.ResolveEndOffset(entry.lineNumber, path);
-                            _debugger.Emulator.AddAssigment(ofs, entry.varName);
+                            var ofs = _debugger.Map.ResolveEndOffset(entry.Key, path);
+                            _debugger.Emulator.AddAssigment(ofs, entry.Value.name, entry.Value.type);
                         }
                         catch
                         {
@@ -1385,13 +1385,13 @@ namespace Neo.Debugger.Forms
 
         private string ValidateHover(string text)
         {
-            var value = _debugger.Emulator.GetVariableValue(text);
-            if (value == null)
+            var variable = _debugger.Emulator.GetVariable(text);
+            if (variable == null)
             {
                 return null;
             }
 
-            return text + " = " +FormattingUtils.StackItemAsString(value);
+            return text + " = " +FormattingUtils.StackItemAsString(variable.value, false, variable.type);
         }
 
         private void OpenStorage()

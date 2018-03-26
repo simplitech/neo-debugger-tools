@@ -11,7 +11,7 @@ namespace Neo.Emulator.Utils
 {
     public static class FormattingUtils
     {
-        public static string StackItemAsString(StackItem item, bool addQuotes = false, string hintType = null)
+        public static string StackItemAsString(StackItem item, bool addQuotes = false, NeoEmulator.Type hintType = NeoEmulator.Type.Unknown)
         {
             if (item is ICollection)
             {
@@ -43,12 +43,12 @@ namespace Neo.Emulator.Utils
                 return s.ToString();
             }
 
-            if (item is Neo.VM.Types.Boolean && hintType == null)
+            if (item is Neo.VM.Types.Boolean && hintType == NeoEmulator.Type.Unknown)
             {
                 return item.GetBoolean().ToString();
             }
 
-            if (item is Neo.VM.Types.Integer && hintType == null)
+            if (item is Neo.VM.Types.Integer && hintType == NeoEmulator.Type.Unknown)
             {
                 return item.GetBigInteger().ToString();
             }
@@ -97,7 +97,7 @@ namespace Neo.Emulator.Utils
             Void = 255
         };
 
-        public static string OutputData(byte[] data, bool addQuotes, string hintType = null)
+        public static string OutputData(byte[] data, bool addQuotes, NeoEmulator.Type hintType = NeoEmulator.Type.Unknown)
         {
             if (data == null)
             {
@@ -212,21 +212,21 @@ namespace Neo.Emulator.Utils
             }
             else
             {
-                if (hintType != null)
+                if (hintType != NeoEmulator.Type.Unknown)
                 {
-                    switch (hintType.ToLower())
+                    switch (hintType)
                     {
-                        case "string":
+                        case NeoEmulator.Type.String:
                             {
                                 return System.Text.Encoding.UTF8.GetString(data);
                             }
 
-                        case "boolean":
+                        case NeoEmulator.Type.Boolean:
                             {
                                 return (data != null && data.Length > 0 && data[0] != 0) ? "True" : "False";
                             }
 
-                        case "integer":
+                        case NeoEmulator.Type.Integer:
                             {
                                 return new BigInteger(data).ToString();
                             }

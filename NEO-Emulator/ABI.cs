@@ -1,4 +1,5 @@
 ﻿using LunarParser.JSON;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,13 +9,13 @@ namespace Neo.Emulator
     public class AVMInput
     {
         public string name;
-        public string type;
+        public NeoEmulator.Type type;
     }
 
     public class AVMFunction
     {
         public string name;
-        public string returnType;
+        public NeoEmulator.Type returnType;
         public AVMInput[] inputs;
     }
 
@@ -28,7 +29,7 @@ namespace Neo.Emulator
         {
             var f = new AVMFunction();
             f.name = "Main";
-            f.inputs = new AVMInput[] { new AVMInput() { name = "args", type = "Array" } };
+            f.inputs = new AVMInput[] { new AVMInput() { name = "args", type = NeoEmulator.Type.Array } };
 
             this.functions[f.name] = f;
             this.entryPoint = functions.Values.FirstOrDefault();
@@ -45,7 +46,10 @@ namespace Neo.Emulator
             foreach (var child in fn.Children) {
                 var f = new AVMFunction();
                 f.name = child.GetString("name");
-                f.returnType = child.GetString("returnType");
+                if (!Enum.TryParse(child.GetString("returnType"), out f.returnType))
+                {
+                    f.returnType = NeoEmulator.Type.Unknown;
+                }
 
                 var p = child.GetNode("parameters");
                 if (p != null && p.ChildCount > 0)
@@ -55,7 +59,10 @@ namespace Neo.Emulator
                     {
                         var input = new AVMInput();
                         input.name = p[i].GetString("name");
-                        input.type = p[i].GetString("type");
+                        if (!Enum.TryParse<NeoEmulator.Type>(p[i].GetString("type"), out input.type))
+                        {
+                            input.type = NeoEmulator.Type.Unknown;
+                        }                         
                         f.inputs[i] = input;
                     }
                 }

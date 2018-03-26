@@ -70,6 +70,28 @@ namespace Neo.Emulator
 
     public class NeoEmulator 
     {
+        public enum Type
+        {
+            Unknown,
+            String,
+            Boolean,
+            Integer,
+            Array,
+            ByteArray
+        }
+
+        public class Variable
+        {
+            public StackItem value;
+            public Type type;
+        }
+
+        public struct Assignment
+        {
+            public string name;
+            public Type type;
+        }
+
         private ExecutionEngine engine;
         public byte[] contractByteCode { get; private set; }
 
@@ -196,7 +218,9 @@ namespace Neo.Emulator
             }
         }
 
-        public void Reset(DataNode inputs)
+        private ABI _ABI;
+
+        public void Reset(DataNode inputs, ABI ABI)
         {
             if (contractByteCode == null || contractByteCode.Length == 0)
             {
@@ -216,8 +240,6 @@ namespace Neo.Emulator
 
             usedGas = 0;
             usedOpcodeCount = 0;
-
-            _variables.Clear();
 
             currentTransaction.emulator = this;
             engine = new ExecutionEngine(currentTransaction, Crypto.Default, null, interop);
@@ -264,6 +286,9 @@ namespace Neo.Emulator
 
             lastState = new DebuggerState(DebuggerState.State.Reset, 0);
             currentTransaction = null;
+
+            _variables.Clear();
+            this._ABI = ABI;
         }
 
         public void SetProfilerFilenameSource(string filename, string source)
@@ -309,6 +334,35 @@ namespace Neo.Emulator
                 {
                     engine.StepInto();
                 }
+
+                if (this._ABI != null && _ABI.entryPoint != null)
+                {
+                    int index = 0;
+                    foreach (var entry in _ABI.entryPoint.inputs)
+                    {
+                        try
+                        {
+                            var val = engine.EvaluationStack.Peek(index);
+
+                            var varType = entry.type;
+
+                            // if the type is unknown we can always check if the type was known in a previous assigment
+                            var prevVal = GetVariable(entry.name);
+                            if (varType == Type.Unknown && prevVal != null)
+                            {
+                                varType = prevVal.type;
+                            }
+
+                            _variables[entry.name] = new Variable() { value = val, type = varType };
+
+                            index++;
+                        }
+                        catch
+                        {
+                            break;
+                        }
+                    }
+                }
             }
 
             var shouldContinue = GetRunningState();
@@ -322,11 +376,11 @@ namespace Neo.Emulator
 
                     if (_assigments.ContainsKey(currentOffset))
                     {
-                        var varName = _assigments[currentOffset];
+                        var ass = _assigments[currentOffset];
                         try
                         {
                             var val = engine.EvaluationStack.Peek();
-                            _variables[varName] = val;
+                            _variables[ass.name] =  new Variable() { value = val, type = ass.type };
                         }
                         catch
                         {
@@ -576,8 +630,8 @@ namespace Neo.Emulator
             }
         }
 
-        private Dictionary<int, string> _assigments = new Dictionary<int, string>();
-        private Dictionary<string, StackItem> _variables = new Dictionary<string, StackItem>();
+        private Dictionary<int, Assignment> _assigments = new Dictionary<int, Assignment>();
+        private Dictionary<string, Variable> _variables = new Dictionary<string, Variable>();
 
         public void ClearAssignments()
         {
@@ -585,12 +639,12 @@ namespace Neo.Emulator
             _variables.Clear();
         }
 
-        public void AddAssigment(int offset, string name)
+        public void AddAssigment(int offset, string name, Type type)
         {
-            _assigments[offset] = name;
+            _assigments[offset] = new Assignment() { name = name, type = type};
         }
 
-        public StackItem GetVariableValue(string name)
+        public Variable GetVariable(string name)
         {
             if (_variables.ContainsKey(name))
             {

@@ -35,7 +35,8 @@ namespace Neo.Debugger.Forms
             var storage = _debugger.currentAccount.storage;
             foreach (var entry in storage.entries)
             {
-                string hintType = entry.Key.Length == 20 ? "Integer" : "Integer";
+                // TODO : Proper type detection?
+                NeoEmulator.Type hintType = entry.Key.Length == 20 ? NeoEmulator.Type.Integer : NeoEmulator.Type.Integer;
                 dataGridView1.Rows.Add(FormattingUtils.OutputData(entry.Key, false), FormattingUtils.OutputData(entry.Value, false, hintType));
             }
         }

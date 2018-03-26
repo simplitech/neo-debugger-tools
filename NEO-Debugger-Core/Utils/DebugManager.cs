@@ -616,7 +616,7 @@ namespace Neo.Debugger.Core.Utils
 
             try
             {
-                _emulator.Reset(debugParams.ArgList);
+                _emulator.Reset(debugParams.ArgList, this.ABI);
             }
             catch
             {
