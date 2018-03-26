@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using Neo.Debugger.Dissambler;
 using Neo.Debugger.Profiler;
-using Neo.VM;
 
 namespace Neo.Debugger.Core.Utils
 {
@@ -180,7 +179,7 @@ namespace Neo.Debugger.Core.Utils
         private Emulator _emulator { get; set; }
         private Dictionary<string, string> _debugContent = new Dictionary<string, string>();
         private ABI _ABI { get; set; }
-        private NeoMapFile _map { get; set; }        
+        private NeoMapFile _map { get; set; }
         private bool _isCompiled { get; set; }
 
         public AVMDisassemble avmDisassemble { get; private set; }
@@ -201,7 +200,7 @@ namespace Neo.Debugger.Core.Utils
 
         //Tests
         private TestSuite _tests { get; set; }
-        
+
         //File paths
         private string _avmFilePath { get; set; }
         private string _oldMapFilePath
@@ -212,21 +211,24 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
-        private string _mapFilePath {
+        private string _mapFilePath
+        {
             get
             {
                 return _avmFilePath.Replace(".avm", ".debug.json");
             }
         }
 
-        private string _abiFilePath {
+        private string _abiFilePath
+        {
             get
             {
                 return _avmFilePath.Replace(".avm", ".abi.json");
             }
         }
 
-        private string _blockchainFilePath {
+        private string _blockchainFilePath
+        {
             get
             {
                 return _avmFilePath.Replace(".avm", ".chain.json");
@@ -275,7 +277,7 @@ namespace Neo.Debugger.Core.Utils
             }
 
             _debugContent.Clear();
-            
+
             _contractName = Path.GetFileNameWithoutExtension(_avmFilePath);
             _contractByteCode = File.ReadAllBytes(_avmFilePath);
             _map = new NeoMapFile();
@@ -325,7 +327,7 @@ namespace Neo.Debugger.Core.Utils
                 {
                     if (string.IsNullOrEmpty(entry))
                     {
-                        continue; 
+                        continue;
                     }
 
                     if (!File.Exists(entry))
@@ -362,14 +364,39 @@ namespace Neo.Debugger.Core.Utils
             blockchain.Load(_blockchainFilePath);
             _emulator = new Emulator(blockchain);
 
-            _emulator.stepDelegate = OnEmulatorStep;
+            _emulator.OnStep = OnEmulatorStep;
 
             return true;
         }
 
-        private void OnEmulatorStep(OpCode opcode, decimal gasCost)
+        private void OnEmulatorStep(Emulator.EmulatorStepInfo info)
         {
-            this.profiler.TallyOpcode(opcode, gasCost);
+            int lineNumber;
+            string filePath;
+            string sourceCode;
+            try
+            {
+                lineNumber = ResolveLine(info.offset, true, out filePath);
+                sourceCode = GetContentFor(filePath);
+            }
+            catch
+            {
+                lineNumber = 0;
+                filePath = null;
+                sourceCode = "";
+            }
+
+            if (string.IsNullOrEmpty(filePath))
+            {
+                filePath = "Unknown";
+            }
+
+            if (lineNumber >= 0)
+            {
+                this.profiler.SetLineno(lineNumber);
+                this.profiler.SetFilenameSource(filePath, sourceCode);
+                this.profiler.TallyOpcode(info.opcode, info.gasCost);
+            }
         }
 
         public bool DeployContract()
@@ -456,7 +483,7 @@ namespace Neo.Debugger.Core.Utils
                     var ofs = avmDisassemble.ResolveOffset(line);
                     return ofs;
                 }
-                else 
+                else
                 {
                     var ofs = _map.ResolveStartOffset(line + 1, filePath);
                     return ofs;
@@ -517,7 +544,7 @@ namespace Neo.Debugger.Core.Utils
         public bool AddBreakpoint(int lineNumber)
         {
             var ofs = ResolveOffset(lineNumber, _currentFilePath);
-            if (ofs < 0) 
+            if (ofs < 0)
                 return false;
 
             _emulator.SetBreakpointState(ofs, true);
@@ -566,8 +593,6 @@ namespace Neo.Debugger.Core.Utils
             try
             {
                 _currentLine = ResolveLine(_state.offset, useMap, out _currentFilePath);
-                this.profiler.SetLineno(_currentLine);
-                this.profiler.SetFilenameSource(_currentFilePath, GetContentFor(_currentFilePath));
             }
             catch
             {

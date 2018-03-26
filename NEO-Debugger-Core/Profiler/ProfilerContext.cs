@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Neo.Debugger.Profiler
@@ -49,7 +50,7 @@ namespace Neo.Debugger.Profiler
 
         public void SetFilenameSource(string filename, string source)
         {
-            _filename = filename;
+            _filename = Path.GetFileName(filename);
             if (!String.IsNullOrEmpty(source))
             {
                 _source = source.Split('\n');
@@ -143,7 +144,9 @@ namespace Neo.Debugger.Profiler
                     }
                     file.WriteLine();
 
-                    foreach (SourceStmtInfo ssi in dictStmtInfo.Values)
+                    var entries = dictStmtInfo.Values.OrderBy(x => x._filelineo._filename).ThenBy(x => x._filelineo._lineno);
+
+                    foreach (SourceStmtInfo ssi in entries)
                     {
                         file.Write("\"" + ssi._filelineo._filename + "\"");
                         file.Write(",\"" + ssi._filelineo._lineno.ToString() + "\"");

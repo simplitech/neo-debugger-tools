@@ -91,6 +91,14 @@ namespace Neo.Emulation
             public Type type;
         }
 
+        public struct EmulatorStepInfo
+        {
+            public byte[] byteCode;
+            public int offset;
+            public OpCode opcode;
+            public decimal gasCost;
+        }
+
         private ExecutionEngine engine;
         public byte[] contractByteCode { get; private set; }
 
@@ -115,8 +123,7 @@ namespace Neo.Emulation
         public decimal usedGas { get; private set; }
         public int usedOpcodeCount { get; private set; }
 
-        public delegate void StepDelegate(OpCode opcode, decimal gasCost);
-        public StepDelegate stepDelegate;
+        public Action<EmulatorStepInfo> OnStep;
 
         public Emulator(Blockchain blockchain)
         {
@@ -436,10 +443,7 @@ namespace Neo.Emulation
                 usedGas += opCost;
                 usedOpcodeCount++;
 
-                if (stepDelegate != null)
-                {
-                    stepDelegate(opcode, opCost);
-                }
+                OnStep?.Invoke(new EmulatorStepInfo() { byteCode = engine.CurrentContext.Script, offset = engine.CurrentContext.InstructionPointer, opcode = opcode, gasCost = opCost });
             }
             catch
             {
