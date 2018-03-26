@@ -57,11 +57,11 @@ namespace Neo.Debugger.Forms
 
             keyDataGrid.Rows.Add(new object[] { "Address", keyPair.address });
             keyDataGrid.Rows.Add(new object[] { "Script Hash (RAW, hex) ", scriptHash.ToHexString() });
-            keyDataGrid.Rows.Add(new object[] { "Script Hash (RAW, bytes) ", Util.ToReadableByteArrayString(scriptHash) });
+            keyDataGrid.Rows.Add(new object[] { "Script Hash (RAW, bytes) ", DebuggerUtils.ToReadableByteArrayString(scriptHash) });
             keyDataGrid.Rows.Add(new object[] { "Public Key (RAW, hex)", keyPair.PublicKey.ToHexString() });
             keyDataGrid.Rows.Add(new object[] { "Private Key (RAW, hex)", keyPair.PrivateKey.ToHexString() });
             keyDataGrid.Rows.Add(new object[] { "Private Key (WIF, hex)", keyPair.WIF });
-            keyDataGrid.Rows.Add(new object[] { "Private Key (RAW, bytes)", Util.ToReadableByteArrayString(keyPair.PrivateKey) });
+            keyDataGrid.Rows.Add(new object[] { "Private Key (RAW, bytes)", DebuggerUtils.ToReadableByteArrayString(keyPair.PrivateKey) });
         }
 
         private void button2_Click(object sender, EventArgs e)

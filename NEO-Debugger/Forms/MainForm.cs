@@ -33,9 +33,14 @@ namespace Neo.Debugger.Forms
 
         private MouseHoverManager hoverManager;
 
+        private string TitleCaption;
+
         public MainForm(string argumentsAvmFile)
         {
             InitializeComponent();
+
+            TitleCaption = this.Text;
+            this.Text = $"{TitleCaption} {DebuggerUtils.DebuggerVersion}";
 
             stackPanel.Columns.Add("Eval", "Eval");
             stackPanel.Columns.Add("Alt", "Alt");
@@ -116,14 +121,12 @@ namespace Neo.Debugger.Forms
                 foreach (var language in templates.Keys)
                 {
                     {
-                        var temp = language.ToString().Replace("Sharp", "#");
-                        var item = newToolStripMenuItem.DropDownItems.Add(temp);
+                        var item = newToolStripMenuItem.DropDownItems.Add(LanguageSupport.GetLanguageName(language));
                         item.Click += newToolStripMenuItem_Click;
                     }
 
                     {
-                        var temp = language.ToString().Replace("Sharp", "#");
-                        var item = (ToolStripMenuItem)newFromTemplateToolStripMenuItem.DropDownItems.Add(temp);
+                        var item = (ToolStripMenuItem)newFromTemplateToolStripMenuItem.DropDownItems.Add(LanguageSupport.GetLanguageName(language));
 
                         var list = templates[language];
                         foreach (var entry in list)
@@ -225,9 +228,6 @@ namespace Neo.Debugger.Forms
 
             _debugger.LoadTests();
 
-            //Set the UI
-            this.Text += " - " + FileName.Text;
-
             _debugger.IsCompiled = true;
 
             ReloadProjectTree();
@@ -263,7 +263,7 @@ namespace Neo.Debugger.Forms
 
                     case SourceLanguage.Python:
                         {
-                            string pythonPath = Util.FindExecutablePath("python.exe");
+                            string pythonPath = DebuggerUtils.FindExecutablePath("python.exe");
                             if (string.IsNullOrEmpty(pythonPath))
                             {
                                 SendLogToPanel("To compile smart contracts written in Python you need to have Python.exe installed");
@@ -281,7 +281,7 @@ namespace Neo.Debugger.Forms
                         }
                 }
 
-                compilerPath = Util.FindExecutablePath(compilerFile);
+                compilerPath = DebuggerUtils.FindExecutablePath(compilerFile);
 
                 browserFolder:
 
@@ -312,7 +312,7 @@ namespace Neo.Debugger.Forms
                     goto browserFolder;
                 }
 
-                SendLogToPanel($"Found {_sourceLanguage} Neo compiler: " + compilerPath);
+                SendLogToPanel($"Found {LanguageSupport.GetLanguageName(_sourceLanguage)} Neo compiler: " + compilerPath);
 
                 if (string.IsNullOrEmpty(compilerPath))
                 {
@@ -885,7 +885,7 @@ namespace Neo.Debugger.Forms
 
             if (!this.CompileContract())
             {
-                MessageBox.Show($"Could not compile {language} template!");
+                MessageBox.Show($"Could not compile {LanguageSupport.GetLanguageName(language)} template!");
                 return;
             }
 

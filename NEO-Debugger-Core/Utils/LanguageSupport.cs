@@ -6,6 +6,15 @@ namespace Neo.Debugger.Core.Utils
 {
     public static class LanguageSupport
     {
+        public static string GetLanguageName(SourceLanguage language)
+        {
+            switch (language)
+            {
+                case SourceLanguage.CSharp: return "C#";
+                default: return language.ToString();
+            }
+        }
+
         public static string[] GetLanguageKeywords(SourceLanguage language)
         {
             switch (language)

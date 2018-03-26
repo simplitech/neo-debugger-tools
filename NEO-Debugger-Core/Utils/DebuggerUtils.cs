@@ -7,8 +7,10 @@ using System.Linq;
 
 namespace Neo.Debugger.Core.Utils
 {
-    public static class Util
+    public static class DebuggerUtils
     {
+        public static string DebuggerVersion = "v1.1";
+
         public static DataNode GetArgsListAsNode(string argList)
         {
             var node = JSONReader.ReadFromString("{\"params\": [" + argList + "]}");

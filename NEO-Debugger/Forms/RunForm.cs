@@ -165,15 +165,15 @@ namespace Neo.Debugger.Forms
                         if (s.StartsWith("\"") && s.EndsWith("\""))
                         {
                             s = s.Substring(1, s.Length - 2);
-                            if (Util.IsHex(s))
+                            if (DebuggerUtils.IsHex(s))
                             {
                                 var bytes = s.HexToBytes();
-                                s = Util.BytesToString(bytes);
+                                s = DebuggerUtils.BytesToString(bytes);
                             }
-                            else if (Util.IsValidWallet(s))
+                            else if (DebuggerUtils.IsValidWallet(s))
                             {
                                 var scriptHash = Emulator.Helper.AddressToScriptHash(s);
-                                s = Util.BytesToString(scriptHash);
+                                s = DebuggerUtils.BytesToString(scriptHash);
                             }
                             else
                             {
@@ -241,7 +241,7 @@ namespace Neo.Debugger.Forms
             }
             if (key != _abi.entryPoint.name)
             {
-                if (f.inputs == null || f.inputs.Length == 0)
+                if (f.inputs == null || f.inputs.Count == 0)
                 {
                     argList = "[null]";
                 }
@@ -252,7 +252,7 @@ namespace Neo.Debugger.Forms
             //Set the arguments list
             try
             {
-                _debugParameters.ArgList = Util.GetArgsListAsNode(argList);
+                _debugParameters.ArgList = DebuggerUtils.GetArgsListAsNode(argList);
             }
             catch
             {
@@ -372,7 +372,7 @@ namespace Neo.Debugger.Forms
                         if (testCase.args != null && j < testCase.args.ChildCount)
                         {
                             var node = testCase.args[j];
-                            val = Util.ParseNode(node, j);
+                            val = DebuggerUtils.ParseNode(node, j);
                         }
                         else
                         {
@@ -534,7 +534,7 @@ namespace Neo.Debugger.Forms
 
         private void button3_Click_1(object sender, EventArgs e)
         {
-            var keyPair = Util.GetKeyFromString(privateKeyInput.Text);
+            var keyPair = DebuggerUtils.GetKeyFromString(privateKeyInput.Text);
             if (keyPair != null)
             {
                 Runtime.invokerKeys = keyPair;

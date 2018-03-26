@@ -68,7 +68,7 @@ namespace Neo.Emulator.Utils
 
             }
             
-            if ((data == null || data.Length == 0) && hintType == null)
+            if ((data == null || data.Length == 0) && hintType == NeoEmulator.Type.Unknown)
             {
                 return "Null";
             }

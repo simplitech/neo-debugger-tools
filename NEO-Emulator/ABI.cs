@@ -16,7 +16,7 @@ namespace Neo.Emulator
     {
         public string name;
         public NeoEmulator.Type returnType;
-        public AVMInput[] inputs;
+        public List<AVMInput> inputs = new List<AVMInput>();
     }
 
     public class ABI
@@ -29,7 +29,8 @@ namespace Neo.Emulator
         {
             var f = new AVMFunction();
             f.name = "Main";
-            f.inputs = new AVMInput[] { new AVMInput() { name = "args", type = NeoEmulator.Type.Array } };
+            f.inputs = new List<AVMInput>();
+            f.inputs.Add(new AVMInput() { name = "args", type = NeoEmulator.Type.Array });
 
             this.functions[f.name] = f;
             this.entryPoint = functions.Values.FirstOrDefault();
@@ -54,8 +55,8 @@ namespace Neo.Emulator
                 var p = child.GetNode("parameters");
                 if (p != null && p.ChildCount > 0)
                 {
-                    f.inputs = new AVMInput[p.ChildCount];
-                    for (int i=0; i<f.inputs.Length; i++)
+                    f.inputs.Clear();
+                    for (int i=0; i<p.ChildCount; i++)
                     {
                         var input = new AVMInput();
                         input.name = p[i].GetString("name");
@@ -63,7 +64,7 @@ namespace Neo.Emulator
                         {
                             input.type = NeoEmulator.Type.Unknown;
                         }                         
-                        f.inputs[i] = input;
+                        f.inputs.Add(input);
                     }
                 }
                 else
