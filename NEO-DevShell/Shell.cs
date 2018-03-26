@@ -341,7 +341,7 @@ namespace NEO_DevShell
 
                 Shell.Write("Executing transaction...");
 
-                Shell.debugger.Reset(inputs);
+                Shell.debugger.Reset(inputs, null);
                 Shell.debugger.Run();
 
                 var val = Shell.debugger.GetOutput();

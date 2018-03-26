@@ -19,7 +19,10 @@ namespace Neo.Debugger.Core.Utils
         {
             string envPath = Environment.ExpandEnvironmentVariables("%PATH%");
             var paths = envPath.Split(';').ToList();
-            paths.Add(AppDomain.CurrentDomain.BaseDirectory);
+
+            var exePath = AppDomain.CurrentDomain.BaseDirectory;
+            paths.Add(exePath);
+            paths.Add(exePath + "/Compilers");
 
             foreach (var path in paths)
             {
