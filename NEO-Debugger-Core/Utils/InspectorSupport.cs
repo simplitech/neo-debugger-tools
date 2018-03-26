@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Neo.Emulator.NeoEmulator;
-using Neo.Emulator;
+using static Neo.Emulation.Emulator;
+using Neo.Emulation;
 
 namespace Neo.Debugger.Core.Utils
 {
@@ -18,35 +18,35 @@ namespace Neo.Debugger.Core.Utils
             this.assignements = assignements;
         }
 
-        private NeoEmulator.Type ConvertType(string typeName)
+        private Emulator.Type ConvertType(string typeName)
         {
             if (string.IsNullOrEmpty(typeName))
             {
-                return NeoEmulator.Type.Unknown;
+                return Emulator.Type.Unknown;
             }
             else
             switch (typeName.ToLower())
             {
-                    case "byte[]": return NeoEmulator.Type.ByteArray;
-                    case "string": return NeoEmulator.Type.String;
-                    case "bool": return NeoEmulator.Type.Boolean;
+                    case "byte[]": return Emulator.Type.ByteArray;
+                    case "string": return Emulator.Type.String;
+                    case "bool": return Emulator.Type.Boolean;
                     case "int":
                     case "uint":
                     case "long":
                     case "ulong":
                     case "biginteger":
-                        return NeoEmulator.Type.ByteArray;
+                        return Emulator.Type.ByteArray;
                     default:
                         if (typeName.EndsWith("[]"))
                         {
-                            return NeoEmulator.Type.Array;
+                            return Emulator.Type.Array;
                         }
-                        return NeoEmulator.Type.Unknown;
+                        return Emulator.Type.Unknown;
             }
 
         }
 
-        private void AddLine(SyntaxNode node, string name, NeoEmulator.Type type)
+        private void AddLine(SyntaxNode node, string name, Emulator.Type type)
         {
             var position = node.SpanStart;
             var text = node.GetText();
@@ -98,7 +98,7 @@ namespace Neo.Debugger.Core.Utils
 
             if (s != null)
             {
-                AddLine(node, s.Left.ToString(), NeoEmulator.Type.Unknown);
+                AddLine(node, s.Left.ToString(), Emulator.Type.Unknown);
             }
         }
 

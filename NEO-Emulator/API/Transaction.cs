@@ -4,11 +4,11 @@ using System.Linq;
 using System.Collections.Generic;
 using LunarParser;
 
-namespace Neo.Emulator.API
+namespace Neo.Emulation.API
 {
     public class Transaction : IInteropInterface, IScriptContainer
     {
-        public NeoEmulator emulator; // temporary HACK 
+        public Emulator emulator; // temporary HACK 
 
         public byte[] hash;
 

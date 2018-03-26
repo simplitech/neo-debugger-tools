@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 
-namespace Neo.Emulator.API
+namespace Neo.Emulation.API
 {
     public class Blockchain
     {
@@ -111,7 +111,7 @@ namespace Neo.Emulator.API
         {
             foreach (var entry in _accounts)
             {
-                var bytes = Emulator.Helper.AddressToScriptHash(entry.keys.address);
+                var bytes = Emulation.Helper.AddressToScriptHash(entry.keys.address);
                 var temp = new UInt160(bytes);
                 if (temp.Equals(hash))
                 {

@@ -1,9 +1,9 @@
 ﻿using Neo.VM;
 using System;
 using System.Collections.Generic;
-using Neo.Emulator.Utils;
+using Neo.Emulation.Utils;
 
-namespace Neo.Emulator.API
+namespace Neo.Emulation.API
 {
     public static class Asset
     {

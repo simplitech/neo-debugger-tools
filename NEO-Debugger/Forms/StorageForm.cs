@@ -1,5 +1,5 @@
-﻿using Neo.Emulator;
-using Neo.Emulator.Utils;
+﻿using Neo.Emulation;
+using Neo.Emulation.Utils;
 using System;
 using System.Windows.Forms;
 
@@ -7,9 +7,9 @@ namespace Neo.Debugger.Forms
 {
     public partial class StorageForm : Form
     {
-        private NeoEmulator _debugger;
+        private Emulator _debugger;
 
-        public StorageForm(NeoEmulator debugger)
+        public StorageForm(Emulator debugger)
         {
             InitializeComponent();
             _debugger = debugger;
@@ -36,7 +36,7 @@ namespace Neo.Debugger.Forms
             foreach (var entry in storage.entries)
             {
                 // TODO : Proper type detection?
-                NeoEmulator.Type hintType = entry.Key.Length == 20 ? NeoEmulator.Type.Integer : NeoEmulator.Type.Integer;
+                Emulator.Type hintType = entry.Key.Length == 20 ? Emulator.Type.Integer : Emulator.Type.Integer;
                 dataGridView1.Rows.Add(FormattingUtils.OutputData(entry.Key, false), FormattingUtils.OutputData(entry.Value, false, hintType));
             }
         }

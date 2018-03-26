@@ -1,6 +1,6 @@
 ﻿using Neo.Debugger.Utils;
-using Neo.Emulator;
-using Neo.Emulator.API;
+using Neo.Emulation;
+using Neo.Emulation.API;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Windows.Forms;
@@ -184,7 +184,7 @@ namespace Neo.Debugger.Forms
 
                     var assetID = Asset.GetAssetId(symbol);
 
-                    var bytes = Emulator.Helper.AddressToScriptHash(to.keys.address);
+                    var bytes = Emulation.Helper.AddressToScriptHash(to.keys.address);
                     var hash = new Cryptography.UInt160(bytes);
 
                     var tx = new Transaction(block);

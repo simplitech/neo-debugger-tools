@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using LunarParser;
 using LunarParser.JSON;
 
-namespace Neo.Emulator
+namespace Neo.Emulation
 {
     public class TestCase
     {

@@ -9,7 +9,7 @@ namespace Neo.Debugger.Core.Utils
 {
     public static class DebuggerUtils
     {
-        public static string DebuggerVersion = "v1.1";
+        public static string DebuggerVersion = "v1.0";
 
         public static DataNode GetArgsListAsNode(string argList)
         {

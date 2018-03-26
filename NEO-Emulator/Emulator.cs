@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.Numerics;
-using Neo.Emulator.API;
+using Neo.Emulation.API;
 using LunarParser;
-using Neo.Emulator.Utils;
+using Neo.Emulation.Utils;
 using System.Diagnostics;
-using Neo.Emulator.Profiler;
+using Neo.Emulation.Profiler;
 
-namespace Neo.Emulator
+namespace Neo.Emulation
 {
     public enum CheckWitnessMode
     {
@@ -43,7 +43,7 @@ namespace Neo.Emulator
 
     public static class NeoEmulatorExtensions
     {
-        public static NeoEmulator GetEmulator(this ExecutionEngine engine)
+        public static Emulator GetEmulator(this ExecutionEngine engine)
         {
             var tx  = (Transaction)engine.ScriptContainer;
             return tx.emulator;
@@ -68,7 +68,7 @@ namespace Neo.Emulator
         }
     }
 
-    public class NeoEmulator 
+    public class Emulator 
     {
         public enum Type
         {
@@ -119,7 +119,7 @@ namespace Neo.Emulator
         //Profiler context
         public static ProfilerContext _pctx;
 
-        public NeoEmulator(Blockchain blockchain)
+        public Emulator(Blockchain blockchain)
         {
             this.blockchain = blockchain;
             this.interop = new InteropService();
@@ -137,7 +137,7 @@ namespace Neo.Emulator
             this.currentAccount = address;
             this.contractByteCode = address.byteCode;
 
-            var assembly = typeof(Neo.Emulator.Helper).Assembly;
+            var assembly = typeof(Neo.Emulation.Helper).Assembly;
             var methods = assembly.GetTypes()
                                   .SelectMany(t => t.GetMethods())
                                   .Where(m => m.GetCustomAttributes(typeof(SyscallAttribute), false).Length > 0)
@@ -266,7 +266,7 @@ namespace Neo.Emulator
                 {
                     foreach (var item in inputs.Children)
                     {
-                        var obj = NeoEmulator.ConvertArgument(item);
+                        var obj = Emulator.ConvertArgument(item);
                         items.Push(obj);
                     }
                 }

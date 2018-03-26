@@ -4,7 +4,7 @@ using System.IO;
 using LunarParser.JSON;
 using Neo.Cryptography;
 
-namespace Neo.Emulator.Dissambler
+namespace Neo.Emulation.Dissambler
 {
     public class DebugMapEntry
     {

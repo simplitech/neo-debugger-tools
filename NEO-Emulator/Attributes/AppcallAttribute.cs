@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Neo.Emulator
+namespace Neo.Emulation
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
     public class AppcallAttribute : Attribute

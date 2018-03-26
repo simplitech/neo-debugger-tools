@@ -1,11 +1,11 @@
 ﻿using LunarParser;
-using Neo.Emulator.Utils;
+using Neo.Emulation.Utils;
 using Neo.VM;
 using Neo.Cryptography;
 using System.Numerics;
 using System;
 
-namespace Neo.Emulator.API
+namespace Neo.Emulation.API
 {
     public class TransactionOutput : IApiInterface, IInteropInterface
     {

@@ -1,9 +1,9 @@
 ﻿using LunarParser;
 using LunarParser.JSON;
-using Neo.Emulator;
-using Neo.Emulator.API;
-using Neo.Emulator.Dissambler;
-using Neo.Emulator.Utils;
+using Neo.Emulation;
+using Neo.Emulation.API;
+using Neo.Emulation.Dissambler;
+using Neo.Emulation.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,7 +27,7 @@ namespace NEO_DevShell
     {
         public List<Command> commands = new List<Command>();
         public Blockchain blockchain { get; private set; }
-        public NeoEmulator debugger;
+        public Emulator debugger;
 
         public string avmPath;
         public string blockchainPath;
@@ -36,7 +36,7 @@ namespace NEO_DevShell
         public Shell()
         {
             this.blockchain = new Blockchain();
-            this.debugger = new NeoEmulator(blockchain);
+            this.debugger = new Emulator(blockchain);
 
             AddCommand(new HelpCommand());
             AddCommand(new ExitCommand());

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using LunarParser;
-using Neo.Emulator;
-using Neo.Emulator.API;
+using Neo.Emulation;
+using Neo.Emulation.API;
 using NUnit.Framework;
 
 namespace ICO_Unit_Tests
@@ -9,7 +9,7 @@ namespace ICO_Unit_Tests
     [TestFixture]
     public class ContractTests
     {
-        private static NeoEmulator emulator; 
+        private static Emulator emulator; 
 
         [OneTimeSetUp]
         public void Setup()
@@ -18,7 +18,7 @@ namespace ICO_Unit_Tests
             Directory.SetCurrentDirectory(path);
             var avmBytes = File.ReadAllBytes("ICOContract.avm");
             var chain = new Blockchain();
-            emulator = new NeoEmulator(chain);
+            emulator = new Emulator(chain);
             var address = chain.DeployContract("test", avmBytes);
             emulator.SetExecutingAccount(address);
         }

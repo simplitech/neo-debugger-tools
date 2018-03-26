@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Neo.Emulator.Utils
+namespace Neo.Emulation.Utils
 {
     public static class StringUtils
     {

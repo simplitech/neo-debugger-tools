@@ -1,12 +1,12 @@
 ﻿using Neo.VM;
-using Neo.Emulator.Utils;
+using Neo.Emulation.Utils;
 using System;
 using System.Diagnostics;
 using System.Text;
 using Neo.Cryptography;
 using System.Collections;
 
-namespace Neo.Emulator.API
+namespace Neo.Emulation.API
 {
     public static class Runtime
     {

@@ -1,4 +1,4 @@
-﻿using Neo.Emulator.Dissambler;
+﻿using Neo.Emulation.Dissambler;
 using System;
 using System.IO;
 

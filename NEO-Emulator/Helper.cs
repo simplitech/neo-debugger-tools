@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 
 
-namespace Neo.Emulator
+namespace Neo.Emulation
 {
     public class ByteArrayComparer : IEqualityComparer<byte[]>
     {

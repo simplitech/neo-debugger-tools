@@ -1,7 +1,7 @@
 ﻿using Neo.VM;
 using System;
 
-namespace Neo.Emulator.API
+namespace Neo.Emulation.API
 {
     public class TransactionAttribute : IApiInterface
     {

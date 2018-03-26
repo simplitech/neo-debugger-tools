@@ -1,6 +1,6 @@
 ﻿using Neo.Cryptography;
 using Neo.Cryptography.ECC;
-using Neo.Emulator.Utils;
+using Neo.Emulation.Utils;
 using System;
 using System.Linq;
 

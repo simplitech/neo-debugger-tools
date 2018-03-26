@@ -1,8 +1,8 @@
 ﻿using LunarParser;
 using Neo.VM;
-using Neo.Emulator.Utils;
+using Neo.Emulation.Utils;
 
-namespace Neo.Emulator.API
+namespace Neo.Emulation.API
 {
     public class TransactionInput : IInteropInterface
     {

@@ -4,18 +4,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Neo.Emulator
+namespace Neo.Emulation
 {
     public class AVMInput
     {
         public string name;
-        public NeoEmulator.Type type;
+        public Emulator.Type type;
     }
 
     public class AVMFunction
     {
         public string name;
-        public NeoEmulator.Type returnType;
+        public Emulator.Type returnType;
         public List<AVMInput> inputs = new List<AVMInput>();
     }
 
@@ -29,8 +29,7 @@ namespace Neo.Emulator
         {
             var f = new AVMFunction();
             f.name = "Main";
-            f.inputs = new List<AVMInput>();
-            f.inputs.Add(new AVMInput() { name = "args", type = NeoEmulator.Type.Array });
+            f.inputs.Add(new AVMInput() { name = "args", type = Emulator.Type.Array });
 
             this.functions[f.name] = f;
             this.entryPoint = functions.Values.FirstOrDefault();
@@ -49,27 +48,22 @@ namespace Neo.Emulator
                 f.name = child.GetString("name");
                 if (!Enum.TryParse(child.GetString("returnType"), out f.returnType))
                 {
-                    f.returnType = NeoEmulator.Type.Unknown;
+                    f.returnType = Emulator.Type.Unknown;
                 }
 
                 var p = child.GetNode("parameters");
                 if (p != null && p.ChildCount > 0)
                 {
-                    f.inputs.Clear();
                     for (int i=0; i<p.ChildCount; i++)
                     {
                         var input = new AVMInput();
                         input.name = p[i].GetString("name");
-                        if (!Enum.TryParse<NeoEmulator.Type>(p[i].GetString("type"), out input.type))
+                        if (!Enum.TryParse<Emulator.Type>(p[i].GetString("type"), out input.type))
                         {
-                            input.type = NeoEmulator.Type.Unknown;
+                            input.type = Emulator.Type.Unknown;
                         }                         
                         f.inputs.Add(input);
                     }
-                }
-                else
-                {
-                    f.inputs = null;
                 }
 
                 functions[f.name] = f;

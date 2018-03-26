@@ -7,11 +7,11 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Text;
 
-namespace Neo.Emulator.Utils
+namespace Neo.Emulation.Utils
 {
     public static class FormattingUtils
     {
-        public static string StackItemAsString(StackItem item, bool addQuotes = false, NeoEmulator.Type hintType = NeoEmulator.Type.Unknown)
+        public static string StackItemAsString(StackItem item, bool addQuotes = false, Emulator.Type hintType = Emulator.Type.Unknown)
         {
             if (item is ICollection)
             {
@@ -43,12 +43,12 @@ namespace Neo.Emulator.Utils
                 return s.ToString();
             }
 
-            if (item is Neo.VM.Types.Boolean && hintType == NeoEmulator.Type.Unknown)
+            if (item is Neo.VM.Types.Boolean && hintType == Emulator.Type.Unknown)
             {
                 return item.GetBoolean().ToString();
             }
 
-            if (item is Neo.VM.Types.Integer && hintType == NeoEmulator.Type.Unknown)
+            if (item is Neo.VM.Types.Integer && hintType == Emulator.Type.Unknown)
             {
                 return item.GetBigInteger().ToString();
             }
@@ -68,7 +68,7 @@ namespace Neo.Emulator.Utils
 
             }
             
-            if ((data == null || data.Length == 0) && hintType == NeoEmulator.Type.Unknown)
+            if ((data == null || data.Length == 0) && hintType == Emulator.Type.Unknown)
             {
                 return "Null";
             }
@@ -97,7 +97,7 @@ namespace Neo.Emulator.Utils
             Void = 255
         };
 
-        public static string OutputData(byte[] data, bool addQuotes, NeoEmulator.Type hintType = NeoEmulator.Type.Unknown)
+        public static string OutputData(byte[] data, bool addQuotes, Emulator.Type hintType = Emulator.Type.Unknown)
         {
             if (data == null)
             {
@@ -212,21 +212,21 @@ namespace Neo.Emulator.Utils
             }
             else
             {
-                if (hintType != NeoEmulator.Type.Unknown)
+                if (hintType != Emulator.Type.Unknown)
                 {
                     switch (hintType)
                     {
-                        case NeoEmulator.Type.String:
+                        case Emulator.Type.String:
                             {
                                 return System.Text.Encoding.UTF8.GetString(data);
                             }
 
-                        case NeoEmulator.Type.Boolean:
+                        case Emulator.Type.Boolean:
                             {
                                 return (data != null && data.Length > 0 && data[0] != 0) ? "True" : "False";
                             }
 
-                        case NeoEmulator.Type.Integer:
+                        case Emulator.Type.Integer:
                             {
                                 return new BigInteger(data).ToString();
                             }

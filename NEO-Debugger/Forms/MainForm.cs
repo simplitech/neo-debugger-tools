@@ -7,8 +7,8 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Text;
 using ScintillaNET;
-using Neo.Emulator.Utils;
-using Neo.Emulator;
+using Neo.Emulation.Utils;
+using Neo.Emulation;
 using Neo.Debugger.Utils;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
@@ -84,7 +84,7 @@ namespace Neo.Debugger.Forms
             LoadTemplates();
 
             //Setup emulator log
-            Emulator.API.Runtime.OnLogMessage = SendLogToPanel;
+            Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
 
             //Init the debugger
             InitDebugger();
@@ -1133,7 +1133,7 @@ namespace Neo.Debugger.Forms
                         
                         var gasStr = string.Format("{0:N4}", _debugger.Emulator.usedGas);
 
-                        var hintType = !string.IsNullOrEmpty(_settings.lastFunction) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(_settings.lastFunction) ? _debugger.ABI.functions[_settings.lastFunction].returnType : NeoEmulator.Type.Unknown;
+                        var hintType = !string.IsNullOrEmpty(_settings.lastFunction) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(_settings.lastFunction) ? _debugger.ABI.functions[_settings.lastFunction].returnType : Emulator.Type.Unknown;
 
                         MessageBox.Show("Execution finished.\nGAS cost: " + gasStr + "\nInstruction count: "+_debugger.Emulator.usedOpcodeCount+"\nResult: " + FormattingUtils.StackItemAsString(val, false, hintType));
                         break;

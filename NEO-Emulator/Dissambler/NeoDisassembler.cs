@@ -1,11 +1,11 @@
-﻿using Neo.Emulator.Utils;
+﻿using Neo.Emulation.Utils;
 using Neo.VM;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Neo.Emulator.Dissambler
+namespace Neo.Emulation.Dissambler
 {
     public class DisassembleEntry
     {

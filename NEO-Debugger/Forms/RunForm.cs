@@ -1,8 +1,8 @@
 ﻿using LunarParser;
 using LunarParser.JSON;
 using Neo.Cryptography;
-using Neo.Emulator;
-using Neo.Emulator.API;
+using Neo.Emulation;
+using Neo.Emulation.API;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
 using System;
@@ -153,7 +153,7 @@ namespace Neo.Debugger.Forms
                         argList += ",";
                     }
 
-                    if (p.type == NeoEmulator.Type.Array || p.type == NeoEmulator.Type.ByteArray)
+                    if (p.type == Emulator.Type.Array || p.type == Emulator.Type.ByteArray)
                     {
                         var s = val.ToString();
 
@@ -172,7 +172,7 @@ namespace Neo.Debugger.Forms
                             }
                             else if (DebuggerUtils.IsValidWallet(s))
                             {
-                                var scriptHash = Emulator.Helper.AddressToScriptHash(s);
+                                var scriptHash = Emulation.Helper.AddressToScriptHash(s);
                                 s = DebuggerUtils.BytesToString(scriptHash);
                             }
                             else
@@ -192,7 +192,7 @@ namespace Neo.Debugger.Forms
                     else
                         switch (p.type)
                         {
-                            case NeoEmulator.Type.String:
+                            case Emulator.Type.String:
                                 {
                                     var s = val.ToString();
                                     if (!s.StartsWith("\"") || !s.EndsWith("\""))
@@ -204,7 +204,7 @@ namespace Neo.Debugger.Forms
                                     break;
                                 }
 
-                            case NeoEmulator.Type.Integer:
+                            case Emulator.Type.Integer:
                                 {
                                     BigInteger n;
                                     var s = val.ToString();
@@ -217,7 +217,7 @@ namespace Neo.Debugger.Forms
                                     break;
                                 }
 
-                            case NeoEmulator.Type.Boolean:
+                            case Emulator.Type.Boolean:
                                 {
                                     switch (val.ToString().ToLower())
                                     {
@@ -310,7 +310,7 @@ namespace Neo.Debugger.Forms
             inputGrid.AllowUserToAddRows = false;
 
             assetAmount.Enabled = assetComboBox.SelectedIndex > 0;
-            timestampBox.Text = Emulator.Helper.ToTimestamp(DateTime.UtcNow).ToString();
+            timestampBox.Text = Emulation.Helper.ToTimestamp(DateTime.UtcNow).ToString();
 
             if (Runtime.invokerKeys == null && File.Exists("last.key"))
             {
@@ -441,7 +441,7 @@ namespace Neo.Debugger.Forms
         {
             var s = p.type.ToString();
 
-            if (p.type == NeoEmulator.Type.Array || p.type == NeoEmulator.Type.ByteArray)
+            if (p.type == Emulator.Type.Array || p.type == Emulator.Type.ByteArray)
             {
                 s += " (Eg: [1, 2, \"something\"]";
             }
@@ -576,14 +576,14 @@ namespace Neo.Debugger.Forms
             uint timestamp;
             if (uint.TryParse(timestampBox.Text, out timestamp))
             {
-                dateTimePicker1.Value = Emulator.Helper.ToDateTime(timestamp);
+                dateTimePicker1.Value = Emulation.Helper.ToDateTime(timestamp);
             }
         }
 
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
             lockDate = true;
-            timestampBox.Text = Emulator.Helper.ToTimestamp(dateTimePicker1.Value).ToString();
+            timestampBox.Text = Emulation.Helper.ToTimestamp(dateTimePicker1.Value).ToString();
             lockDate = false;
         }
 

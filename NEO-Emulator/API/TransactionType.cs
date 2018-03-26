@@ -1,4 +1,4 @@
-﻿namespace Neo.Emulator.API
+﻿namespace Neo.Emulation.API
 {
     public enum TransactionType : byte
     {

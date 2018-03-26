@@ -1,6 +1,6 @@
-﻿using Neo.Emulator;
-using Neo.Emulator.API;
-using Neo.Emulator.Dissambler;
+﻿using Neo.Emulation;
+using Neo.Emulation.API;
+using Neo.Emulation.Dissambler;
 using Neo.Debugger.Core.Data;
 using Neo.Debugger.Core.Models;
 using System;
@@ -22,7 +22,7 @@ namespace Neo.Debugger.Core.Utils
 
         //Public props
         public TestSuite Tests { get { return _tests; } }
-        public NeoEmulator Emulator
+        public Emulator Emulator
         {
             get
             {
@@ -176,7 +176,7 @@ namespace Neo.Debugger.Core.Utils
         private DebuggerState _state;
 
         //Debugging Emulator and Content
-        private NeoEmulator _emulator { get; set; }
+        private Emulator _emulator { get; set; }
         private Dictionary<string, string> _debugContent = new Dictionary<string, string>();
         private ABI _ABI { get; set; }
         private NeoMapFile _map { get; set; }        
@@ -357,7 +357,7 @@ namespace Neo.Debugger.Core.Utils
             //Create load the emulator
             var blockchain = new Blockchain();
             blockchain.Load(_blockchainFilePath);
-            _emulator = new NeoEmulator(blockchain);
+            _emulator = new Emulator(blockchain);
 
             return true;
         }

@@ -1,11 +1,11 @@
 ﻿using LunarParser;
 using Neo.Cryptography;
-using Neo.Emulator.Utils;
+using Neo.Emulation.Utils;
 using Neo.VM;
 using System;
 using System.Collections.Generic;
 
-namespace Neo.Emulator.API
+namespace Neo.Emulation.API
 {
     public class Account
     {

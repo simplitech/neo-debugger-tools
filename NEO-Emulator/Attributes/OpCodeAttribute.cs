@@ -1,7 +1,7 @@
 ﻿using Neo.VM;
 using System;
 
-namespace Neo.Emulator
+namespace Neo.Emulation
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
     public class OpCodeAttribute : Attribute

@@ -1,4 +1,4 @@
-﻿namespace Neo.Emulator
+﻿namespace Neo.Emulation
 {
     public interface IApiInterface
     {

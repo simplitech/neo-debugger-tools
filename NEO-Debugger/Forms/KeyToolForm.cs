@@ -53,7 +53,7 @@ namespace Neo.Debugger.Forms
 
             keyDataGrid.Rows.Clear();
 
-            var scriptHash = Emulator.Helper.AddressToScriptHash(keyPair.address);
+            var scriptHash = Emulation.Helper.AddressToScriptHash(keyPair.address);
 
             keyDataGrid.Rows.Add(new object[] { "Address", keyPair.address });
             keyDataGrid.Rows.Add(new object[] { "Script Hash (RAW, hex) ", scriptHash.ToHexString() });
