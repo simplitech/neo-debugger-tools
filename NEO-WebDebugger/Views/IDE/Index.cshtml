@@ -61,9 +61,9 @@ namespace Neo.SmartContract
                 $('#event_log').append('<li>' + encodedMessage + '</li>');
             };
 
-            // Start the connection.
             $.connection.hub.start().done(function () {
-                //Wireup events here
+                // Send the data using post
+                $.post("/IDE/SetConnectionId", { connectionId: $.connection.hub.id });
             });
         });
     </script>
@@ -87,7 +87,7 @@ namespace Neo.SmartContract
 
                 // Put the results in a div
                 posting.done(function (data) {
-
+                    
                 });
             });
 

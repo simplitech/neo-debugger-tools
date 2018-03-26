@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using Microsoft.AspNet.SignalR;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
+using Neo.WebDebugger.Logic;
 
 namespace Neo.WebDebugger.Controllers
 {
@@ -34,7 +35,7 @@ namespace Neo.WebDebugger.Controllers
 
         private void Compiler_SendToLog(object sender, Debugger.Core.Models.CompilerLogEventArgs e)
         {
-            GlobalHost.ConnectionManager.GetHubContext<DebuggerHub>().Clients.All.logEventMessage(e.Message);
+            SignalRHelper.LogEventMessage(Session["ConnectionId"].ToString(), e.Message);
         }
     }
 }

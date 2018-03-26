@@ -167,6 +167,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Logic\SignalRHelper.cs" />
     <Resource Include="Contracts\CSharp\AgencyTransaction.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -579,6 +580,7 @@
     <Content Include="Scripts\Ace\worker-php.js" />
     <Content Include="Scripts\Ace\worker-xml.js" />
     <Content Include="Scripts\Ace\worker-xquery.js" />
+    <Content Include="Scripts\Cookies\cookies.js" />
     <Content Include="Scripts\jquery-3.3.1.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
