@@ -22,11 +22,14 @@ namespace Neo.Debugger.Core.Utils
 
             var exePath = AppDomain.CurrentDomain.BaseDirectory;
             paths.Add(exePath);
-            paths.Add(exePath + "/Compilers");
+            paths.Add(exePath + "Compilers");
 
-            foreach (var path in paths)
+            foreach (var entry in paths)
             {
-                var fullPath = path + "\\" + exeName;
+                var path = entry.Replace("\\", "/");
+                if (!path.EndsWith("/")) path += "/";
+
+                var fullPath = path + exeName;
                 if (File.Exists(fullPath))
                 {
                     return path;

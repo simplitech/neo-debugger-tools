@@ -87,50 +87,57 @@ namespace Neo.Debugger.Forms
 
         private void LoadTemplates()
         {
-
-            string[] filePaths = Directory.GetFiles("Contracts", "*.*", SearchOption.TopDirectoryOnly);
-            foreach (var fileName in filePaths)
+            try
             {
-                var language = LanguageSupport.DetectLanguage(fileName);
-                if (language == SourceLanguage.Other)
+                var exePath = AppDomain.CurrentDomain.BaseDirectory;
+                string[] filePaths = Directory.GetFiles(exePath + "Contracts", "*.*", SearchOption.TopDirectoryOnly);
+                foreach (var fileName in filePaths)
                 {
-                    continue;
-                }
-
-                List<string> templateList;
-                if (templates.ContainsKey(language))
-                {
-                    templateList = templates[language];
-                }
-                else
-                {
-                    templateList = new List<string>();
-                    templates[language] = templateList;
-                }
-
-                templateList.Add(fileName);
-            }
-
-            foreach (var language in templates.Keys)
-            {
-                {
-                    var temp = language.ToString().Replace("Sharp", "#");
-                    var item = newToolStripMenuItem.DropDownItems.Add(temp);
-                    item.Click += newToolStripMenuItem_Click;
-                }
-
-                {
-                    var temp = language.ToString().Replace("Sharp", "#");
-                    var item = (ToolStripMenuItem) newFromTemplateToolStripMenuItem.DropDownItems.Add(temp);
-
-                    var list = templates[language];
-                    foreach (var entry in list)
+                    var language = LanguageSupport.DetectLanguage(fileName);
+                    if (language == SourceLanguage.Other)
                     {
-                        var templateName = Path.GetFileNameWithoutExtension(entry);
-                        var subItem = item.DropDownItems.Add(templateName);
-                        subItem.Click += newFromTemplateToolStripMenuItem_Click;
+                        continue;
+                    }
+
+                    List<string> templateList;
+                    if (templates.ContainsKey(language))
+                    {
+                        templateList = templates[language];
+                    }
+                    else
+                    {
+                        templateList = new List<string>();
+                        templates[language] = templateList;
+                    }
+
+                    templateList.Add(fileName);
+                }
+
+                foreach (var language in templates.Keys)
+                {
+                    {
+                        var temp = language.ToString().Replace("Sharp", "#");
+                        var item = newToolStripMenuItem.DropDownItems.Add(temp);
+                        item.Click += newToolStripMenuItem_Click;
+                    }
+
+                    {
+                        var temp = language.ToString().Replace("Sharp", "#");
+                        var item = (ToolStripMenuItem)newFromTemplateToolStripMenuItem.DropDownItems.Add(temp);
+
+                        var list = templates[language];
+                        foreach (var entry in list)
+                        {
+                            var templateName = Path.GetFileNameWithoutExtension(entry);
+                            var subItem = item.DropDownItems.Add(templateName);
+                            subItem.Click += newFromTemplateToolStripMenuItem_Click;
+                        }
                     }
                 }
+            }
+            catch
+            {
+                MessageBox.Show("Failed loading templates");
             }
         }
 
