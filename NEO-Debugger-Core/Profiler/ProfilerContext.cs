@@ -7,13 +7,13 @@ namespace Neo.Debugger.Profiler
 {
     public class SourceFileLine
     {
-        public string _filename;
-        public int _lineno;
+        public string fileName;
+        public int lineNumber;
 
         public SourceFileLine(string filename, int lineno)
         {
-            _filename = filename;
-            _lineno = lineno;
+            fileName = filename;
+            lineNumber = lineno;
         }
     }
 
@@ -25,16 +25,16 @@ namespace Neo.Debugger.Profiler
         public string _sourceStmt;
         public int[] _stmtOpcodeCount = new int[MAXNOPTCODES];
         public decimal[] _stmtOpcodeCost = new decimal[MAXNOPTCODES];
+
+        public Dictionary<string, int> _sysCallCount = new Dictionary<string, int>();
+        public Dictionary<string, decimal> _sysCallCost= new Dictionary<string, decimal>();
     }
 
     public class ProfilerContext
     {
         private const int MAXNOPTCODES = 256;
 
-        public string _filename = "Unknown.cs";
-        public string[] _source = { "" };
-        public int _lineno = 0;
-        public string _sourceString = "// No source code available";
+        public Dictionary<string, string[]> sourceLines = new Dictionary<string, string[]>();
 
         public string[] opcodeNames = new string[MAXNOPTCODES];
         public decimal[] opcodeCosts = new decimal[MAXNOPTCODES];
@@ -42,60 +42,71 @@ namespace Neo.Debugger.Profiler
         public Dictionary<string, SourceStmtInfo> dictStmtInfo;
         public int[] totalTallyByOpcode = new int[MAXNOPTCODES];
         public decimal[] totalCostByOpcode = new decimal[MAXNOPTCODES];
+        public HashSet<string> sysCallUsed = new HashSet<string>();
 
         public ProfilerContext()
         {
             dictStmtInfo = new Dictionary<string, SourceStmtInfo>();
         }
 
-        public void SetFilenameSource(string filename, string source)
+        public void TallyOpcode(Neo.VM.OpCode opcode, decimal opCost, int lineNumber, string fileName, string fileSource, string sysCall)
         {
-            _filename = Path.GetFileName(filename);
-            if (!String.IsNullOrEmpty(source))
-            {
-                _source = source.Split('\n');
-            }
-        }
-
-        public void SetLineno(int lineno)
-        {
-            if (lineno >= 0)
-            {
-                _lineno = lineno;
-                if (_lineno < _source.Length)
-                {
-                    _sourceString = _source[lineno];
-                }
-            }
-        }
-
-        public void TallyOpcode(Neo.VM.OpCode opcode, decimal opCost)
-        {
-            SourceFileLine sfl = new SourceFileLine(_filename, _lineno);
-
-            string key = _filename + ":" + _lineno.ToString();
-            if (dictStmtInfo.Keys.Contains(key))
-            {
-                SourceStmtInfo ssi;
-                dictStmtInfo.TryGetValue(key, out ssi);
-                ssi._stmtOpcodeCount[(int)opcode]++;
-                ssi._stmtOpcodeCost[(int)opcode] = ssi._stmtOpcodeCount[(int)opcode] * opcodeCosts[(int)opcode];
-            }
-            else
-            {
-                SourceStmtInfo ssi = new SourceStmtInfo();
-                ssi._filelineo = sfl;
-                ssi._sourceStmt = _sourceString;
-                ssi._stmtOpcodeCount[(int)opcode] = 1;
-                dictStmtInfo.Add(key, ssi);
-            }
+            SourceFileLine sfl = new SourceFileLine(fileName, lineNumber);
 
             if (!opcodeUsed[(int)opcode])
             {
-                opcodeCosts[(int)opcode] = opCost;
+                opcodeCosts[(int)opcode] = opcode == VM.OpCode.SYSCALL ? 0: opCost;
                 opcodeNames[(int)opcode] = opcode.ToString();
                 opcodeUsed[(int)opcode] = true;
             }
+
+            string[] lines;
+            if (sourceLines.ContainsKey(fileName))
+            {
+                lines = sourceLines[fileName];
+            }
+            else
+            {
+                lines = fileSource.Split('\n');
+                sourceLines[fileName] = lines;                
+            }
+
+            var lineSource = (lineNumber >= 0 && lineNumber < lines.Length) ? lines[lineNumber] : "// No source code available";
+
+            string key = fileName + ":" + lineNumber.ToString();
+
+            SourceStmtInfo ssi;
+            if (dictStmtInfo.Keys.Contains(key))
+            {
+                ssi = dictStmtInfo[key];
+            }
+            else
+            {
+                ssi = new SourceStmtInfo();
+                ssi._filelineo = sfl;
+                ssi._sourceStmt = lineSource;
+                ssi._stmtOpcodeCount[(int)opcode] = 0;
+                dictStmtInfo[key] = ssi;
+            }
+
+            if (opcode == VM.OpCode.SYSCALL && sysCall != null)
+            {
+                sysCall = sysCall.Replace("Neo.", "");
+                sysCallUsed.Add(sysCall);
+
+                if (!ssi._sysCallCost.ContainsKey(sysCall))
+                {
+                    ssi._sysCallCost[sysCall] = 0;
+                    ssi._sysCallCount[sysCall] = 0;
+                }
+
+                ssi._sysCallCount[sysCall] += 1;
+                ssi._sysCallCost[sysCall] += opCost;
+            }
+
+            ssi._stmtOpcodeCount[(int)opcode]++;
+            ssi._stmtOpcodeCost[(int)opcode] = ssi._stmtOpcodeCount[(int)opcode] * opcodeCosts[(int)opcode];
+
         }
 
         public Exception DumpCSV(string avmFilePath)
@@ -130,6 +141,12 @@ namespace Neo.Debugger.Profiler
                             file.Write(",\"" + opcodeNames[opcode] + "\"");
                         }
                     }
+
+                    foreach (var sysCall in sysCallUsed)
+                    {
+                        file.Write(",\"" + sysCall + "\"");
+                    }
+
                     file.WriteLine();
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
@@ -144,13 +161,14 @@ namespace Neo.Debugger.Profiler
                     }
                     file.WriteLine();
 
-                    var entries = dictStmtInfo.Values.OrderBy(x => x._filelineo._filename).ThenBy(x => x._filelineo._lineno);
+                    var entries = dictStmtInfo.Values.OrderBy(x => x._filelineo.fileName).ThenBy(x => x._filelineo.lineNumber);
 
                     foreach (SourceStmtInfo ssi in entries)
                     {
-                        file.Write("\"" + ssi._filelineo._filename + "\"");
-                        file.Write(",\"" + ssi._filelineo._lineno.ToString() + "\"");
+                        file.Write("\"" + ssi._filelineo.fileName + "\"");
+                        file.Write(",\"" + ssi._filelineo.lineNumber.ToString() + "\"");
                         file.Write(",\"" + ssi._sourceStmt.Replace("\"", "''") + "\"");
+
                         for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
                         {
                             if (opcodeUsed[opcode])
@@ -160,6 +178,13 @@ namespace Neo.Debugger.Profiler
                                 totalTallyByOpcode[opcode] += ssi._stmtOpcodeCount[opcode];
                             }
                         }
+
+                        foreach (var sysCall in sysCallUsed)
+                        {
+                            int count  = ssi._sysCallCount.ContainsKey(sysCall) ? ssi._sysCallCount[sysCall] :0;
+                            file.Write(",\"" + count + "\"");
+                        }
+
                         file.WriteLine();
                     }
                     int totalOpcodeTally = 0;
@@ -222,9 +247,10 @@ namespace Neo.Debugger.Profiler
 
                     foreach (SourceStmtInfo ssi in dictStmtInfo.Values)
                     {
-                        file.Write("\"" + ssi._filelineo._filename + "\"");
-                        file.Write(",\"" + ssi._filelineo._lineno.ToString() + "\"");
+                        file.Write("\"" + ssi._filelineo.fileName + "\"");
+                        file.Write(",\"" + ssi._filelineo.lineNumber.ToString() + "\"");
                         file.Write(",\"" + ssi._sourceStmt.Replace("\"", "''") + "\"");
+
                         for (int opcode = 0; opcode < MAXNOPTCODES; opcode++)
                         {
                             if (opcodeUsed[opcode])
@@ -234,6 +260,13 @@ namespace Neo.Debugger.Profiler
                                 totalCostByOpcode[opcode] += ssi._stmtOpcodeCost[opcode];
                             }
                         }
+
+                        foreach (var sysCall in sysCallUsed)
+                        {
+                            decimal cost = ssi._sysCallCost.ContainsKey(sysCall) ? ssi._sysCallCost[sysCall]: 0;
+                            file.Write(",\"" + cost + "\"");
+                        }
+
                         file.WriteLine();
                     }
                     decimal totalOpcodeCost = 0;

@@ -97,6 +97,7 @@ namespace Neo.Emulation
             public int offset;
             public OpCode opcode;
             public decimal gasCost;
+            public string sysCall;
         }
 
         private ExecutionEngine engine;
@@ -443,7 +444,7 @@ namespace Neo.Emulation
                 usedGas += opCost;
                 usedOpcodeCount++;
 
-                OnStep?.Invoke(new EmulatorStepInfo() { byteCode = engine.CurrentContext.Script, offset = engine.CurrentContext.InstructionPointer, opcode = opcode, gasCost = opCost });
+                OnStep?.Invoke(new EmulatorStepInfo() { byteCode = engine.CurrentContext.Script, offset = engine.CurrentContext.InstructionPointer, opcode = opcode, gasCost = opCost, sysCall = opcode == OpCode.SYSCALL? engine.lastSysCall : null });
             }
             catch
             {
