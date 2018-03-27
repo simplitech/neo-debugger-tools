@@ -46,7 +46,7 @@ namespace Neo.Emulation
             foreach (var child in fn.Children) {
                 var f = new AVMFunction();
                 f.name = child.GetString("name");
-                if (!Enum.TryParse(child.GetString("returnType"), out f.returnType))
+                if (!Enum.TryParse(child.GetString("returnType"), true, out f.returnType))
                 {
                     f.returnType = Emulator.Type.Unknown;
                 }
@@ -58,7 +58,8 @@ namespace Neo.Emulation
                     {
                         var input = new AVMInput();
                         input.name = p[i].GetString("name");
-                        if (!Enum.TryParse<Emulator.Type>(p[i].GetString("type"), out input.type))
+                        var temp = p[i].GetString("type");
+                        if (!Enum.TryParse<Emulator.Type>(temp, true, out input.type))
                         {
                             input.type = Emulator.Type.Unknown;
                         }                         
