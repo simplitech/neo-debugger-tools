@@ -339,6 +339,8 @@ namespace Neo.Emulation
                         }
                     }
                 }
+
+                return true;
             }
 
             var shouldContinue = GetRunningState();
