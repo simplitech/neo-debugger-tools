@@ -30,10 +30,6 @@ namespace Neo.Debugger.Electron
         private string activeDocumentID;
         private Dictionary<string, FileEntry> projectFiles = new Dictionary<string, FileEntry>();
 
-        private DebugManager _debugger;
-
-        private DebuggerSettings _settings;
-
         private DebuggerShell _shell;
 
         private int docAllocID  = 100;
@@ -94,18 +90,18 @@ namespace Neo.Debugger.Electron
 
                 if (!File.Exists(avmFilePath))
                 {
-                    if (!_debugger.CompileContract(sourceCode, language, avmFilePath))
+                    if (!_shell.Debugger.CompileContract(sourceCode, language, avmFilePath))
                     {
                         return false;
                     }
                 }
 
-                if (!_debugger.LoadContract(avmFilePath))
+                if (!_shell.Debugger.LoadContract(avmFilePath))
                 {
                     return false;
                 }
                
-                LoadFile(avmFilePath, _debugger.avmDisassemble.ToString());
+                LoadFile(avmFilePath, _shell.Debugger.avmDisassemble.ToString());
             }
             
             return true;
@@ -129,23 +125,21 @@ namespace Neo.Debugger.Electron
 
         public Backend(ServerSettings serverSettings)
         {
-            _settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            var settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
 
             var curPath = Directory.GetCurrentDirectory();
 
-            if (!_settings.compilerPaths.ContainsKey(SourceLanguage.CSharp))
+            if (!settings.compilerPaths.ContainsKey(SourceLanguage.CSharp))
             {
-                _settings.compilerPaths[SourceLanguage.CSharp] = curPath + "/compilers";
+                settings.compilerPaths[SourceLanguage.CSharp] = curPath + "/compilers";
             }
 
-            if (!_settings.compilerPaths.ContainsKey(SourceLanguage.Python))
+            if (!settings.compilerPaths.ContainsKey(SourceLanguage.Python))
             {
-                _settings.compilerPaths[SourceLanguage.Python] = curPath + "/compilers";
+                settings.compilerPaths[SourceLanguage.Python] = curPath + "/compilers";
             }
 
-            _debugger = new DebugManager(_settings);
-
-            _shell = new DebuggerShell();
+            _shell = new DebuggerShell(settings);
 
             // initialize a logger
             var log = new SynkServer.Core.Logger();
@@ -233,7 +227,11 @@ namespace Neo.Debugger.Electron
             {
                 var input = request.args["input"];
                 var output = new StringBuilder();
-                _shell.Execute(input);
+
+                _shell.Execute(input, (type, text) =>
+                {
+                    output.AppendLine(text);
+                });
 
                 return output.ToString();
             });

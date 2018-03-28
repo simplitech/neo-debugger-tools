@@ -1,14 +1,11 @@
 ﻿using LunarParser;
-using LunarParser.JSON;
-using Neo.Debugger.Dissambler;
+using Neo.Debugger.Core.Models;
+using Neo.Debugger.Core.Utils;
 using Neo.Emulation;
 using Neo.Emulation.API;
-using Neo.Emulation.Utils;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 
 namespace Neo.Debugger.Shell
@@ -20,41 +17,42 @@ namespace Neo.Debugger.Shell
         public abstract string Name { get; }
         public abstract string Help { get; }
 
-        public abstract void Execute(string[] args);
+        public abstract void Execute(string[] args, Action<ShellMessageType, string> output);
+    }
+
+    public enum ShellMessageType
+    {
+        Default,
+        Success,
+        Error,
     }
 
     public class DebuggerShell
     {
         public List<Command> commands = new List<Command>();
-        public Blockchain blockchain { get; private set; }
-        public Emulator debugger;
 
         public string avmPath;
-        public string blockchainPath;
 
+        public DebugManager Debugger { get; private set; }
+        private DebuggerSettings _settings;
 
-        public DebuggerShell()
+        public DebuggerShell(DebuggerSettings settings)
         {
-            this.blockchain = new Blockchain();
-            this.debugger = new Emulator(blockchain);
+            this._settings = settings;
 
-            AddCommand(new HelpCommand());
-            AddCommand(new ExitCommand());
+            this.Debugger = new DebugManager(_settings);
+
+            AddCommand(new HelpCommand());            
             AddCommand(new LoadCommand());
-            AddCommand(new DeployCommand());
-            AddCommand(new CallCommand());
+            AddCommand(new ContractCommand());
+            AddCommand(new InputCommand());
             AddCommand(new StorageCommand());
         }
 
-        private void AddCommand(Command cmd)
+        public void AddCommand(Command cmd)
         {
             commands.Add(cmd);
             cmd.Shell = this;
-        }
-
-        internal static void Write(string s)
-        {
-            Console.WriteLine("\t" + s);
         }
 
         internal static string[] ParseArgs(string input)
@@ -139,7 +137,7 @@ namespace Neo.Debugger.Shell
             return args.Where(x => !string.IsNullOrEmpty(x)).ToArray();
         }
 
-        public bool Execute(string input)
+        public bool Execute(string input, Action<ShellMessageType, string> output)
         {
             var temp = ParseArgs(input);
             var cmd = temp[0].ToLower();
@@ -148,209 +146,12 @@ namespace Neo.Debugger.Shell
             {
                 if (entry.Name == cmd)
                 {
-                    entry.Execute(temp);
+                    entry.Execute(temp, output);
                     return true;
                 }
             }
 
             return false;
-        }
-    }
-
-    internal class StorageCommand : Command
-    {
-        public override string Name => "storage";
-        public override string Help => "View content of storage";
-
-        public override void Execute(string[] args)
-        {
-            var storage = Shell.debugger.currentAccount.storage;
-            foreach (var entry in storage.entries)
-            {
-                DebuggerShell.Write(FormattingUtils.OutputData(entry.Key, false) + " => "+ FormattingUtils.OutputData(entry.Value, false));
-            }
-        }
-    }
-
-    internal class HelpCommand : Command
-    {
-        public override string Name => "help";
-        public override string Help => "Prints this list of commands";
-
-        public override void Execute(string[] args)
-        {
-            foreach (var cmd in Shell.commands)
-            {
-                DebuggerShell.Write(cmd.Name + ": " + cmd.Help);
-            }
-        }
-    }
-
-    internal class ExitCommand : Command
-    {
-        public override string Name => "exit";
-        public override string Help => "Exits the shell";
-
-        public override void Execute(string[] args)
-        {
-            Environment.Exit(0);
-        }
-    }
-
-    internal class DeployCommand : Command
-    {
-        public override string Name => "deploy";
-        public override string Help => "Deploys a NEO smart contract from a file";
-
-        public override void Execute(string[] args)
-        {
-            if (args.Length < 2) return;
-
-            var filePath = args[1];
-
-            if (File.Exists(filePath))
-            {
-                Shell.avmPath = filePath;
-
-                var bytes = File.ReadAllBytes(filePath);
-
-                var avmName = Path.GetFileName(filePath);
-                DebuggerShell.Write($"Loaded {avmName} ({bytes.Length} bytes)");
-
-                string contractName;
-
-                var mapFile = avmName.Replace(".avm", ".debug.json");
-                if (File.Exists(mapFile))
-                {
-                    var map = new NeoMapFile();
-                    map.LoadFromFile(mapFile, bytes);
-
-                    contractName = map.contractName;
-                }
-                else
-                {
-                    contractName = avmName.Replace(".avm", "");
-                }
-
-                var address = Shell.blockchain.FindAddressByName(contractName);
-
-                if (address == null)
-                {
-                    address = Shell.blockchain.DeployContract(contractName, bytes);
-                    DebuggerShell.Write($"Deployed {contractName} at address {address.keys.address}");
-                }
-                else
-                {
-                    DebuggerShell.Write($"Updated {contractName} at address {address.keys.address}");
-                }
-
-                Runtime.OnLogMessage = (x => DebuggerShell.Write(x));
-            }
-            else
-            {
-                DebuggerShell.Write("File not found.");
-            }
-
-        }
-
-    }
-
-    internal class LoadCommand : Command
-    {
-        public override string Name => "load";
-        public override string Help => "Loads a virtual blockchain from a file";
-
-        public override void Execute(string[] args)
-        {
-            if (args.Length < 2) return;
-
-            var filePath = args[1];
-
-            if (File.Exists(filePath))
-            {
-                Shell.blockchainPath = filePath;
-
-                Shell.blockchain.Load(Shell.blockchainPath);
-                DebuggerShell.Write($"Loaded blockchain, ({Shell.blockchain.currentHeight} blocks, {Shell.blockchain.AddressCount} addresses)");
-            }
-            else
-            {
-                DebuggerShell.Write("File not found.");
-            }
-
-        }
-
-    }
-
-    internal class CallCommand : Command
-    {
-        public override string Name => "call";
-        public override string Help => "Calls a smart contract method";
-
-        public override void Execute(string[] args)
-        {
-            if (Shell.debugger == null)
-            {
-                DebuggerShell.Write("Smart contract not loaded yet.");
-                return;
-            }
-
-
-            DataNode inputs;
-
-            try
-            {
-                inputs = JSONReader.ReadFromString(args[1]);
-            }
-            catch
-            {
-                DebuggerShell.Write("Invalid arguments format. Must be valid JSON.");
-                return;
-            }
-
-            if (args.Length>=3)
-            {
-                bool valid = false;
-
-                if (args[2].ToLower() == "with")
-                {
-                    if (args.Length>=5)
-                    {
-                        BigInteger assetAmount = BigInteger.Parse(args[3]);
-                        var assetName = args[4];
-
-                        foreach (var entry in Asset.Entries)
-                        {
-                            if (entry.name == assetName)
-                            {
-                                DebuggerShell.Write($"Attaching {assetAmount} {assetName} to transaction");
-                                Shell.debugger.SetTransaction(entry.id, assetAmount);
-                                break;
-                            }
-                        }
-
-                        valid = true;
-                    }
-                }
-                
-                if (!valid)
-                {
-                    DebuggerShell.Write("Invalid sintax.");
-                    return;
-                }
-
-                DebuggerShell.Write("Executing transaction...");
-
-                Shell.debugger.Reset(inputs, null);
-                Shell.debugger.Run();
-
-                var val = Shell.debugger.GetOutput();
-
-                Shell.blockchain.Save(Shell.blockchainPath);
-
-                DebuggerShell.Write("Result: " + FormattingUtils.StackItemAsString(val));
-                DebuggerShell.Write("GAS used: " + Shell.debugger.usedGas);
-            }
         }
     }
 

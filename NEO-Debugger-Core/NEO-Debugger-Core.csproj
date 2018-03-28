@@ -66,7 +66,12 @@
     <Compile Include="Dissambler\NeoDebugMap.cs" />
     <Compile Include="Dissambler\NeoDisassembler.cs" />
     <Compile Include="Profiler\ProfilerContext.cs" />
+    <Compile Include="Shell\ContractCommand.cs" />
+    <Compile Include="Shell\HelpCommand.cs" />
+    <Compile Include="Shell\ChainCommand.cs" />
+    <Compile Include="Shell\InputCommand.cs" />
     <Compile Include="Shell\Shell.cs" />
+    <Compile Include="Shell\StorageCommand.cs" />
     <Compile Include="Utils\InspectorSupport.cs" />
     <Compile Include="Utils\LanguageSupport.cs" />
     <Compile Include="Models\DebugParameters.cs" />
