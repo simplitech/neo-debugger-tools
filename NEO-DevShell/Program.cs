@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Neo.Debugger.Core.Utils;
+using Neo.Debugger.Shell;
+using System;
 
 namespace NEO_DevShell
 {
@@ -6,8 +8,8 @@ namespace NEO_DevShell
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("-NEO Developer Shell- version 0.1");
-            var shell = new Shell();
+            Console.WriteLine("NEO Developer Shell - "+ DebuggerUtils.DebuggerVersion);
+            var shell = new DebuggerShell();
 
             if (args.Length>0)
             {

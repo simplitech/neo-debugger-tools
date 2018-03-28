@@ -11,11 +11,11 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 
-namespace NEO_DevShell
+namespace Neo.Debugger.Shell
 {
     public abstract class Command
     {
-        public Shell Shell { get; set; }
+        public DebuggerShell Shell { get; set; }
 
         public abstract string Name { get; }
         public abstract string Help { get; }
@@ -23,7 +23,7 @@ namespace NEO_DevShell
         public abstract void Execute(string[] args);
     }
 
-    public class Shell
+    public class DebuggerShell
     {
         public List<Command> commands = new List<Command>();
         public Blockchain blockchain { get; private set; }
@@ -33,7 +33,7 @@ namespace NEO_DevShell
         public string blockchainPath;
 
 
-        public Shell()
+        public DebuggerShell()
         {
             this.blockchain = new Blockchain();
             this.debugger = new Emulator(blockchain);
@@ -167,7 +167,7 @@ namespace NEO_DevShell
             var storage = Shell.debugger.currentAccount.storage;
             foreach (var entry in storage.entries)
             {
-                Shell.Write(FormattingUtils.OutputData(entry.Key, false) + " => "+ FormattingUtils.OutputData(entry.Value, false));
+                DebuggerShell.Write(FormattingUtils.OutputData(entry.Key, false) + " => "+ FormattingUtils.OutputData(entry.Value, false));
             }
         }
     }
@@ -181,7 +181,7 @@ namespace NEO_DevShell
         {
             foreach (var cmd in Shell.commands)
             {
-                Shell.Write(cmd.Name + ": " + cmd.Help);
+                DebuggerShell.Write(cmd.Name + ": " + cmd.Help);
             }
         }
     }
@@ -215,7 +215,7 @@ namespace NEO_DevShell
                 var bytes = File.ReadAllBytes(filePath);
 
                 var avmName = Path.GetFileName(filePath);
-                Shell.Write($"Loaded {avmName} ({bytes.Length} bytes)");
+                DebuggerShell.Write($"Loaded {avmName} ({bytes.Length} bytes)");
 
                 string contractName;
 
@@ -237,18 +237,18 @@ namespace NEO_DevShell
                 if (address == null)
                 {
                     address = Shell.blockchain.DeployContract(contractName, bytes);
-                    Shell.Write($"Deployed {contractName} at address {address.keys.address}");
+                    DebuggerShell.Write($"Deployed {contractName} at address {address.keys.address}");
                 }
                 else
                 {
-                    Shell.Write($"Updated {contractName} at address {address.keys.address}");
+                    DebuggerShell.Write($"Updated {contractName} at address {address.keys.address}");
                 }
 
-                Runtime.OnLogMessage = (x => Shell.Write(x));
+                Runtime.OnLogMessage = (x => DebuggerShell.Write(x));
             }
             else
             {
-                Shell.Write("File not found.");
+                DebuggerShell.Write("File not found.");
             }
 
         }
@@ -271,11 +271,11 @@ namespace NEO_DevShell
                 Shell.blockchainPath = filePath;
 
                 Shell.blockchain.Load(Shell.blockchainPath);
-                Shell.Write($"Loaded blockchain, ({Shell.blockchain.currentHeight} blocks, {Shell.blockchain.AddressCount} addresses)");
+                DebuggerShell.Write($"Loaded blockchain, ({Shell.blockchain.currentHeight} blocks, {Shell.blockchain.AddressCount} addresses)");
             }
             else
             {
-                Shell.Write("File not found.");
+                DebuggerShell.Write("File not found.");
             }
 
         }
@@ -291,7 +291,7 @@ namespace NEO_DevShell
         {
             if (Shell.debugger == null)
             {
-                Shell.Write("Smart contract not loaded yet.");
+                DebuggerShell.Write("Smart contract not loaded yet.");
                 return;
             }
 
@@ -304,7 +304,7 @@ namespace NEO_DevShell
             }
             catch
             {
-                Shell.Write("Invalid arguments format. Must be valid JSON.");
+                DebuggerShell.Write("Invalid arguments format. Must be valid JSON.");
                 return;
             }
 
@@ -323,7 +323,7 @@ namespace NEO_DevShell
                         {
                             if (entry.name == assetName)
                             {
-                                Shell.Write($"Attaching {assetAmount} {assetName} to transaction");
+                                DebuggerShell.Write($"Attaching {assetAmount} {assetName} to transaction");
                                 Shell.debugger.SetTransaction(entry.id, assetAmount);
                                 break;
                             }
@@ -335,11 +335,11 @@ namespace NEO_DevShell
                 
                 if (!valid)
                 {
-                    Shell.Write("Invalid sintax.");
+                    DebuggerShell.Write("Invalid sintax.");
                     return;
                 }
 
-                Shell.Write("Executing transaction...");
+                DebuggerShell.Write("Executing transaction...");
 
                 Shell.debugger.Reset(inputs, null);
                 Shell.debugger.Run();
@@ -348,8 +348,8 @@ namespace NEO_DevShell
 
                 Shell.blockchain.Save(Shell.blockchainPath);
 
-                Shell.Write("Result: " + FormattingUtils.StackItemAsString(val));
-                Shell.Write("GAS used: " + Shell.debugger.usedGas);
+                DebuggerShell.Write("Result: " + FormattingUtils.StackItemAsString(val));
+                DebuggerShell.Write("GAS used: " + Shell.debugger.usedGas);
             }
         }
     }

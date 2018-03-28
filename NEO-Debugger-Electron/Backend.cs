@@ -2,12 +2,14 @@
 using Neo.Debugger.Core.Data;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
+using Neo.Debugger.Shell;
 using SynkServer.Core;
 using SynkServer.HTTP;
 using SynkServer.Templates;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Neo.Debugger.Electron
 {
@@ -31,6 +33,8 @@ namespace Neo.Debugger.Electron
         private DebugManager _debugger;
 
         private DebuggerSettings _settings;
+
+        private DebuggerShell _shell;
 
         private int docAllocID  = 100;
 
@@ -141,6 +145,8 @@ namespace Neo.Debugger.Electron
 
             _debugger = new DebugManager(_settings);
 
+            _shell = new DebuggerShell();
+
             // initialize a logger
             var log = new SynkServer.Core.Logger();
 
@@ -221,6 +227,15 @@ namespace Neo.Debugger.Electron
                 }
 
                 return "FAIL";
+            });
+
+            site.Post("/shell", (request) =>
+            {
+                var input = request.args["input"];
+                var output = new StringBuilder();
+                _shell.Execute(input);
+
+                return output.ToString();
             });
 
             server.Run();

@@ -11,23 +11,70 @@
 	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>	
 	<script src="/js/jquery-3.3.1.min.js"></script>
 	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/jquery.console.js"></script>
+	
 	<script>if (window.module) module = window.module;</script>
 </head>
+
 <body>
 
-<div class="project_explorer">
-	<h3>Contract Files</h3>
-	<ul class="nav navbar-nav side-nav">
-		{{#each files}}
-		<li id="{{id}}">
-			<a href="#" onclick="switchDocument('{{id}}')"><span class="glyphicon glyphicon-file"></span>&nbsp;{{name}}</a>
-		</li>
-		{{/each}}
-	</ul>
+<style>
+</style>
+
+<div class="main">
+	<div class="view_project">
+		<h3>Contract Files</h3>
+		<ul class="nav navbar-nav side-nav">
+			{{#each files}}
+			<li id="{{id}}">
+				<a href="#" onclick="switchDocument('{{id}}')"><span class="glyphicon glyphicon-file"></span>&nbsp;{{name}}</a>
+			</li>
+			{{/each}}
+		</ul>
+	</div>
+
+	<div class="view_editor">
+		<pre id="editor">Loading...</pre>
+	</div>
+
 </div>
 
-<pre id="editor">Loading...</pre>
+<div class="footer">
 
+	<div class="view_log" id="log">
+		
+	</div>
+
+	<div class="view_stack">
+		 <table class="table">
+			<thead>
+			  <tr>
+				<th>Position</th>
+				<th>Evaluation</th>
+				<th>Alt</th>
+			  </tr>
+			</thead>
+			<tbody>
+			  <tr>
+				<td>0</td>
+				<td>Doe</td>
+				<td>john@example.com</td>
+			  </tr>
+			  <tr>
+				<td>1</td>
+				<td>Moe</td>
+				<td>mary@example.com</td>
+			  </tr>
+			  <tr>
+				<td>2</td>
+				<td>Dooley</td>
+				<td>july@example.com</td>
+			  </tr>
+			</tbody>
+		  </table>
+  </div>
+
+</div>
 
 <!-- load ace -->
 <script src="/editor/ace.js"></script>
@@ -177,6 +224,26 @@
 		
 		activeDocumentID = '{{activeDocumentID}}';
 		$("#"+activeDocumentID).addClass( "active");
+
+		var shell = $('<div class="shell">');
+        $('#log').append(shell);
+		 
+        var controller = shell.console({
+           promptLabel: '> ',
+           commandValidate:function(line){
+             if (line == "") return false;
+             else return true;
+           },
+           commandHandle:function(line){
+               return [{msg:"Unkown",
+                        className:"jquery-console-message-value"}
+						]
+           },
+           autofocus:false,
+           animateScroll:true,
+           promptHistory:true,
+         });
+		 
 	});	
 </script>
 

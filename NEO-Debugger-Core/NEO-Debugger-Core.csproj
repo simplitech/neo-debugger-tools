@@ -66,6 +66,7 @@
     <Compile Include="Dissambler\NeoDebugMap.cs" />
     <Compile Include="Dissambler\NeoDisassembler.cs" />
     <Compile Include="Profiler\ProfilerContext.cs" />
+    <Compile Include="Shell\Shell.cs" />
     <Compile Include="Utils\InspectorSupport.cs" />
     <Compile Include="Utils\LanguageSupport.cs" />
     <Compile Include="Models\DebugParameters.cs" />
