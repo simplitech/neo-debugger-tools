@@ -19,8 +19,8 @@
 	<h3>Contract Files</h3>
 	<ul class="nav navbar-nav side-nav">
 		{{#each files}}
-		<li {{#if active}}class="active"{{/if}}>
-			<a href="#" onclick="switchDocument('{{path}}')"><span class="glyphicon glyphicon-file"></span>&nbsp;{{name}}</a>
+		<li id="{{id}}">
+			<a href="#" onclick="switchDocument('{{id}}')"><span class="glyphicon glyphicon-file"></span>&nbsp;{{name}}</a>
 		</li>
 		{{/each}}
 	</ul>
@@ -61,9 +61,9 @@
     }
     langTools.addCompleter(syntaxCompleter);
 
-	var lineNumber = 2;
+	/*var lineNumber = 2;
 	var marker = editor.session.addMarker(new Range(lineNumber, 0, lineNumber, 1), "myMarker", "fullLine");	
-	//editor.session.removeMarker(marker);
+	//editor.session.removeMarker(marker);*/
 	
   // add command to lazy-load keybinding_menu extension
     editor.commands.addCommand({
@@ -103,10 +103,21 @@
 		
 		var breakpoints = e.editor.session.getBreakpoints(row, 0);
 		var row = e.getDocumentPosition().row;
-		if(typeof breakpoints[row] === typeof undefined)
-			e.editor.session.setBreakpoint(row);
+		if(typeof breakpoints[row] === typeof undefined){
+			$.post("/breakpoint/add", { line:row } ,function(data){
+				if (data == 'ok') {
+					e.editor.session.setBreakpoint(row);
+				}
+			});		
+		}			
 		else
-			e.editor.session.clearBreakpoint(row);		
+		{
+			$.post("/breakpoint/remove", { line:row } ,function(data){
+				if (data == 'ok') {
+					e.editor.session.clearBreakpoint(row);		
+				}
+			});		
+		}
 
 		e.stop();
 	});
@@ -125,14 +136,33 @@
 					editor.renderer.scrollToRow(line);
 					editor.focus();
 				}
+				
+				$.ajax({
+				   url:"/breakpoint/list",
+				   type:'GET',
+				   success: function(data) {
+						let list = $.parseJSON(data);
+						$.each(list, function(index, value) {
+							e.editor.session.setBreakpoint(value);
+						});						
+				   }
+				});			
+				
 		   }
-		});	
+		});			
 	}
 	
-	function switchDocument(path){
+	var activeDocumentID;
+	
+	function switchDocument(id){
+		
+		$("#"+activeDocumentID).toggleClass( "active");
+		activeDocumentID = id;
+		$("#"+activeDocumentID).toggleClass( "active");
+	
 		var cursor = editor.getCursorPosition();
 		var myCode = editor.getValue();
-		$.post("/switch", { code:myCode, path:path } ,function(data){
+		$.post("/switch", { code:myCode, id:id } ,function(data){
 			if (data == 'ok') {
 				reloadDocument(cursor);
 			}
@@ -144,6 +174,9 @@
 	
 	$( document ).ready(function() {
 		reloadDocument();
+		
+		activeDocumentID = '{{activeDocumentID}}';
+		$("#"+activeDocumentID).addClass( "active");
 	});	
 </script>
 

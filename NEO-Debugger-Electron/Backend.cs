@@ -1,4 +1,5 @@
-﻿using Neo.Debugger.Core.Data;
+﻿using LunarParser;
+using Neo.Debugger.Core.Data;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
 using SynkServer.Core;
@@ -12,42 +13,61 @@ namespace Neo.Debugger.Electron
 {
     public class FileEntry
     {
+        public string id;
         public string name;
         public string path;
         public string url;
         public bool active;
+        public string content;
+
+        public HashSet<int> breakpoints = new HashSet<int>();
     }
 
     public class Backend
     {
-        private string activeFilePath;
+        private string activeDocumentID;
         private Dictionary<string, FileEntry> projectFiles = new Dictionary<string, FileEntry>();
-        private Dictionary<string, string> fileContents = new Dictionary<string, string>();
 
         private DebugManager _debugger;
 
         private DebuggerSettings _settings;
 
-        private bool LoadFile(string filePath, string content = null)
+        private int docAllocID  = 100;
+
+        private FileEntry LoadFile(string filePath, string content = null)
         {
             if (content == null)
             {
-                content = File.ReadAllText(filePath);
+                if (File.Exists(filePath))
+                {
+                    content = File.ReadAllText(filePath);
+                }
+                else
+                {
+                    return null;
+                }
             }
 
-            fileContents[filePath] = content;
+            var entry = new FileEntry() { path = filePath, name = Path.GetFileName(filePath), active = false, id = docAllocID.ToString(), content = content};
 
-            var entry = new FileEntry() { path = filePath, name = Path.GetFileName(filePath), active = false };
-            projectFiles[filePath] = entry;
+            projectFiles[entry.id] = entry;
 
-            return true;
+            if (activeDocumentID == null)
+            {
+                activeDocumentID = entry.id;
+            }
+
+            docAllocID++;
+
+            return entry;
         }
 
         private bool LoadContract(string targetPath)
         {
             targetPath = targetPath.Replace("\\", "/");
-            activeFilePath = targetPath;
             projectFiles.Clear();
+
+            activeDocumentID = null;
 
             var extension = Path.GetExtension(targetPath);
             if (extension != ".avm")
@@ -58,12 +78,13 @@ namespace Neo.Debugger.Electron
                     return false;
                 }
 
-                if (!LoadFile(targetPath))
+                var mainEntry = LoadFile(targetPath);
+                if (mainEntry == null)
                 {
                     return false;
                 }
 
-                var sourceCode = fileContents[targetPath];
+                var sourceCode = mainEntry.content;
 
                 var avmFilePath = targetPath.Replace(extension, ".avm");
 
@@ -81,8 +102,8 @@ namespace Neo.Debugger.Electron
                 }
                
                 LoadFile(avmFilePath, _debugger.avmDisassemble.ToString());
-            }            
-
+            }
+            
             return true;
         }
 
@@ -92,10 +113,12 @@ namespace Neo.Debugger.Electron
 
             foreach (var entry in projectFiles.Values)
             {
-                entry.active = (entry.path == activeFilePath);
+                entry.active = (entry.id == activeDocumentID);
             }
 
             context["files"] = this.projectFiles.Values;
+
+            context["activeDocumentID"] = activeDocumentID;
 
             return context;
         }
@@ -140,9 +163,9 @@ namespace Neo.Debugger.Electron
             site.Post("/switch", (request) =>
             {
                 var code = request.args["code"];
-                fileContents[this.activeFilePath] = code;
+                projectFiles[this.activeDocumentID].content = code;
 
-                this.activeFilePath = request.args["path"];
+                this.activeDocumentID = request.args["id"];
 
                 var context = GetContext();
 
@@ -151,8 +174,40 @@ namespace Neo.Debugger.Electron
 
             site.Get("/content", (request) =>
             {
-                var content = fileContents[activeFilePath];
+                var content = projectFiles[activeDocumentID].content;
                 return content;
+            });
+
+            site.Get("/breakpoint/list", (request) =>
+            {
+                var breakpoints = projectFiles[activeDocumentID].breakpoints;
+                var node = DataNode.CreateArray();
+                foreach (var line in breakpoints)
+                {
+                    var item = DataNode.CreateValue(line);
+                    node.AddNode(item);
+                }
+                return node;
+            });
+
+            site.Post("/breakpoint/add", (request) =>
+            {
+                int line = int.Parse(request.args["line"]);
+
+                var breakpoints = projectFiles[activeDocumentID].breakpoints;
+                breakpoints.Add(line);
+
+                return "ok";
+            });
+
+            site.Post("/breakpoint/remove", (request) =>
+            {
+                int line = int.Parse(request.args["line"]);
+
+                var breakpoints = projectFiles[activeDocumentID].breakpoints;
+                breakpoints.Remove(line);
+
+                return "ok";
             });
 
             site.Post("/compile", (request) =>
