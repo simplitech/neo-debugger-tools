@@ -792,6 +792,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Compilers\CSharp\" />
+    <Folder Include="Compilers\Python\" />
     <Folder Include="fonts\" />
     <Folder Include="Models\" />
   </ItemGroup>
@@ -799,6 +801,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NEO-Compiler\NEO-Compiler.csproj">
+      <Project>{36e1ccd1-3c95-459d-88d1-6f14e07eaec9}</Project>
+      <Name>NEO-Compiler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NEO-Debugger-Core\NEO-Debugger-Core.csproj">
       <Project>{f034e57e-520b-4572-88f0-76e8d28d4e7b}</Project>
       <Name>NEO-Debugger-Core</Name>
@@ -839,6 +845,9 @@
     <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.8\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.8\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /s /y $(SolutionDir)NEO-Compiler\bin\$(ConfigurationName)\*  $(ProjectDir)$(OutDir)Compilers\CSharp\</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

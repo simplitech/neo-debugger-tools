@@ -6,6 +6,7 @@ using Microsoft.AspNet.SignalR;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
 using Neo.WebDebugger.Logic;
+using Neo.Debugger.Core.Data;
 
 namespace Neo.WebDebugger.Controllers
 {
@@ -16,8 +17,10 @@ namespace Neo.WebDebugger.Controllers
         {
             //Use settings from the My Documents folder, in a hosted / multi-tenant environment, this will have to change.  This works for local machine for now
             var settings = new Settings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            settings.compilerPaths[SourceLanguage.CSharp] = Server.MapPath("~") + @"\Compilers\CSharp";
+            settings.compilerPaths[SourceLanguage.Python] = Server.MapPath("~") + @"\Compilers\Python";
 
-            Compiler compiler = new Compiler(settings);
+            Neo.Debugger.Core.Utils.Compiler compiler = new Neo.Debugger.Core.Utils.Compiler(settings);
             compiler.SendToLog += Compiler_SendToLog;
 
             Directory.CreateDirectory(settings.path);
