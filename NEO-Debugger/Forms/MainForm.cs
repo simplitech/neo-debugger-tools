@@ -42,6 +42,7 @@ namespace Neo.Debugger.Forms
             TitleCaption = this.Text;
             this.Text = $"{TitleCaption} {DebuggerUtils.DebuggerVersion}";
 
+            stackPanel.Columns.Add("Index", "Index");
             stackPanel.Columns.Add("Eval", "Eval");
             stackPanel.Columns.Add("Alt", "Alt");
 
@@ -1432,13 +1433,13 @@ namespace Neo.Debugger.Forms
 
             stackPanel.Rows.Clear();
 
-            int index = 0;
-            while (index < evalStack.Length || index < altStack.Length)
+            int index = Math.Max(evalStack.Length, altStack.Length) - 1;
+            while (index>=0)
             {
                 string a = index < evalStack.Length ? FormattingUtils.StackItemAsString(evalStack[index]) : "";
                 string b = index < altStack.Length ? FormattingUtils.StackItemAsString(altStack[index]) : "";
-                stackPanel.Rows.Add(new object[] { a,b });
-                index++;
+                stackPanel.Rows.Add(new object[] { index, a,b });
+                index--;
             }
         }
 

@@ -378,6 +378,8 @@ namespace Neo.Debugger.Core.Utils
             {
                 lineNumber = ResolveLine(info.offset, true, out filePath);
                 sourceCode = GetContentFor(filePath);
+
+                filePath = Path.GetFileName(filePath);
             }
             catch
             {
@@ -393,9 +395,7 @@ namespace Neo.Debugger.Core.Utils
 
             if (lineNumber >= 0)
             {
-                this.profiler.SetLineno(lineNumber);
-                this.profiler.SetFilenameSource(filePath, sourceCode);
-                this.profiler.TallyOpcode(info.opcode, info.gasCost);
+                this.profiler.TallyOpcode(info.opcode, info.gasCost, lineNumber, filePath, sourceCode, info.sysCall);
             }
         }
 

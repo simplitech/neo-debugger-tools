@@ -86,7 +86,7 @@ namespace Neo.Debugger.Dissambler
 
                     if (hintStr.Contains("$XX"))
                     {
-                        hintStr = hintStr.Replace("$XX", FormattingUtils.OutputHex(entry.data));
+                        hintStr = hintStr.Replace("$XX", entry.data.ByteToHex());
                     }
 
                     hintStr = "// " + hintStr;

@@ -122,12 +122,12 @@ namespace Neo.Emulation.Utils
                         byte[] fieldValueAsBytes = part.SubArray(4, part.Length - 4);
                         string fieldValueAsString = System.Text.Encoding.ASCII.GetString(fieldValueAsBytes);
                         Debug.WriteLine("fieldCode " + ((char)fieldCode).ToString() + " fieldType " + ((int)fieldType).ToString());
-                        Debug.WriteLine("fieldValue " + OutputHex(fieldValueAsBytes) + " '" + fieldValueAsString + "'");
+                        Debug.WriteLine("fieldValue " + fieldValueAsBytes.ByteToHex() + " '" + fieldValueAsString + "'");
                         switch ((char)fieldCode)
                         {
                             case '#': // signature and flags
                                 {
-                                    keyString += "#:" + ((int)fieldType).ToString() + "=" + OutputHex(fieldValueAsBytes);
+                                    keyString += "#:" + ((int)fieldType).ToString() + "=" + fieldValueAsBytes.ByteToHex();
                                     break;
                                 }
                             case 'a': // app name
@@ -170,12 +170,12 @@ namespace Neo.Emulation.Utils
                                             }
                                         case (int)ContractParameterTypeLocal.ByteArray:
                                             {
-                                                keyString += "u:" + ((int)fieldType).ToString() + "=" + OutputHex(fieldValueAsBytes);
+                                                keyString += "u:" + ((int)fieldType).ToString() + "=" + fieldValueAsBytes.ByteToHex();
                                                 break;
                                             }
                                         default:
                                             {
-                                                keyString += "u?:" + ((int)fieldType).ToString() + "=" + OutputHex(fieldValueAsBytes);
+                                                keyString += "u?:" + ((int)fieldType).ToString() + "=" + fieldValueAsBytes.ByteToHex();
                                                 break;
                                             }
                                     }
@@ -199,7 +199,7 @@ namespace Neo.Emulation.Utils
                                 }
                             default:
                                 {
-                                    keyString += ((char)fieldCode).ToString() + "?:" + ((int)fieldType).ToString() + "=" + OutputHex(fieldValueAsBytes);
+                                    keyString += ((char)fieldCode).ToString() + "?:" + ((int)fieldType).ToString() + "=" + fieldValueAsBytes.ByteToHex();
                                     break;
                                 }
                         }
@@ -248,7 +248,7 @@ namespace Neo.Emulation.Utils
                             return Crypto.Default.ToAddress(signatureHash);
                         }
 
-                        return OutputHex(data);
+                        return data.ByteToHex();
                     }
                 }
 
@@ -262,12 +262,6 @@ namespace Neo.Emulation.Utils
             }
 
             return result;
-        }
-
-        public static string OutputHex(byte[] data)
-        {
-            string hex = BitConverter.ToString(data);
-            return hex;
         }
 
         // Separate() from: https://stackoverflow.com/questions/9755090/split-a-byte-array-at-a-delimiter

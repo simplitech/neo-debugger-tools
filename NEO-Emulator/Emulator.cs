@@ -97,6 +97,7 @@ namespace Neo.Emulation
             public int offset;
             public OpCode opcode;
             public decimal gasCost;
+            public string sysCall;
         }
 
         private ExecutionEngine engine;
@@ -140,20 +141,6 @@ namespace Neo.Emulation
         {
             this.currentAccount = address;
             this.contractByteCode = address.byteCode;
-
-            var assembly = typeof(Neo.Emulation.Helper).Assembly;
-            var methods = assembly.GetTypes()
-                                  .SelectMany(t => t.GetMethods())
-                                  .Where(m => m.GetCustomAttributes(typeof(SyscallAttribute), false).Length > 0)
-                                  .ToArray();
-
-            foreach (var method in methods)
-            {
-                var attr = (SyscallAttribute)method.GetCustomAttributes(typeof(SyscallAttribute), false).FirstOrDefault();
-
-                interop.Register(attr.Method, (engine) => { return (bool)method.Invoke(null, new object[] { engine }); }, attr.gasCost);
-                Debug.WriteLine("interopRegister:\t" + attr.Method);
-            }
         }
 
         private int lastOffset = -1;
@@ -352,6 +339,8 @@ namespace Neo.Emulation
                         }
                     }
                 }
+
+                return true;
             }
 
             var shouldContinue = GetRunningState();
@@ -443,7 +432,7 @@ namespace Neo.Emulation
                 usedGas += opCost;
                 usedOpcodeCount++;
 
-                OnStep?.Invoke(new EmulatorStepInfo() { byteCode = engine.CurrentContext.Script, offset = engine.CurrentContext.InstructionPointer, opcode = opcode, gasCost = opCost });
+                OnStep?.Invoke(new EmulatorStepInfo() { byteCode = engine.CurrentContext.Script, offset = engine.CurrentContext.InstructionPointer, opcode = opcode, gasCost = opCost, sysCall = opcode == OpCode.SYSCALL? engine.lastSysCall : null });
             }
             catch
             {
