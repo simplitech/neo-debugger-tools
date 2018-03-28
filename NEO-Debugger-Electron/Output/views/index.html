@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<title>Neo Debugger</title>
+    
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="/css/debugger.css">
+
+	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>	
+	<script src="/js/jquery-3.3.1.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script>if (window.module) module = window.module;</script>
+</head>
+<body>
+
+<div class="project_explorer">
+	<h3>Contract Files</h3>
+	<ul class="nav navbar-nav side-nav">
+		{{#each files}}
+		<li {{#if active}}class="active"{{/if}}>
+			<a href="#" onclick="switchDocument('{{path}}')"><span class="glyphicon glyphicon-file"></span>&nbsp;{{name}}</a>
+		</li>
+		{{/each}}
+	</ul>
+</div>
+
+<pre id="editor">Loading...</pre>
+
+
+<!-- load ace -->
+<script src="/editor/ace.js"></script>
+<!-- load ace language tools -->
+<script src="/editor/ext-language_tools.js"></script>
+<script>
+    // load extensions
+	var Range = ace.require('ace/range').Range;
+	
+	var langTools = ace.require("ace/ext/language_tools");
+    var editor = ace.edit("editor");
+	
+    editor.setTheme("ace/theme/twilight");
+    editor.session.setMode("ace/mode/csharp");
+
+    // enable autocompletion and snippets
+    editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: false
+    });
+
+	editor.focus();
+	
+    var syntaxCompleter = {
+        getCompletions: function(editor, session, pos, prefix, callback) {
+            if (prefix.length === 0) { callback(null, []); return }
+			alert(prefix);
+			callback(null, [{name: "snippet", value: "snippet", score: "500", meta: "method"}]);
+        }
+    }
+    langTools.addCompleter(syntaxCompleter);
+
+	var lineNumber = 2;
+	var marker = editor.session.addMarker(new Range(lineNumber, 0, lineNumber, 1), "myMarker", "fullLine");	
+	//editor.session.removeMarker(marker);
+	
+  // add command to lazy-load keybinding_menu extension
+    editor.commands.addCommand({
+        name: "showKeyboardShortcuts",
+        bindKey: {win: "Ctrl-Alt-h", mac: "Command-Alt-h"},
+        exec: function(editor) {
+            ace.config.loadModule("ace/ext/keybinding_menu", function(module) {
+                module.init(editor);
+                editor.showKeyboardShortcuts();				
+            })
+        }
+    })
+    //editor.execCommand("showKeyboardShortcuts");	
+
+	    editor.commands.addCommand({
+        name: "compileCode",
+        bindKey: {win: "Alt-5", mac: "Alt-5"},
+        exec: function(editor) {
+			var myCode = editor.getValue();
+			$.post("/compile", { code:myCode } ,function(data){
+				alert(data);
+			});
+        }
+    });
+
+	// mark lines
+	editor.on("guttermousedown", function(e) {
+		var target = e.domEvent.target; 
+		if (target.className.indexOf("ace_gutter-cell") == -1)
+			return; 
+		if (!editor.isFocused()) 
+			return; 
+		if (e.clientX > 25 + target.getBoundingClientRect().left) 
+			return; 
+
+		var row = e.getDocumentPosition().row;
+		
+		var breakpoints = e.editor.session.getBreakpoints(row, 0);
+		var row = e.getDocumentPosition().row;
+		if(typeof breakpoints[row] === typeof undefined)
+			e.editor.session.setBreakpoint(row);
+		else
+			e.editor.session.clearBreakpoint(row);		
+
+		e.stop();
+	});
+	
+	function reloadDocument(cursor){
+		$.ajax({
+		   url:"/content",
+		   type:'GET',
+		   success: function(data) {
+				editor.setValue(data);
+				editor.clearSelection();			   
+				
+				if (cursor){
+					var line = cursor.row+1;
+					editor.gotoLine(line, cursor.column, false);
+					editor.renderer.scrollToRow(line);
+					editor.focus();
+				}
+		   }
+		});	
+	}
+	
+	function switchDocument(path){
+		var cursor = editor.getCursorPosition();
+		var myCode = editor.getValue();
+		$.post("/switch", { code:myCode, path:path } ,function(data){
+			if (data == 'ok') {
+				reloadDocument(cursor);
+			}
+			else {
+				alert("failed: "+data);
+			}						
+		});
+	}
+	
+	$( document ).ready(function() {
+		reloadDocument();
+	});	
+</script>
+
+</body>
+</html>
