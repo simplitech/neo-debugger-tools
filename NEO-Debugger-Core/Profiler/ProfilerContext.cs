@@ -174,7 +174,7 @@ namespace Neo.Debugger.Profiler
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
-                    file.Write(",\"" + "V Stmt Opcode Tally / Opcode Cost >" + "\"");
+                    file.Write(",\"" + "v Stmt Opcode Tally / Opcode Cost >" + "\"");
                     for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
@@ -229,8 +229,8 @@ namespace Neo.Debugger.Profiler
                     int totalOpcodeTally = 0;
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
-                    file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "Tally by Opcode >" + "\"");
+                    file.Write(",\"" + "--------" + "\"");
                     for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
@@ -243,7 +243,6 @@ namespace Neo.Debugger.Profiler
 
                     // Dump grand total tally (footer)
                     file.Write("\"" + "" + "\"");
-                    file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "Total Tally >" + "\"");
                     file.Write(",\"" + totalOpcodeTally.ToString() + "\"");
@@ -285,7 +284,7 @@ namespace Neo.Debugger.Profiler
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
-                    file.Write(",\"" + "V Stmt Cost / Opcode Cost >" + "\"");
+                    file.Write(",\"" + "v Stmt Cost / Opcode Cost >" + "\"");
                     for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
@@ -337,8 +336,8 @@ namespace Neo.Debugger.Profiler
                     decimal totalOpcodeCost = 0;
                     file.Write("\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
-                    file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "Costs by Opcode >" + "\"");
+                    file.Write(",\"" + "--------" + "\"");
                     for (int opcode = 0; opcode < MAXNOPTCODES + SYSCALLOPTCODES; opcode++)
                     {
                         if (opcodeUsed[opcode])
@@ -351,7 +350,6 @@ namespace Neo.Debugger.Profiler
 
                     // Dump grand total cost (footer)
                     file.Write("\"" + "" + "\"");
-                    file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "" + "\"");
                     file.Write(",\"" + "Total Cost >" + "\"");
                     file.Write(",\"" + totalOpcodeCost.ToString() + "\"");

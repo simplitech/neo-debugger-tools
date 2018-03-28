@@ -73,7 +73,6 @@ namespace Neo.Debugger.Dissambler
             //sb.AppendLine(FormattingUtils.OutputLine("Offset", "Opcode", "Comment"));
             foreach (var entry in this.lines)
             {
-                string ofsStr = entry.startOfs.ToString();
                 string opStr = entry.name;
                 string hintStr = entry.comment;
 
@@ -92,7 +91,7 @@ namespace Neo.Debugger.Dissambler
                     hintStr = "// " + hintStr;
                 }
 
-                sb.AppendLine(FormattingUtils.OutputLine(ofsStr, opStr, hintStr));
+                sb.AppendLine(opStr.PadRight(8, ' ') + hintStr);
             }
 
             return sb.ToString();

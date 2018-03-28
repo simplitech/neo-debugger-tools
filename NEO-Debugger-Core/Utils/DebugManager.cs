@@ -1,4 +1,5 @@
-﻿using Neo.Emulation;
+﻿// NOTE - For this project to run it is necessary to download Electron and copy its contents to folder "Output/electron"
+using Neo.Emulation;
 using Neo.Emulation.API;
 using Neo.Debugger.Core.Data;
 using Neo.Debugger.Core.Models;
@@ -165,7 +166,7 @@ namespace Neo.Debugger.Core.Utils
         #endregion
 
         //Settings
-        private Settings _settings;
+        private DebuggerSettings _settings;
 
         //File load flag
         private bool _avmFileLoaded;
@@ -235,7 +236,7 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
-        public DebugManager(Settings settings)
+        public DebugManager(DebuggerSettings settings)
         {
             _settings = settings;
             this.profiler = new ProfilerContext();
@@ -353,6 +354,29 @@ namespace Neo.Debugger.Core.Utils
             _resetFlag = true;
 
             _currentFilePath = avmPath;
+
+            return true;
+        }
+
+        public bool LoadContract(string avmFilePath)
+        {
+            if (!LoadAvmFile(avmFilePath))
+                return false;
+
+            if (!LoadEmulator())
+                return false;
+
+            if (!DeployContract())
+                return false;
+
+            LoadTests();
+
+            this.IsCompiled = true;
+
+            if (MapLoaded && Map.FileNames.Any())
+            {
+                this.CurrentFilePath = Map.FileNames.FirstOrDefault();
+            }
 
             return true;
         }
@@ -663,12 +687,13 @@ namespace Neo.Debugger.Core.Utils
         public static readonly string TempContractName = "TempContract";
 
 
-        public bool CompileContract(string sourceCode, SourceLanguage language)
+        public bool CompileContract(string sourceCode, SourceLanguage language, string outputFile = null)
         {
             Compiler compiler = new Compiler(_settings);
             compiler.SendToLog += Compiler_SendToLog;
 
             var extension = LanguageSupport.GetExtension(language);
+
             var sourceFile = TempContractName + extension;
 
             Directory.CreateDirectory(_settings.path);
@@ -679,9 +704,14 @@ namespace Neo.Debugger.Core.Utils
             if (success)
             {
                 _avmFilePath = fileName.Replace(extension, ".avm");
+
+                if (outputFile != null)
+                {
+                    File.Copy(_avmFilePath, outputFile, true);
+                }
             }
 
-            _isCompiled = true;
+            _isCompiled = success;
             return success;
         }
 
