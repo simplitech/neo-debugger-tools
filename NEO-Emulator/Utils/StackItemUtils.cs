@@ -76,12 +76,6 @@ namespace Neo.Emulation.Utils
             return FormattingUtils.OutputData(data, addQuotes, hintType);
         }
 
-        public static string OutputLine(string col1, string col2, string col3)
-        {
-            int colSize = 14;
-            return col1.PadRight(colSize) + col2.PadRight(colSize) + col3;
-        }
-
         private enum ContractParameterTypeLocal : byte
         {
             Signature = 0,

@@ -14,7 +14,7 @@ namespace Neo.WebDebugger.Controllers
         public ActionResult Compile(string source)
         {
             //Use settings from the My Documents folder, in a hosted / multi-tenant environment, this will have to change.  This works for local machine for now
-            var settings = new Settings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            var settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
 
             Compiler compiler = new Compiler(settings);
             compiler.SendToLog += Compiler_SendToLog;

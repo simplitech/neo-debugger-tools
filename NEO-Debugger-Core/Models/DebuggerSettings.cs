@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Neo.Debugger.Core.Models
 {
-    public class Settings
+    public class DebuggerSettings
     {
         public string lastOpenedFile;
         public string lastPrivateKey;
@@ -20,13 +20,13 @@ namespace Neo.Debugger.Core.Models
         public Dictionary<string, string> lastParams = new Dictionary<string, string>();
 
         private string fileName;
+
         public readonly string path;
 
 
-        public Settings(string settingsFolderPath)
+        public DebuggerSettings(string settingsFolderPath)
         {
             this.path = settingsFolderPath + @"\Neo Contracts";
-
             this.fileName = path + @"\debugger.settings.json";
 
             if (File.Exists(fileName))

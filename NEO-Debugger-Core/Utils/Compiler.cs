@@ -16,9 +16,9 @@ namespace Neo.Debugger.Core.Utils
         public event CompilerLogEventHandler SendToLog;
         public delegate void CompilerLogEventHandler(object sender, CompilerLogEventArgs e);
 
-        private Settings _settings;
+        private DebuggerSettings _settings;
 
-        public Compiler(Settings settings)
+        public Compiler(DebuggerSettings settings)
         {
             _settings = settings;
         }

@@ -22,7 +22,7 @@ namespace Neo.Debugger.Forms
         //Command line param
         private string _sourceAvmPath;
         private string _argumentsAvmFile;
-        private Settings _settings;
+        private DebuggerSettings _settings;
         private DebugManager _debugger;
         private Scintilla TextArea;
 
@@ -62,7 +62,7 @@ namespace Neo.Debugger.Forms
         private void MainForm_Load(object sender, EventArgs e)
         {
             //Use settings from the My Documents folder
-            _settings = new Settings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            _settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
 
             if (string.IsNullOrEmpty(_sourceAvmPath))
             {
@@ -218,26 +218,13 @@ namespace Neo.Debugger.Forms
 
         private bool LoadContract(string avmFilePath)
         {
-            if (!_debugger.LoadAvmFile(avmFilePath))
+            if (!_debugger.LoadContract(avmFilePath))
+            {
                 return false;
-
-            if (!_debugger.LoadEmulator())
-                return false;
-
-            if (!_debugger.DeployContract())
-                return false;
-
-            _debugger.LoadTests();
-
-            _debugger.IsCompiled = true;
+            }
 
             ReloadProjectTree();
             
-            if (_debugger.MapLoaded && _debugger.Map.FileNames.Any())
-            {
-                _debugger.CurrentFilePath = _debugger.Map.FileNames.FirstOrDefault();
-            }
-
             ReloadTextArea(_debugger.CurrentFilePath);
 
             return true;
