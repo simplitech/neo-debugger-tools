@@ -23,6 +23,7 @@ namespace Neo.WebDebugger
 
             bundles.Add(new ScriptBundle("~/bundles/scripts").Include(
                       "~/Scripts/SemanticUI/semantic.min.js",
+                      "~/Scripts/Cookies/cookies.js",
                       "~/Scripts/Ace/ace.js"));
         }
     }

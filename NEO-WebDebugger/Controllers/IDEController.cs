@@ -13,5 +13,16 @@ namespace Neo.WebDebugger.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public void SetConnectionId(string connectionId)
+        {
+            Session["ConnectionId"] = connectionId;
+        } 
+
+        public bool ToggleBreakpoint(int line)
+        {
+            return true;
+        }
     }
 }

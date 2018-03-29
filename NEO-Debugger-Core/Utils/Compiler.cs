@@ -74,6 +74,11 @@ namespace Neo.Debugger.Core.Utils
 
             info.WorkingDirectory = _settings.compilerPaths[language];
 
+            var file = Path.Combine(info.WorkingDirectory, info.FileName);
+            if (!File.Exists(file))
+                throw new FileNotFoundException("File not found", file);
+
+            info.FileName = file;
             info.UseShellExecute = false;
             info.RedirectStandardInput = false;
             info.RedirectStandardOutput = true;
