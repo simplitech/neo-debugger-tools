@@ -59,6 +59,7 @@
             this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stepToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rebuildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.blockchainToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,8 +79,9 @@
             this.stackLabel = new System.Windows.Forms.Label();
             this.gasCostLabel = new System.Windows.Forms.Label();
             this.projectTree = new System.Windows.Forms.TreeView();
-            this.rebuildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stackPanel = new System.Windows.Forms.DataGridView();
+            this.codeGeneratorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.neoLuxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.PanelSearch.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.stackPanel)).BeginInit();
@@ -319,7 +321,7 @@
             // 
             this.runToolStripMenuItem.Name = "runToolStripMenuItem";
             this.runToolStripMenuItem.ShortcutKeyDisplayString = "F5";
-            this.runToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.runToolStripMenuItem.Size = new System.Drawing.Size(149, 24);
             this.runToolStripMenuItem.Text = "Run";
             this.runToolStripMenuItem.Click += new System.EventHandler(this.runToolStripMenuItem_Click);
             // 
@@ -327,22 +329,29 @@
             // 
             this.stepToolStripMenuItem.Name = "stepToolStripMenuItem";
             this.stepToolStripMenuItem.ShortcutKeyDisplayString = "F10";
-            this.stepToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.stepToolStripMenuItem.Size = new System.Drawing.Size(149, 24);
             this.stepToolStripMenuItem.Text = "Step";
             this.stepToolStripMenuItem.Click += new System.EventHandler(this.stepToolStripMenuItem_Click);
             // 
             // resetToolStripMenuItem
             // 
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-            this.resetToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(149, 24);
             this.resetToolStripMenuItem.Text = "Reset";
             this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
+            // 
+            // rebuildToolStripMenuItem
+            // 
+            this.rebuildToolStripMenuItem.Name = "rebuildToolStripMenuItem";
+            this.rebuildToolStripMenuItem.Size = new System.Drawing.Size(149, 24);
+            this.rebuildToolStripMenuItem.Text = "Rebuild";
+            this.rebuildToolStripMenuItem.Click += new System.EventHandler(this.rebuildToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
             this.toolStripMenuItem2.ShortcutKeyDisplayString = "F6";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(180, 24);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(149, 24);
             this.toolStripMenuItem2.Text = "Storage";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
@@ -359,21 +368,21 @@
             // viewToolStripMenuItem1
             // 
             this.viewToolStripMenuItem1.Name = "viewToolStripMenuItem1";
-            this.viewToolStripMenuItem1.Size = new System.Drawing.Size(180, 24);
+            this.viewToolStripMenuItem1.Size = new System.Drawing.Size(111, 24);
             this.viewToolStripMenuItem1.Text = "View";
             this.viewToolStripMenuItem1.Click += new System.EventHandler(this.blockchainToolStripMenuItem_Click);
             // 
             // loadToolStripMenuItem
             // 
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            this.loadToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(111, 24);
             this.loadToolStripMenuItem.Text = "Load";
             this.loadToolStripMenuItem.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
             // resetToolStripMenuItem1
             // 
             this.resetToolStripMenuItem1.Name = "resetToolStripMenuItem1";
-            this.resetToolStripMenuItem1.Size = new System.Drawing.Size(180, 24);
+            this.resetToolStripMenuItem1.Size = new System.Drawing.Size(111, 24);
             this.resetToolStripMenuItem1.Text = "Reset";
             this.resetToolStripMenuItem1.Click += new System.EventHandler(this.resetToolStripMenuItem1_Click);
             // 
@@ -381,7 +390,8 @@
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.cCompilerToolStripMenuItem,
-            this.keyDecoderToolStripMenuItem});
+            this.keyDecoderToolStripMenuItem,
+            this.codeGeneratorToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(52, 23);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -526,13 +536,6 @@
             this.projectTree.TabIndex = 16;
             this.projectTree.DoubleClick += new System.EventHandler(this.projectTree_DoubleClick);
             // 
-            // rebuildToolStripMenuItem
-            // 
-            this.rebuildToolStripMenuItem.Name = "rebuildToolStripMenuItem";
-            this.rebuildToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
-            this.rebuildToolStripMenuItem.Text = "Rebuild";
-            this.rebuildToolStripMenuItem.Click += new System.EventHandler(this.rebuildToolStripMenuItem_Click);
-            // 
             // stackPanel
             // 
             this.stackPanel.AllowUserToAddRows = false;
@@ -547,6 +550,21 @@
             this.stackPanel.RowHeadersVisible = false;
             this.stackPanel.Size = new System.Drawing.Size(382, 153);
             this.stackPanel.TabIndex = 17;
+            // 
+            // codeGeneratorToolStripMenuItem
+            // 
+            this.codeGeneratorToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.neoLuxToolStripMenuItem});
+            this.codeGeneratorToolStripMenuItem.Name = "codeGeneratorToolStripMenuItem";
+            this.codeGeneratorToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.codeGeneratorToolStripMenuItem.Text = "Code Generator";
+            // 
+            // neoLuxToolStripMenuItem
+            // 
+            this.neoLuxToolStripMenuItem.Name = "neoLuxToolStripMenuItem";
+            this.neoLuxToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.neoLuxToolStripMenuItem.Text = "Neo-Lux";
+            this.neoLuxToolStripMenuItem.Click += new System.EventHandler(this.neoLuxToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -637,6 +655,8 @@
         private System.Windows.Forms.TreeView projectTree;
         private System.Windows.Forms.ToolStripMenuItem rebuildToolStripMenuItem;
         private System.Windows.Forms.DataGridView stackPanel;
+        private System.Windows.Forms.ToolStripMenuItem codeGeneratorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem neoLuxToolStripMenuItem;
     }
 }
 

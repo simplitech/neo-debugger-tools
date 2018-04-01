@@ -14,6 +14,7 @@ using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
 using Neo.Debugger.Core.Data;
 using Neo.VM;
+using Neo.Debugger.Core.Generator;
 
 namespace Neo.Debugger.Forms
 {
@@ -1332,11 +1333,13 @@ namespace Neo.Debugger.Forms
             }
         }
 
-        private void AddNodeToProjectTree(string path)
+        private TreeNode AddNodeToProjectTree(string path)
         {
             var fileName = Path.GetFileName(path);
             var node = projectTree.Nodes.Add(path, fileName);
             nodeMap[path] = node;
+
+            return node;
         }
 
         private void ReloadProjectTree()
@@ -1618,6 +1621,23 @@ namespace Neo.Debugger.Forms
             }
 
             CompileContract();
+        }
+
+        private void neoLuxToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_debugger.ABI == null || _debugger.ABI.functions.Count == 0)
+            {
+                MessageBox.Show("No ABI loaded for this contract!");
+                return;
+            }
+
+            var code = NeoLux.GenerateInterface(_debugger.ABI);
+
+            var path = _debugger.ContractName + "Client.cs";
+            _debugger.SetContentFor(path, code);
+            AddNodeToProjectTree(path);
+
+            ReloadTextArea(path);
         }
     }
 }

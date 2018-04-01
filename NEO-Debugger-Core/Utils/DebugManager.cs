@@ -260,6 +260,11 @@ namespace Neo.Debugger.Core.Utils
             throw new ArgumentException("Invalid path: " + path);
         }
 
+        public void SetContentFor(string path, string content)
+        {
+            _debugContent[path] = content;
+        }
+
         public bool LoadAvmFile(string avmPath)
         {
             //Decide what we need to open
