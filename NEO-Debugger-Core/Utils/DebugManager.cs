@@ -704,11 +704,23 @@ namespace Neo.Debugger.Core.Utils
             Directory.CreateDirectory(_settings.path);
             var fileName = Path.Combine(_settings.path, sourceFile);
 
+            var avmPath = fileName.Replace(extension, ".avm");
+
+            try
+            {
+                File.Delete(avmPath.Replace(".avm", ".abi.json"));
+                File.Delete(avmPath.Replace(".avm", ".debug.json"));
+            }
+            catch
+            {
+                // ignore
+            }
+
             bool success = compiler.CompileContract(sourceCode, fileName, language);
 
             if (success)
             {
-                _avmFilePath = fileName.Replace(extension, ".avm");
+                _avmFilePath = avmPath;
 
                 if (outputFile != null)
                 {

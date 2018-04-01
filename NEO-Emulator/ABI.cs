@@ -29,6 +29,7 @@ namespace Neo.Emulation
         {
             var f = new AVMFunction();
             f.name = "Main";
+            f.inputs.Add(new AVMInput() { name = "operation", type = Emulator.Type.String});
             f.inputs.Add(new AVMInput() { name = "args", type = Emulator.Type.Array });
 
             this.functions[f.name] = f;
