@@ -538,19 +538,20 @@ namespace Neo.Emulation
                 if (isByteArray)
                 {
                     var arr = new byte[item.ChildCount];
-                    int index = 0;
+                    int index = arr.Length;
                     foreach (var child in item.Children)
                     {
+                        index--;
                         arr[index] = byte.Parse(child.Value);
-                        index++;
                    }
                     return arr;
                 }
                 else
                 {
                     var list = new List<object>();
-                    foreach (var child in item.Children)
+                    for (int i=item.ChildCount-1; i>=0; i--)
                     {
+                        var child = item.GetNodeByIndex(i);
                         list.Add(ConvertArgument(child));
                     }
                     return list;

@@ -47,6 +47,8 @@ namespace Neo.Debugger.Core.Utils
 
             var info = new ProcessStartInfo();
 
+            info.WorkingDirectory = _settings.compilerPaths[language];
+
             switch (language)
             {
                 case SourceLanguage.CSharp:
@@ -75,8 +77,6 @@ namespace Neo.Debugger.Core.Utils
                         return false;
                     }
             }
-
-            info.WorkingDirectory = _settings.compilerPaths[language];
 
             info.UseShellExecute = false;
             info.RedirectStandardInput = false;
