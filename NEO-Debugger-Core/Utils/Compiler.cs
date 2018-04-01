@@ -51,7 +51,11 @@ namespace Neo.Debugger.Core.Utils
             {
                 case SourceLanguage.CSharp:
                     {
-                        info.FileName = "neon.exe";
+                        var file = Path.Combine(info.WorkingDirectory, "neon.exe");
+                        if (!File.Exists(file))
+                            throw new FileNotFoundException("File not found", file);
+
+                        info.FileName = file;
                         info.Arguments = "\"" + outputFilePath + "\"";
                         break;
                     }
@@ -74,11 +78,6 @@ namespace Neo.Debugger.Core.Utils
 
             info.WorkingDirectory = _settings.compilerPaths[language];
 
-            var file = Path.Combine(info.WorkingDirectory, info.FileName);
-            if (!File.Exists(file))
-                throw new FileNotFoundException("File not found", file);
-
-            info.FileName = file;
             info.UseShellExecute = false;
             info.RedirectStandardInput = false;
             info.RedirectStandardOutput = true;
