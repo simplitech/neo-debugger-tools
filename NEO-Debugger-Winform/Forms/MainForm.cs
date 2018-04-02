@@ -1383,6 +1383,11 @@ namespace Neo.Debugger.Forms
 
         private string ValidateHover(string text)
         {
+            if (_debugger == null)
+            {
+                return null;
+            }
+
             var variable = _debugger.Emulator.GetVariable(text);
             if (variable == null)
             {
