@@ -68,6 +68,8 @@
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cCompilerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.keyDecoderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.codeGeneratorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.neoLuxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.PanelSearch = new System.Windows.Forms.Panel();
             this.BtnNextSearch = new System.Windows.Forms.Button();
             this.BtnPrevSearch = new System.Windows.Forms.Button();
@@ -80,8 +82,6 @@
             this.gasCostLabel = new System.Windows.Forms.Label();
             this.projectTree = new System.Windows.Forms.TreeView();
             this.stackPanel = new System.Windows.Forms.DataGridView();
-            this.codeGeneratorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.neoLuxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.PanelSearch.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.stackPanel)).BeginInit();
@@ -399,16 +399,31 @@
             // cCompilerToolStripMenuItem
             // 
             this.cCompilerToolStripMenuItem.Name = "cCompilerToolStripMenuItem";
-            this.cCompilerToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.cCompilerToolStripMenuItem.Size = new System.Drawing.Size(176, 24);
             this.cCompilerToolStripMenuItem.Text = "Compile";
             this.cCompilerToolStripMenuItem.Click += new System.EventHandler(this.cCompilerToolStripMenuItem_Click);
             // 
             // keyDecoderToolStripMenuItem
             // 
             this.keyDecoderToolStripMenuItem.Name = "keyDecoderToolStripMenuItem";
-            this.keyDecoderToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
+            this.keyDecoderToolStripMenuItem.Size = new System.Drawing.Size(176, 24);
             this.keyDecoderToolStripMenuItem.Text = "Key Tool";
             this.keyDecoderToolStripMenuItem.Click += new System.EventHandler(this.keyDecoderToolStripMenuItem_Click);
+            // 
+            // codeGeneratorToolStripMenuItem
+            // 
+            this.codeGeneratorToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.neoLuxToolStripMenuItem});
+            this.codeGeneratorToolStripMenuItem.Name = "codeGeneratorToolStripMenuItem";
+            this.codeGeneratorToolStripMenuItem.Size = new System.Drawing.Size(176, 24);
+            this.codeGeneratorToolStripMenuItem.Text = "Code Generator";
+            // 
+            // neoLuxToolStripMenuItem
+            // 
+            this.neoLuxToolStripMenuItem.Name = "neoLuxToolStripMenuItem";
+            this.neoLuxToolStripMenuItem.Size = new System.Drawing.Size(130, 24);
+            this.neoLuxToolStripMenuItem.Text = "Neo-Lux";
+            this.neoLuxToolStripMenuItem.Click += new System.EventHandler(this.neoLuxToolStripMenuItem_Click);
             // 
             // PanelSearch
             // 
@@ -551,21 +566,6 @@
             this.stackPanel.Size = new System.Drawing.Size(382, 153);
             this.stackPanel.TabIndex = 17;
             // 
-            // codeGeneratorToolStripMenuItem
-            // 
-            this.codeGeneratorToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.neoLuxToolStripMenuItem});
-            this.codeGeneratorToolStripMenuItem.Name = "codeGeneratorToolStripMenuItem";
-            this.codeGeneratorToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
-            this.codeGeneratorToolStripMenuItem.Text = "Code Generator";
-            // 
-            // neoLuxToolStripMenuItem
-            // 
-            this.neoLuxToolStripMenuItem.Name = "neoLuxToolStripMenuItem";
-            this.neoLuxToolStripMenuItem.Size = new System.Drawing.Size(180, 24);
-            this.neoLuxToolStripMenuItem.Text = "Neo-Lux";
-            this.neoLuxToolStripMenuItem.Click += new System.EventHandler(this.neoLuxToolStripMenuItem_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -587,8 +587,9 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "MainForm";
-            this.Text = "NEO Debugger";
+            this.Text = "/";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Activated += new System.EventHandler(this.MainForm_Activated);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.menuStrip1.ResumeLayout(false);

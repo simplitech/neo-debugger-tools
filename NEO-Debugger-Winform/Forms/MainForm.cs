@@ -217,12 +217,16 @@ namespace Neo.Debugger.Forms
             }
         }
 
+        private DateTime _contractModTime;
+
         private bool LoadContract(string avmFilePath)
         {
             if (!_debugger.LoadContract(avmFilePath))
             {
                 return false;
             }
+
+            _contractModTime = File.GetLastWriteTime(_debugger.AvmFilePath);
 
             ReloadProjectTree();
             
@@ -1638,6 +1642,21 @@ namespace Neo.Debugger.Forms
             AddNodeToProjectTree(path);
 
             ReloadTextArea(path);
+        }
+
+        private void MainForm_Activated(object sender, EventArgs e)
+        {
+            if (_debugger != null && _debugger.AvmFileLoaded)
+            {
+                var curTime = File.GetLastWriteTime(_debugger.AvmFilePath);
+                if (curTime != _contractModTime)
+                {
+                    if (MessageBox.Show("The AVM was changed externally, reload it?", "AVM changed", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        LoadContract(_debugger.AvmFilePath);
+                    }
+                }
+            }
         }
     }
 }
