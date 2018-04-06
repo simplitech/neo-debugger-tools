@@ -1,5 +1,4 @@
-﻿// NOTE - For this project to run it is necessary to download Electron and copy its contents to folder "Output/electron"
-using Neo.Emulation;
+﻿using Neo.Emulation;
 using Neo.Emulation.API;
 using Neo.Debugger.Core.Data;
 using Neo.Debugger.Core.Models;

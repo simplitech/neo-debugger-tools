@@ -65,13 +65,10 @@ namespace Neo.Emulation.API
             {
                 foreach (var child in balanceNode.Children)
                 {
-                    if (child.Name == "entry")
-                    {
-                        var symbol = child.GetString("symbol");
-                        var amount = child.GetDecimal("amount");
+                    var symbol = child.GetString("symbol");
+                    var amount = child.GetDecimal("amount");
 
-                        balances[symbol] = amount;
-                    }
+                    balances[symbol] = amount;
                 }
             }
 
@@ -92,6 +89,16 @@ namespace Neo.Emulation.API
             if (this.byteCode != null)
             {
                 result.AddField("code", this.byteCode.ByteToHex());
+            }
+
+            var balanceNode = DataNode.CreateArray("balance");
+            result.AddNode(balanceNode);
+            foreach (var entry in balances)
+            {
+                var node = DataNode.CreateObject();
+                node.AddField("symbol", entry.Key);
+                node.AddField("amount", entry.Value);
+                balanceNode.AddNode(node);
             }
 
             if (this.storage != null)
