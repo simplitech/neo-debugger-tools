@@ -44,7 +44,8 @@ namespace Neo.WebDebugger.Controllers
 
         private void Compiler_SendToLog(object sender, Debugger.Core.Models.CompilerLogEventArgs e)
         {
-            SignalRHelper.LogEventMessage(Session["ConnectionId"].ToString(), e.Message);
+            if(Session["ConnectionId"] != null && !String.IsNullOrEmpty(e.Message))
+                SignalRHelper.LogEventMessage(Session["ConnectionId"].ToString(), e.Message);
         }
     }
 }
