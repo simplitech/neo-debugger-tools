@@ -1,6 +1,4 @@
-﻿using LunarParser;
-using LunarParser.JSON;
-using Neo.Cryptography;
+﻿using Neo.Cryptography;
 using Neo.Emulation;
 using Neo.Emulation.API;
 using Neo.Debugger.Core.Models;
@@ -9,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Numerics;
 using System.Windows.Forms;
 
@@ -271,6 +268,9 @@ namespace Neo.Debugger.Forms
                         BigInteger.TryParse(assetAmount.Text, out amount);
                         if (amount > 0)
                         {
+                            lastSentSymbol = entry.name;
+                            lastSentAmount = assetAmount.Text;
+
                             amount *= Asset.Decimals; // fix decimals
 
                             //Add the transaction info
@@ -303,12 +303,26 @@ namespace Neo.Debugger.Forms
 
         #region Main Form
 
+        private static string lastSentSymbol = "";
+        private static string lastSentAmount = "0";
+
         private void RunForm_Shown(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.None;
 
             inputGrid.AllowUserToAddRows = false;
 
+            assetComboBox.SelectedIndex = 0;
+            for (int i=0; i< assetComboBox.Items.Count; i++)
+            {
+                if (assetComboBox.Items[i].ToString() == lastSentSymbol)
+                {
+                    assetComboBox.SelectedIndex = i;
+                    break;
+                }
+            }
+
+            assetAmount.Text = lastSentAmount;
             assetAmount.Enabled = assetComboBox.SelectedIndex > 0;
             timestampBox.Text = Emulation.Helper.ToTimestamp(DateTime.UtcNow).ToString();
 
