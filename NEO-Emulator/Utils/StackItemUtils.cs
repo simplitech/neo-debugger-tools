@@ -1,4 +1,5 @@
-﻿using Neo.Cryptography;
+﻿using Neo.Lux.Cryptography;
+using Neo.Lux.Utils;
 using Neo.VM;
 using System;
 using System.Collections;
@@ -19,7 +20,7 @@ namespace Neo.Emulation.Utils
                 if (bytes != null && bytes.Length == 20)
                 {
                     var signatureHash = new UInt160(bytes);
-                    return Crypto.Default.ToAddress(signatureHash);
+                    return CryptoUtils.ToAddress(signatureHash);
                 }
 
                 var s = new StringBuilder();
@@ -239,7 +240,7 @@ namespace Neo.Emulation.Utils
                         if (data.Length == 20)
                         {
                             var signatureHash = new UInt160(data);
-                            return Crypto.Default.ToAddress(signatureHash);
+                            return CryptoUtils.ToAddress(signatureHash);
                         }
 
                         return data.ByteToHex();

@@ -3,7 +3,7 @@ using Neo.Emulation.Utils;
 using System;
 using System.Diagnostics;
 using System.Text;
-using Neo.Cryptography;
+using Neo.Lux.Cryptography;
 using System.Collections;
 
 namespace Neo.Emulation.API

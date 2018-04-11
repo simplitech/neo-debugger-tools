@@ -1,4 +1,5 @@
-﻿using Neo.VM;
+﻿using Neo.Lux.Core;
+using Neo.VM;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -60,13 +61,13 @@ namespace Neo.Debugger.Profiler
             }
         }
 
-        public void TallyOpcode(Neo.VM.OpCode opcode, decimal opCost, int lineNumber, string fileName, string fileSource, string sysCallName)
+        public void TallyOpcode(OpCode opcode, decimal opCost, int lineNumber, string fileName, string fileSource, string sysCallName)
         {
             SourceFileLine sfl = new SourceFileLine(fileName, lineNumber);
 
             if (!opcodeUsed[(int)opcode])
             {
-                opcodeCosts[(int)opcode] = opcode == VM.OpCode.SYSCALL ? 0: opCost;
+                opcodeCosts[(int)opcode] = opcode == OpCode.SYSCALL ? 0: opCost;
                 opcodeNames[(int)opcode] = opcode.ToString();
                 opcodeUsed[(int)opcode] = true;
             }
@@ -100,7 +101,7 @@ namespace Neo.Debugger.Profiler
                 dictStmtInfo[key] = ssi;
             }
 
-            if (opcode == VM.OpCode.SYSCALL && sysCallName != null)
+            if (opcode == OpCode.SYSCALL && sysCallName != null)
             {
                 sysCallName = sysCallName.Replace("Neo.", "");
                 sysCallNamesUsed.Add(sysCallName);

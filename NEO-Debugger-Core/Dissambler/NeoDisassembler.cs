@@ -1,5 +1,5 @@
 ﻿using Neo.Emulation.Utils;
-using Neo.VM;
+using Neo.Lux.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;

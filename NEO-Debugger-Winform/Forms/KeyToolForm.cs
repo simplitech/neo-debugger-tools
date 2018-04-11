@@ -1,7 +1,8 @@
-﻿using Neo.Cryptography;
+﻿using Neo.Lux.Cryptography;
 using System;
 using System.Windows.Forms;
 using Neo.Debugger.Core.Utils;
+using Neo.Lux.Utils;
 
 namespace Neo.Debugger.Forms
 {
@@ -23,8 +24,6 @@ namespace Neo.Debugger.Forms
             keyDataGrid.Columns[1].ReadOnly = true;
             keyDataGrid.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             keyDataGrid.Columns[1].FillWeight = 4;
-
-
         }
 
         private void KeyToolForm_Shown(object sender, EventArgs e)
@@ -53,7 +52,7 @@ namespace Neo.Debugger.Forms
 
             keyDataGrid.Rows.Clear();
 
-            var scriptHash = Emulation.Helper.AddressToScriptHash(keyPair.address);
+            var scriptHash = keyPair.address.AddressToScriptHash();
 
             keyDataGrid.Rows.Add(new object[] { "Address", keyPair.address });
             keyDataGrid.Rows.Add(new object[] { "Script Hash (RAW, hex) ", scriptHash.ToHexString() });

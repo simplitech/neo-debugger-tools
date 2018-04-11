@@ -1,14 +1,15 @@
-﻿using Neo.Cryptography;
-using Neo.Emulation;
+﻿using Neo.Emulation;
 using Neo.Emulation.API;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
+using Neo.Lux.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Numerics;
 using System.Windows.Forms;
+using Neo.Lux.Cryptography;
 
 namespace Neo.Debugger.Forms
 {
@@ -169,7 +170,7 @@ namespace Neo.Debugger.Forms
                             }
                             else if (DebuggerUtils.IsValidWallet(s))
                             {
-                                var scriptHash = Emulation.Helper.AddressToScriptHash(s);
+                                var scriptHash = s.AddressToScriptHash();
                                 s = DebuggerUtils.BytesToString(scriptHash);
                             }
                             else
@@ -324,7 +325,7 @@ namespace Neo.Debugger.Forms
 
             assetAmount.Text = lastSentAmount;
             assetAmount.Enabled = assetComboBox.SelectedIndex > 0;
-            timestampBox.Text = Emulation.Helper.ToTimestamp(DateTime.UtcNow).ToString();
+            timestampBox.Text = DateTime.UtcNow.ToTimestamp().ToString();
 
             if (Runtime.invokerKeys == null && File.Exists("last.key"))
             {
@@ -590,14 +591,14 @@ namespace Neo.Debugger.Forms
             uint timestamp;
             if (uint.TryParse(timestampBox.Text, out timestamp))
             {
-                dateTimePicker1.Value = Emulation.Helper.ToDateTime(timestamp);
+                dateTimePicker1.Value = timestamp.ToDateTime();
             }
         }
 
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
         {
             lockDate = true;
-            timestampBox.Text = Emulation.Helper.ToTimestamp(dateTimePicker1.Value).ToString();
+            timestampBox.Text = dateTimePicker1.Value.ToTimestamp().ToString();
             lockDate = false;
         }
 

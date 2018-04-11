@@ -34,9 +34,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LunarParser">
-      <HintPath>..\packages\LunarParser.1.0.31\lib\net461\LunarParser.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="LunarParser, Version=1.0.32.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LunarParser.1.0.32\lib\net461\LunarParser.dll</HintPath>
+    </Reference>
+    <Reference Include="Neo.Lux, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NeoLux.0.5.0\lib\net461\Neo.Lux.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Net.Http" />
@@ -45,25 +47,6 @@
   <ItemGroup>
     <Compile Include="ABI.cs" />
     <Compile Include="API\TransactionType.cs" />
-    <Compile Include="Cryptography\Base58.cs" />
-    <Compile Include="Cryptography\BloomFilter.cs" />
-    <Compile Include="Cryptography\Crypto.cs" />
-    <Compile Include="Cryptography\ECC\ECCurve.cs" />
-    <Compile Include="Cryptography\ECC\ECDsa.cs" />
-    <Compile Include="Cryptography\ECC\ECFieldElement.cs" />
-    <Compile Include="Cryptography\ECC\ECPoint.cs" />
-    <Compile Include="Cryptography\Fixed8.cs" />
-    <Compile Include="Cryptography\Helper.cs" />
-    <Compile Include="Cryptography\ISerializable.cs" />
-    <Compile Include="Cryptography\KeyPair.cs" />
-    <Compile Include="Cryptography\MerkleTree.cs" />
-    <Compile Include="Cryptography\MerkleTreeNode.cs" />
-    <Compile Include="Cryptography\Murmur3.cs" />
-    <Compile Include="Cryptography\ProtectedMemoryContext.cs" />
-    <Compile Include="Cryptography\RIPEMD160Managed.cs" />
-    <Compile Include="Cryptography\UInt160.cs" />
-    <Compile Include="Cryptography\UInt256.cs" />
-    <Compile Include="Cryptography\UIntBase.cs" />
     <Compile Include="API\Account.cs" />
     <Compile Include="API\Asset.cs" />
     <Compile Include="API\Block.cs" />
@@ -82,7 +65,6 @@
     <Compile Include="Attributes\NonemitAttribute.cs" />
     <Compile Include="Attributes\OpCodeAttribute.cs" />
     <Compile Include="Attributes\SyscallAttribute.cs" />
-    <Compile Include="Helper.cs" />
     <Compile Include="IApiInterface.cs" />
     <Compile Include="Emulator.cs" />
     <Compile Include="StorageContext.cs" />
@@ -93,15 +75,13 @@
     <Compile Include="Utils\StackItemUtils.cs" />
     <Compile Include="VM\ExecutionContext.cs" />
     <Compile Include="VM\ExecutionEngine.cs" />
-    <Compile Include="VM\Helper.cs" />
+    <Compile Include="VM\VMUtils.cs" />
     <Compile Include="VM\ICrypto.cs" />
     <Compile Include="VM\IInteropInterface.cs" />
     <Compile Include="VM\InteropService.cs" />
     <Compile Include="VM\IScriptContainer.cs" />
     <Compile Include="VM\IScriptTable.cs" />
-    <Compile Include="VM\OpCode.cs" />
     <Compile Include="VM\RandomAccessStack.cs" />
-    <Compile Include="VM\ScriptBuilder.cs" />
     <Compile Include="VM\StackItem.cs" />
     <Compile Include="VM\Types\Array.cs" />
     <Compile Include="VM\Types\Boolean.cs" />

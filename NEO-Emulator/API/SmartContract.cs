@@ -1,4 +1,5 @@
-﻿using Neo.VM;
+﻿using Neo.Lux.Core;
+using Neo.VM;
 using System;
 
 namespace Neo.Emulation

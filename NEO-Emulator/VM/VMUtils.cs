@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Neo.VM
 {
-    internal static class Helper
+    internal static class VMUtils
     {
         public static byte[] ReadVarBytes(this BinaryReader reader, int max = 0X7fffffc7)
         {

@@ -1,4 +1,7 @@
-﻿using Neo.VM.Types;
+﻿using Neo.Lux.Core;
+using Neo.Lux.Cryptography;
+using Neo.Lux.Utils;
+using Neo.VM.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,7 +19,6 @@ namespace Neo.VM
         private readonly InteropService service;
 
         public IScriptContainer ScriptContainer { get; }
-        public ICrypto Crypto { get; }
         public RandomAccessStack<ExecutionContext> InvocationStack { get; } = new RandomAccessStack<ExecutionContext>();
         public RandomAccessStack<StackItem> EvaluationStack { get; } = new RandomAccessStack<StackItem>();
         public RandomAccessStack<StackItem> AltStack { get; } = new RandomAccessStack<StackItem>();
@@ -25,10 +27,9 @@ namespace Neo.VM
         public ExecutionContext EntryContext => InvocationStack.Peek(InvocationStack.Count - 1);
         public VMState State { get; set; } = VMState.BREAK;
 
-        public ExecutionEngine(IScriptContainer container, ICrypto crypto, IScriptTable table = null, InteropService service = null)
+        public ExecutionEngine(IScriptContainer container, IScriptTable table = null, InteropService service = null)
         {
             this.ScriptContainer = container;
-            this.Crypto = crypto;
             this.table = table;
             this.service = service ?? new InteropService();
         }
@@ -575,13 +576,13 @@ namespace Neo.VM
                     case OpCode.HASH160:
                         {
                             byte[] x = EvaluationStack.Pop().GetByteArray();
-                            EvaluationStack.Push(Crypto.Hash160(x));
+                            EvaluationStack.Push(CryptoUtils.Hash160(x));
                         }
                         break;
                     case OpCode.HASH256:
                         {
                             byte[] x = EvaluationStack.Pop().GetByteArray();
-                            EvaluationStack.Push(Crypto.Hash256(x));
+                            EvaluationStack.Push(CryptoUtils.Hash256(x));
                         }
                         break;
                     case OpCode.CHECKSIG:
@@ -590,7 +591,7 @@ namespace Neo.VM
                             byte[] signature = EvaluationStack.Pop().GetByteArray();
                             try
                             {
-                                EvaluationStack.Push(Crypto.VerifySignature(ScriptContainer.GetMessage(), signature, pubkey));
+                                EvaluationStack.Push(CryptoUtils.VerifySignature(ScriptContainer.GetMessage(), signature, pubkey));
                             }
                             catch (ArgumentException)
                             {
@@ -656,7 +657,7 @@ namespace Neo.VM
                             {
                                 for (int i = 0, j = 0; fSuccess && i < m && j < n;)
                                 {
-                                    if (Crypto.VerifySignature(message, signatures[i], pubkeys[j]))
+                                    if (CryptoUtils.VerifySignature(message, signatures[i], pubkeys[j]))
                                         i++;
                                     j++;
                                     if (m - i > n - j)

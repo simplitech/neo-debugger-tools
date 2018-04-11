@@ -1,13 +1,13 @@
 ﻿using Neo.VM;
-using Neo.Cryptography;
+using Neo.Lux.Cryptography;
 using System.Collections.Generic;
-using System.Linq;
 using System;
 using System.Numerics;
 using Neo.Emulation.API;
 using LunarParser;
 using Neo.Emulation.Utils;
-using System.Diagnostics;
+using Neo.Lux.Utils;
+using Neo.Lux.Core;
 
 namespace Neo.Emulation
 {
@@ -44,7 +44,7 @@ namespace Neo.Emulation
     {
         public static Emulator GetEmulator(this ExecutionEngine engine)
         {
-            var tx  = (Transaction)engine.ScriptContainer;
+            var tx  = (API.Transaction)engine.ScriptContainer;
             return tx.emulator;
         }
 
@@ -113,7 +113,7 @@ namespace Neo.Emulation
         private DebuggerState lastState = new DebuggerState(DebuggerState.State.Invalid, -1);
 
         public Account currentAccount { get; private set; }
-        public Transaction currentTransaction { get; private set; }
+        public API.Transaction currentTransaction { get; private set; }
 
         private UInt160 currentHash;
 
@@ -226,14 +226,14 @@ namespace Neo.Emulation
             if (currentTransaction == null)
             {
                 //throw new Exception("Transaction not set");
-                currentTransaction = new Transaction(this.blockchain.currentBlock);
+                currentTransaction = new API.Transaction(this.blockchain.currentBlock);
             }
 
             usedGas = 0;
             usedOpcodeCount = 0;
 
             currentTransaction.emulator = this;
-            engine = new ExecutionEngine(currentTransaction, Crypto.Default, null, interop);
+            engine = new ExecutionEngine(currentTransaction, null, interop);
             engine.LoadScript(contractByteCode);
 
             foreach (var output in currentTransaction.outputs)
@@ -497,10 +497,10 @@ namespace Neo.Emulation
         {
             var key = Runtime.invokerKeys;
 
-            var bytes = key != null ? Helper.AddressToScriptHash(key.address) : new byte[20];
+            var bytes = key != null ? CryptoUtils.AddressToScriptHash(key.address) : new byte[20];
 
             var src_hash = new UInt160(bytes);
-            var dst_hash = new UInt160(Helper.AddressToScriptHash(this.currentAccount.keys.address));
+            var dst_hash = new UInt160(CryptoUtils.AddressToScriptHash(this.currentAccount.keys.address));
             this.currentHash = dst_hash;
 
             BigInteger asset_decimals = 100000000;
@@ -508,7 +508,7 @@ namespace Neo.Emulation
 
             var block = blockchain.GenerateBlock();
 
-            var tx = new Transaction(block);
+            var tx = new API.Transaction(block);
             //tx.inputs.Add(new TransactionInput(-1, src_hash));
             tx.outputs.Add(new TransactionOutput(assetID, amount, dst_hash));
             tx.outputs.Add(new TransactionOutput(assetID, total_amount - amount, src_hash));

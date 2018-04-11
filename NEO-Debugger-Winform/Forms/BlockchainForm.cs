@@ -1,6 +1,8 @@
 ﻿using Neo.Debugger.Utils;
 using Neo.Emulation;
 using Neo.Emulation.API;
+using Neo.Lux.Cryptography;
+using Neo.Lux.Utils;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Windows.Forms;
@@ -65,7 +67,7 @@ namespace Neo.Debugger.Forms
                             var hashLbNode = outLbNode.Nodes.Add("Hash");
                             var hashNode = hashLbNode.Nodes.Add(output.hash.ToString());
 
-                            var address = Cryptography.Crypto.Default.ToAddress(output.hash);
+                            var address = CryptoUtils.ToAddress(output.hash);
                             var addrLbNode = outLbNode.Nodes.Add("Address");
                             var addrNode = addrLbNode.Nodes.Add(address);
 
@@ -184,8 +186,8 @@ namespace Neo.Debugger.Forms
 
                     var assetID = Asset.GetAssetId(symbol);
 
-                    var bytes = Emulation.Helper.AddressToScriptHash(to.keys.address);
-                    var hash = new Cryptography.UInt160(bytes);
+                    var bytes = CryptoUtils.AddressToScriptHash(to.keys.address);
+                    var hash = new UInt160(bytes);
 
                     var tx = new Transaction(block);
                     tx.outputs.Add(new TransactionOutput(assetID, amount, hash));

@@ -27,7 +27,7 @@ namespace Neo.VM
             Register("System.ExecutionEngine.GetCallingScriptHash", GetCallingScriptHash, defaultGasCost);
             Register("System.ExecutionEngine.GetEntryScriptHash", GetEntryScriptHash, defaultGasCost);
 
-            var assembly = typeof(Neo.Emulation.Helper).Assembly;
+            var assembly = typeof(VMUtils).Assembly;
             var methods = assembly.GetTypes()
                                   .SelectMany(t => t.GetMethods())
                                   .Where(m => m.GetCustomAttributes(typeof(SyscallAttribute), false).Length > 0)

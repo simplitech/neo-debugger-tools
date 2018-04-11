@@ -1,5 +1,5 @@
 ﻿using LunarParser;
-using Neo.Cryptography;
+using Neo.Lux.Cryptography;
 using Neo.Emulation.Utils;
 using Neo.VM;
 using System;

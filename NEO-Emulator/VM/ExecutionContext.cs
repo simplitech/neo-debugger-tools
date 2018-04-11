@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Neo.Lux.Core;
+using Neo.Lux.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -32,7 +34,7 @@ namespace Neo.VM
             get
             {
                 if (_script_hash == null)
-                    _script_hash = engine.Crypto.Hash160(Script);
+                    _script_hash = CryptoUtils.Hash160(Script);
                 return _script_hash;
             }
         }

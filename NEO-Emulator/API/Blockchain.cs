@@ -1,6 +1,7 @@
 ﻿using LunarParser;
 using LunarParser.JSON;
-using Neo.Cryptography;
+using Neo.Lux.Cryptography;
+using Neo.Lux.Utils;
 using Neo.VM;
 using System;
 using System.Collections.Generic;
@@ -58,7 +59,7 @@ namespace Neo.Emulation.API
             _blocks.Clear();
             var block = GenerateBlock();
 
-            var hash = new UInt160(Helper.AddressToScriptHash(keypair.address));
+            var hash = new UInt160(CryptoUtils.AddressToScriptHash(keypair.address));
 
             var tx = new Transaction(block);
 
@@ -111,7 +112,7 @@ namespace Neo.Emulation.API
         {
             foreach (var entry in _accounts)
             {
-                var bytes = Emulation.Helper.AddressToScriptHash(entry.keys.address);
+                var bytes = CryptoUtils.AddressToScriptHash(entry.keys.address);
                 var temp = new UInt160(bytes);
                 if (temp.Equals(hash))
                 {

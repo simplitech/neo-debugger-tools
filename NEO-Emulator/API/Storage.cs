@@ -1,4 +1,5 @@
 ﻿using LunarParser;
+using Neo.Lux.Utils;
 using Neo.VM;
 using System;
 using System.Collections.Generic;

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using Neo.Debugger.Dissambler;
 using Neo.Debugger.Profiler;
+using Neo.Lux.Utils;
 
 namespace Neo.Debugger.Core.Utils
 {

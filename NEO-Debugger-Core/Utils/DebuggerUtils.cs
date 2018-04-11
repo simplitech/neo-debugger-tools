@@ -1,6 +1,7 @@
 ﻿using LunarParser;
 using LunarParser.JSON;
-using Neo.Cryptography;
+using Neo.Lux.Cryptography;
+using Neo.Lux.Utils;
 using System;
 using System.IO;
 using System.Linq;
