@@ -120,7 +120,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AVM\AVMCompiler.cs" />
-    <Compile Include="AVM\base58.cs" />
     <Compile Include="AVM\DebugInfo.cs" />
     <Compile Include="AVM\FuncExport.cs" />
     <Compile Include="AVM\NeoModule.cs" />
@@ -161,6 +160,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Neo.Lux\Neo.Lux\Neo.Lux.csproj">
+      <Project>{720eb7a6-d250-4783-b5e5-22182d568f95}</Project>
+      <Name>Neo.Lux</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NEO-Debugger-Core\NEO-Debugger-Core.csproj">
       <Project>{f034e57e-520b-4572-88f0-76e8d28d4e7b}</Project>
       <Name>NEO-Debugger-Core</Name>

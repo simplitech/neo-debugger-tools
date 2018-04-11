@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Neo.Lux.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -67,8 +68,7 @@ namespace Neo.Compiler.AVM
         {
             var sha256 = System.Security.Cryptography.SHA256.Create();
             byte[] hash256 = sha256.ComputeHash(script);
-            var ripemd160 = new Neo.Cryptography.RIPEMD160Managed();
-            var hash = ripemd160.ComputeHash(hash256);
+            var hash = CryptoUtils.RIPEMD160(hash256);
 
             var outjson = new MyJson.JsonNode_Object();
 

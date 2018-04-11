@@ -156,7 +156,7 @@ namespace Neo.Compiler.AVM
 
     public class NeoCode
     {
-        public VM.OpCode code = VM.OpCode.NOP;
+        public Lux.Core.OpCode code = Lux.Core.OpCode.NOP;
         public int addr;
         public byte[] bytes;
         public string debugcode;

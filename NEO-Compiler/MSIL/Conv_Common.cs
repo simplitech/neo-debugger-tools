@@ -9,7 +9,7 @@ namespace Neo.Compiler.MSIL
     /// </summary>
     public partial class ModuleConverter
     {
-        private NeoCode _Insert1(VM.OpCode code, string comment, NeoMethod to, byte[] data = null)
+        private NeoCode _Insert1(Lux.Core.OpCode code, string comment, NeoMethod to, byte[] data = null)
         {
             NeoCode _code = new NeoCode();
             int startaddr = addr;
@@ -34,24 +34,24 @@ namespace Neo.Compiler.MSIL
 
         private NeoCode _InsertPush(byte[] data, string comment, NeoMethod to)
         {
-            if (data.Length == 0) return _Insert1(VM.OpCode.PUSH0, comment, to);
-            if (data.Length <= 75) return _Insert1((VM.OpCode)data.Length, comment, to, data);
+            if (data.Length == 0) return _Insert1(Lux.Core.OpCode.PUSH0, comment, to);
+            if (data.Length <= 75) return _Insert1((Lux.Core.OpCode)data.Length, comment, to, data);
             byte prefixLen;
-            VM.OpCode code;
+            Lux.Core.OpCode code;
             if (data.Length <= byte.MaxValue)
             {
                 prefixLen = sizeof(byte);
-                code = VM.OpCode.PUSHDATA1;
+                code = Lux.Core.OpCode.PUSHDATA1;
             }
             else if (data.Length <= ushort.MaxValue)
             {
                 prefixLen = sizeof(ushort);
-                code = VM.OpCode.PUSHDATA2;
+                code = Lux.Core.OpCode.PUSHDATA2;
             }
             else
             {
                 prefixLen = sizeof(uint);
-                code = VM.OpCode.PUSHDATA4;
+                code = Lux.Core.OpCode.PUSHDATA4;
             }
             byte[] bytes = new byte[data.Length + prefixLen];
             Buffer.BlockCopy(BitConverter.GetBytes(data.Length), 0, bytes, 0, prefixLen);
@@ -61,13 +61,13 @@ namespace Neo.Compiler.MSIL
 
         private NeoCode _InsertPush(int i, string comment, NeoMethod to)
         {
-            if (i == 0) return _Insert1(VM.OpCode.PUSH0, comment, to);
-            if (i == -1) return _Insert1(VM.OpCode.PUSHM1, comment, to);
-            if (i > 0 && i <= 16) return _Insert1((VM.OpCode)(byte)i + 0x50, comment, to);
+            if (i == 0) return _Insert1(Lux.Core.OpCode.PUSH0, comment, to);
+            if (i == -1) return _Insert1(Lux.Core.OpCode.PUSHM1, comment, to);
+            if (i > 0 && i <= 16) return _Insert1((Lux.Core.OpCode)(byte)i + 0x50, comment, to);
             return _InsertPush(((BigInteger)i).ToByteArray(), comment, to);
         }
 
-        private NeoCode _Convert1by1(VM.OpCode code, OpCode src, NeoMethod to, byte[] data = null)
+        private NeoCode _Convert1by1(Lux.Core.OpCode code, OpCode src, NeoMethod to, byte[] data = null)
         {
             NeoCode _code = new NeoCode();
             int startaddr = addr;
@@ -97,24 +97,24 @@ namespace Neo.Compiler.MSIL
 
         private NeoCode _ConvertPush(byte[] data, OpCode src, NeoMethod to)
         {
-            if (data.Length == 0) return _Convert1by1(VM.OpCode.PUSH0, src, to);
-            if (data.Length <= 75) return _Convert1by1((VM.OpCode)data.Length, src, to, data);
+            if (data.Length == 0) return _Convert1by1(Lux.Core.OpCode.PUSH0, src, to);
+            if (data.Length <= 75) return _Convert1by1((Lux.Core.OpCode)data.Length, src, to, data);
             byte prefixLen;
-            VM.OpCode code;
+            Lux.Core.OpCode code;
             if (data.Length <= byte.MaxValue)
             {
                 prefixLen = sizeof(byte);
-                code = VM.OpCode.PUSHDATA1;
+                code = Lux.Core.OpCode.PUSHDATA1;
             }
             else if (data.Length <= ushort.MaxValue)
             {
                 prefixLen = sizeof(ushort);
-                code = VM.OpCode.PUSHDATA2;
+                code = Lux.Core.OpCode.PUSHDATA2;
             }
             else
             {
                 prefixLen = sizeof(uint);
-                code = VM.OpCode.PUSHDATA4;
+                code = Lux.Core.OpCode.PUSHDATA4;
             }
             byte[] bytes = new byte[data.Length + prefixLen];
             Buffer.BlockCopy(BitConverter.GetBytes(data.Length), 0, bytes, 0, prefixLen);
@@ -124,9 +124,9 @@ namespace Neo.Compiler.MSIL
 
         private NeoCode _ConvertPush(long i, OpCode src, NeoMethod to)
         {
-            if (i == 0) return _Convert1by1(VM.OpCode.PUSH0, src, to);
-            if (i == -1) return _Convert1by1(VM.OpCode.PUSHM1, src, to);
-            if (i > 0 && i <= 16) return _Convert1by1((VM.OpCode)(byte)i + 0x50, src, to);
+            if (i == 0) return _Convert1by1(Lux.Core.OpCode.PUSH0, src, to);
+            if (i == -1) return _Convert1by1(Lux.Core.OpCode.PUSHM1, src, to);
+            if (i > 0 && i <= 16) return _Convert1by1((Lux.Core.OpCode)(byte)i + 0x50, src, to);
             return _ConvertPush(((BigInteger)i).ToByteArray(), src, to);
         }
         private int _ConvertPushI8WithConv(ILMethod from,long i ,OpCode src,NeoMethod to)
@@ -221,8 +221,8 @@ namespace Neo.Compiler.MSIL
         {
             ////压入深度临时栈
             //Pressed into the depth of the temporary stack
-            //_Insert1(VM.OpCode.DEPTH, "record depth.", to);
-            //_Insert1(VM.OpCode.TOALTSTACK, "", to);
+            //_Insert1(Lux.Core.OpCode.DEPTH, "record depth.", to);
+            //_Insert1(Lux.Core.OpCode.TOALTSTACK, "", to);
 
             ////初始化临时槽位位置
             //Initialize the temporary slot location
@@ -235,23 +235,23 @@ namespace Neo.Compiler.MSIL
             //新玩法，用一个数组，应该能减少指令数量
             // New plan, using an array, should reduce the number of instructions
             _InsertPush(from.paramtypes.Count + from.body_Variables.Count, "begincode", to);
-            _Insert1(VM.OpCode.NEWARRAY, "", to);
-            _Insert1(VM.OpCode.TOALTSTACK, "", to);
+            _Insert1(Lux.Core.OpCode.NEWARRAY, "", to);
+            _Insert1(Lux.Core.OpCode.TOALTSTACK, "", to);
             //移动参数槽位
             //Move parameter slot
             for (var i = 0; i < from.paramtypes.Count; i++)
             {
                 //getarray
-                _Insert1(VM.OpCode.FROMALTSTACK, "set param:" + i, to);
-                _Insert1(VM.OpCode.DUP, null, to);
-                _Insert1(VM.OpCode.TOALTSTACK, null, to);
+                _Insert1(Lux.Core.OpCode.FROMALTSTACK, "set param:" + i, to);
+                _Insert1(Lux.Core.OpCode.DUP, null, to);
+                _Insert1(Lux.Core.OpCode.TOALTSTACK, null, to);
 
                 _InsertPush(i, "", to); //Array pos
 
                 _InsertPush(2, "", to); //Array item
-                _Insert1(VM.OpCode.ROLL, null, to);
+                _Insert1(Lux.Core.OpCode.ROLL, null, to);
 
-                _Insert1(VM.OpCode.SETITEM, null, to);
+                _Insert1(Lux.Core.OpCode.SETITEM, null, to);
             }
         }
 
@@ -259,48 +259,48 @@ namespace Neo.Compiler.MSIL
         {
             ////占位不谢
             ////Do not thank the placeholder
-            _Convert1by1(VM.OpCode.NOP, src, to);
+            _Convert1by1(Lux.Core.OpCode.NOP, src, to);
 
             ////移除临时槽位
             ////drop body_Variables
             //for (var i = 0; i < from.body_Variables.Count; i++)
             //{
-            //    _Insert1(VM.OpCode.DEPTH, "body_Variables drop", to, null);
-            //    _Insert1(VM.OpCode.DEC, null, to, null);
+            //    _Insert1(Lux.Core.OpCode.DEPTH, "body_Variables drop", to, null);
+            //    _Insert1(Lux.Core.OpCode.DEC, null, to, null);
 
             //    //push olddepth
-            //    _Insert1(VM.OpCode.FROMALTSTACK, null, to);
-            //    _Insert1(VM.OpCode.DUP, null, to);
-            //    _Insert1(VM.OpCode.TOALTSTACK, null, to);
+            //    _Insert1(Lux.Core.OpCode.FROMALTSTACK, null, to);
+            //    _Insert1(Lux.Core.OpCode.DUP, null, to);
+            //    _Insert1(Lux.Core.OpCode.TOALTSTACK, null, to);
             //    //(d-1)-olddepth
-            //    _Insert1(VM.OpCode.SUB, null, to);
+            //    _Insert1(Lux.Core.OpCode.SUB, null, to);
 
-            //    _Insert1(VM.OpCode.XDROP, null, to, null);
+            //    _Insert1(Lux.Core.OpCode.XDROP, null, to, null);
             //}
             ////移除参数槽位
             ////Remove the parameter slot
             //for (var i = 0; i < from.paramtypes.Count; i++)
             //{
             //    //d
-            //    _Insert1(VM.OpCode.DEPTH, "param drop", to, null);
+            //    _Insert1(Lux.Core.OpCode.DEPTH, "param drop", to, null);
 
             //    //push olddepth
-            //    _Insert1(VM.OpCode.FROMALTSTACK, null, to);
-            //    _Insert1(VM.OpCode.DUP, null, to);
-            //    _Insert1(VM.OpCode.DEC, null, to);//深度-1
-            //    _Insert1(VM.OpCode.TOALTSTACK, null, to);
+            //    _Insert1(Lux.Core.OpCode.FROMALTSTACK, null, to);
+            //    _Insert1(Lux.Core.OpCode.DUP, null, to);
+            //    _Insert1(Lux.Core.OpCode.DEC, null, to);//深度-1
+            //    _Insert1(Lux.Core.OpCode.TOALTSTACK, null, to);
 
             //    //(d)-olddepth
-            //    _Insert1(VM.OpCode.SUB, null, to);
+            //    _Insert1(Lux.Core.OpCode.SUB, null, to);
 
-            //    _Insert1(VM.OpCode.XDROP, null, to, null);
+            //    _Insert1(Lux.Core.OpCode.XDROP, null, to, null);
 
             //}
 
             //移除深度临时栈
             //Remove the depth temporary stack
-            _Insert1(VM.OpCode.FROMALTSTACK, "endcode", to);
-            _Insert1(VM.OpCode.DROP, "", to);
+            _Insert1(Lux.Core.OpCode.FROMALTSTACK, "endcode", to);
+            _Insert1(Lux.Core.OpCode.DROP, "", to);
         }
 
     }
