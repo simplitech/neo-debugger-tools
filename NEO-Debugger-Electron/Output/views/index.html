@@ -118,6 +118,7 @@
 
 	var currentLine = null;
 	var currentMarker = null;
+	var currentState = "Invalid";
 	
 	function jumpToLine(lineNumber) {
 		if (lineNumber == currentLine) {
@@ -133,6 +134,7 @@
 	}
 
 	function updateState(obj)	 {
+		currentState = obj.state;
 		if (obj.state == 'Break' || obj.state == 'Running') {
 			if (obj.line) {
 				jumpToLine(obj.line);
@@ -252,20 +254,41 @@
 	}
 	
 	function runClick() {		
-		bootbox.prompt("Insert input (in JSON format)", function(result){ 
-			if (result != null) {
-				executeCommand("invoke "+result, function(obj, error) {
-					if (error != null) {
-						bootbox.alert(error.message);
-						return;						
-					}										
-				});
-			}
-		});
+		if (currentState == "Break" || currentState == "Running") {
+			executeCommand("run", function(obj, error) {
+				if (error != null) {
+					bootbox.alert(error.message);
+					return;						
+				}										
+			});					
+		}
+		else {
+			bootbox.prompt("Insert input (in JSON format)", function(result){ 
+				if (result != null) {
+					executeCommand("invoke "+result, function(obj, error) {
+						if (error != null) {
+							bootbox.alert(error.message);
+							return;						
+						}										
+					});
+				}
+			});
+		}
+		
 	}
 	
 	function stepClick() {
-		bootbox.alert("Not implemented!");
+		if (currentState == "Break" || currentState == "Running") {
+			executeCommand("step", function(obj, error) {
+				if (error != null) {
+					bootbox.alert(error.message);
+					return;						
+				}										
+			});		
+		}
+		else {
+			bootbox.alert("Not running!");
+		}
 	}
 	
 	function stopClick() {
