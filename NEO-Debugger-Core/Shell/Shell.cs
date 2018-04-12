@@ -47,6 +47,8 @@ namespace Neo.Debugger.Shell
             AddCommand(new ContractCommand());
             AddCommand(new InvokeCommand());
             AddCommand(new StorageCommand());
+            AddCommand(new BreakpointCommand());
+            AddCommand(new FileCommand());
         }
 
         public void AddCommand(Command cmd)

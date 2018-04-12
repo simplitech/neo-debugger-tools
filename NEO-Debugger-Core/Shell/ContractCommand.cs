@@ -12,8 +12,6 @@ namespace Neo.Debugger.Shell
 
         public override void Execute(string[] args, Action<ShellMessageType, string> output)
         {
-            if (args.Length < 2) return;
-
             switch (args[1].ToLower())
             {
                 case "load":

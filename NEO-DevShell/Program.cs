@@ -68,7 +68,7 @@ namespace NEO_DevShell
                 case ShellMessageType.Success: Console.ForegroundColor = ConsoleColor.Green; break;
                 case ShellMessageType.Default: Console.ForegroundColor = ConsoleColor.Gray; break;
             }
-            Console.WriteLine("\t" + text);
+            Console.WriteLine(text);
         }
     }
 }

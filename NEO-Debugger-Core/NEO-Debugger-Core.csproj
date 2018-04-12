@@ -70,7 +70,9 @@
     <Compile Include="Dissambler\NeoDisassembler.cs" />
     <Compile Include="Generator\NeoLux.cs" />
     <Compile Include="Profiler\ProfilerContext.cs" />
+    <Compile Include="Shell\BreakpointCommand.cs" />
     <Compile Include="Shell\ContractCommand.cs" />
+    <Compile Include="Shell\FileCommand.cs" />
     <Compile Include="Shell\HelpCommand.cs" />
     <Compile Include="Shell\ChainCommand.cs" />
     <Compile Include="Shell\InvokeCommand.cs" />

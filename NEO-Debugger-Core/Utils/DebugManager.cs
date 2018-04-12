@@ -571,30 +571,58 @@ namespace Neo.Debugger.Core.Utils
         public IEnumerable<Breakpoint> Breakpoints => _breakpoints;
         private List<Breakpoint> _breakpoints = new List<Breakpoint>();
 
-        public bool AddBreakpoint(int lineNumber)
+        public bool AddBreakpoint(int lineNumber, string fileName = null)
         {
-            var ofs = ResolveOffset(lineNumber, _currentFilePath);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                fileName = _currentFilePath;
+            }
+
+            var ofs = ResolveOffset(lineNumber, fileName);
             if (ofs < 0)
                 return false;
 
             _emulator.SetBreakpointState(ofs, true);
 
-            _breakpoints.Add(new Breakpoint() { filePath = _currentFilePath, lineNumber = lineNumber, offset = ofs });
+            _breakpoints.Add(new Breakpoint() { filePath = fileName, lineNumber = lineNumber, offset = ofs });
 
             return true;
         }
 
-        public bool RemoveBreakpoint(int lineNumber)
+        public bool RemoveBreakpoint(int lineNumber, string fileName = null)
         {
-            _breakpoints.RemoveAll(x => x.lineNumber == lineNumber && x.filePath == _currentFilePath);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                fileName = _currentFilePath;
+            }
 
-            var ofs = ResolveOffset(lineNumber, _currentFilePath);
+            _breakpoints.RemoveAll(x => x.lineNumber == lineNumber && x.filePath == fileName);
+
+            var ofs = ResolveOffset(lineNumber, fileName);
             if (ofs < 0)
                 return false;
 
             _emulator.SetBreakpointState(ofs, false);
 
             return true;
+        }
+
+        public bool HasBreakpoint(int lineNumber, string fileName = null)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                fileName = _currentFilePath;
+            }
+
+            foreach (var entry in _breakpoints)
+            {
+                if (entry.lineNumber == lineNumber && entry.filePath == fileName)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void Run()
