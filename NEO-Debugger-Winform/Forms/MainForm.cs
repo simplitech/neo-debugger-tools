@@ -1094,7 +1094,7 @@ namespace Neo.Debugger.Forms
             }
 
             //Update the UI to reflect the debugger state
-            switch (_debugger.State)
+            switch (_debugger.State.state)
             {
                 case DebuggerState.State.Running:
                     {
@@ -1303,7 +1303,7 @@ namespace Neo.Debugger.Forms
                 HighlightLine(_debugger.CurrentLine);
             }
 
-            if (_debugger.State == DebuggerState.State.Break || _debugger.State == DebuggerState.State.Exception)
+            if (_debugger.State.state == DebuggerState.State.Break || _debugger.State.state == DebuggerState.State.Exception)
             {
                 try
                 {

@@ -31,6 +31,7 @@ namespace Neo.Debugger.Electron
         private string activeDocumentID;
         private Dictionary<string, FileEntry> projectFiles = new Dictionary<string, FileEntry>();
 
+        private DebugManager _debugger;
         private DebuggerShell _shell;
 
         private int docAllocID  = 100;
@@ -140,7 +141,8 @@ namespace Neo.Debugger.Electron
                 settings.compilerPaths[SourceLanguage.Python] = curPath + "/compilers";
             }
 
-            _shell = new DebuggerShell(settings);
+            _debugger = new DebugManager(settings);
+            _shell = new DebuggerShell(_debugger);
 
             // initialize a logger
             var log = new SynkServer.Core.Logger();
