@@ -30,6 +30,14 @@ namespace Neo.Debugger.Shell
 
                             Runtime.OnLogMessage = (x => output(ShellMessageType.Default, x));
 
+
+                            if (Shell.Debugger.MapLoaded)
+                            {
+                                foreach (var entry in Shell.Debugger.Map.FileNames)
+                                {
+                                    Shell.Debugger.LoadAssignmentsFromContent(entry);
+                                }
+                            }
                         }                    
                         else
                         {

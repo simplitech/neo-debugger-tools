@@ -33,7 +33,12 @@ namespace Neo.Debugger.Shell
 
                         foreach (var entry in Shell.Debugger.Emulator.Variables)
                         {
-                            var val = FormattingUtils.StackItemAsString(entry.value, false, entry.type);
+                            if (count == 0)
+                            {
+                                output(ShellMessageType.Default, $"Variable values:");
+                            }
+
+                            var val = FormattingUtils.StackItemAsString(entry.value, true, entry.type);
                             output(ShellMessageType.Default, $"\t{entry.name} = {val}");
                             count++;
                         }
@@ -120,7 +125,7 @@ namespace Neo.Debugger.Shell
             }
 
             output(ShellMessageType.Default, "Executing transaction...");
-            Shell.Debugger.Emulator.Reset(inputs, null);
+            Shell.Debugger.Emulator.Reset(inputs, Shell.Debugger.ABI);
 
             ShellRunner.Run(Shell, output);
         }
