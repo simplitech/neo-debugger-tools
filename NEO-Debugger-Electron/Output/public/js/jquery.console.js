@@ -520,28 +520,29 @@
           else continuedText = promptText;
         } else continuedText = undefined;
         if (continuedText) text = continuedText;
-        var ret = config.commandHandle(text,function(msgs){
-          commandResult(msgs);
+        
+		config.commandHandle(text, function(ret){			
+			if (extern.continuedPrompt && !continuedText)
+			  continuedText = promptText;
+			if (typeof ret == 'boolean') {
+			  if (ret) {
+				// Command succeeded without a result.
+				commandResult();
+			  } else {
+				commandResult(
+				  'Command failed.',
+				  "jquery-console-message-error"
+				);
+			  }
+			} else if (typeof ret == "string") {
+			  commandResult(ret,"jquery-console-message-success");
+			} else if (typeof ret == 'object' && ret.length) {
+			  commandResult(ret);
+			} else if (extern.continuedPrompt) {
+			  commandResult();
+			}
+			
         });
-        if (extern.continuedPrompt && !continuedText)
-          continuedText = promptText;
-        if (typeof ret == 'boolean') {
-          if (ret) {
-            // Command succeeded without a result.
-            commandResult();
-          } else {
-            commandResult(
-              'Command failed.',
-              "jquery-console-message-error"
-            );
-          }
-        } else if (typeof ret == "string") {
-          commandResult(ret,"jquery-console-message-success");
-        } else if (typeof ret == 'object' && ret.length) {
-          commandResult(ret);
-        } else if (extern.continuedPrompt) {
-          commandResult();
-        }
       }
     };
 

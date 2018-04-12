@@ -230,12 +230,19 @@ namespace Neo.Debugger.Electron
             {
                 var input = request.args["input"];
                 var output = new StringBuilder();
+                output.Append('[');
 
-                _shell.Execute(input, (type, text) =>
+                if (!_shell.Execute(input, (type, text) =>
                 {
+                    output.Append('"');
                     output.AppendLine(text);
-                });
+                    output.Append('"');
+                }))
+                {
+                    output.Append("\"Invalid command\"");
+                }
 
+                output.Append(']');
                 return output.ToString();
             });
 

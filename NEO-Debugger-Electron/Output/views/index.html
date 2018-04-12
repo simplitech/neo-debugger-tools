@@ -234,10 +234,23 @@
              if (line == "") return false;
              else return true;
            },
-           commandHandle:function(line){
-               return [{msg:"Unkown",
-                        className:"jquery-console-message-value"}
-						]
+           commandHandle:function(input, callback){					
+					$.post("/shell", { input:input } ,function(data){
+						debugger;
+						let consoleClass = "jquery-console-message-value";						
+						let ret = [];
+						
+						try {
+							let arr = $.parseJSON(data );						
+							for (let i=0; i< arr.length;i++){
+								ret.push({msg:arr[i], className:consoleClass});
+							}
+						} catch (err) {
+							ret.push({msg:err.message, className:consoleClass});
+						}						
+						callback(ret);						
+					});
+				
            },
            autofocus:false,
            animateScroll:true,
