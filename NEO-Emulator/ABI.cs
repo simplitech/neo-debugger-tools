@@ -21,7 +21,7 @@ namespace Neo.Emulation
 
     public class ABI
     {
-        public Dictionary<string, AVMFunction> functions = new Dictionary<string, AVMFunction>();
+        public Dictionary<string, AVMFunction> functions = new Dictionary<string, AVMFunction>(StringComparer.InvariantCultureIgnoreCase);
         public AVMFunction entryPoint { get; private set; }
         public readonly string fileName;
 
