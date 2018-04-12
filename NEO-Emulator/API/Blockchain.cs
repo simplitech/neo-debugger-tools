@@ -209,7 +209,7 @@ namespace Neo.Emulation.API
             this.Save(this.fileName);
         }
 
-        public void Save(string fileName)
+        public bool Save(string fileName)
         {
             this.fileName = fileName;
 
@@ -225,8 +225,17 @@ namespace Neo.Emulation.API
                 result.AddNode(address.Save());
             }
 
-            var json = JSONWriter.WriteToString(result);
-            File.WriteAllText(fileName, json);
+            try
+            {
+                var json = JSONWriter.WriteToString(result);
+                File.WriteAllText(fileName, json);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private Account GenerateAddress(string name)
