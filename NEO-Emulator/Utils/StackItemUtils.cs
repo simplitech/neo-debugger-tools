@@ -74,6 +74,30 @@ namespace Neo.Emulation.Utils
                 return "Null";
             }
 
+            if (hintType == Emulator.Type.Array)
+            {
+                var s = new StringBuilder();
+                s.Append('[');
+                int count = 0;
+                if (data.Length > 0)
+                {
+                    var array = (VM.Types.Array)item;
+                    foreach (var entry in array)
+                    {
+                        if (count > 0)
+                        {
+                            s.Append(", ");
+                        }
+                        count++;
+
+                        s.Append(StackItemAsString(entry, addQuotes, Emulator.Type.Unknown));
+                    }
+                }
+                s.Append(']');
+
+                return s.ToString();
+            }
+
             return FormattingUtils.OutputData(data, addQuotes, hintType);
         }
 
@@ -213,7 +237,12 @@ namespace Neo.Emulation.Utils
                     {
                         case Emulator.Type.String:
                             {
-                                return System.Text.Encoding.UTF8.GetString(data);
+                                var val = System.Text.Encoding.UTF8.GetString(data);
+                                if (addQuotes)
+                                {
+                                    val= '"' + val+ '"';
+                                }
+                                return val;
                             }
 
                         case Emulator.Type.Boolean:
