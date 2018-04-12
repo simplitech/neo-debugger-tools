@@ -228,13 +228,7 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
-        private string _blockchainFilePath
-        {
-            get
-            {
-                return _avmFilePath.Replace(".avm", ".chain.json");
-            }
-        }
+        private string _blockchainFilePath;
 
         public DebugManager(DebuggerSettings settings)
         {
@@ -363,12 +357,12 @@ namespace Neo.Debugger.Core.Utils
             return true;
         }
 
-        public bool LoadContract(string avmFilePath)
+        public bool LoadContract(string avmFilePath, string chainPath = null)
         {
             if (!LoadAvmFile(avmFilePath))
                 return false;
 
-            if (!LoadEmulator())
+            if (!LoadEmulator(chainPath))
                 return false;
 
             if (!DeployContract())
@@ -386,8 +380,15 @@ namespace Neo.Debugger.Core.Utils
             return true;
         }
 
-        public bool LoadEmulator()
+        public bool LoadEmulator(string chainPath)
         {
+            if (string.IsNullOrEmpty(chainPath))
+            {
+                chainPath = _avmFilePath.Replace(".avm", ".chain.json");
+            }
+
+            _blockchainFilePath = chainPath;
+
             //Create load the emulator
             var blockchain = new Blockchain();
             blockchain.Load(_blockchainFilePath);
@@ -477,7 +478,7 @@ namespace Neo.Debugger.Core.Utils
                     throw new Exception("Cannot resolve line");
                 }
 
-                if (executingBytecode.SequenceEqual(_emulator.contractByteCode))
+                if (executingBytecode.SequenceEqual(_emulator.ContractByteCode))
                 {
                     filePath = AvmFilePath;
                 }
