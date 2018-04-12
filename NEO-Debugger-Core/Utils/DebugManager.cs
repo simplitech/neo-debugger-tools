@@ -52,11 +52,11 @@ namespace Neo.Debugger.Core.Utils
                 return _resetFlag;
             }
         }
-        public DebuggerState.State State
+        public DebuggerState State
         {
             get
             {
-                return _state.state;
+                return _state;
             }
         }
         public int Offset
@@ -166,7 +166,7 @@ namespace Neo.Debugger.Core.Utils
         #endregion
 
         //Settings
-        private DebuggerSettings _settings;
+        public DebuggerSettings Settings { get; private set; }
 
         //File load flag
         private bool _avmFileLoaded;
@@ -232,7 +232,7 @@ namespace Neo.Debugger.Core.Utils
 
         public DebugManager(DebuggerSettings settings)
         {
-            _settings = settings;
+            Settings = settings;
             this.profiler = new ProfilerContext();
         }
 
@@ -264,8 +264,8 @@ namespace Neo.Debugger.Core.Utils
             //Decide what we need to open
             if (!String.IsNullOrEmpty(avmPath)) //use the explicit file provided
                 _avmFilePath = avmPath;
-            else if (!String.IsNullOrEmpty(_settings.lastOpenedFile)) //fallback to last opened
-                _avmFilePath = _settings.lastOpenedFile;
+            else if (!String.IsNullOrEmpty(Settings.lastOpenedFile)) //fallback to last opened
+                _avmFilePath = Settings.lastOpenedFile;
             else
                 return false; //We don't know what to open, just let the user specify with another call
 
@@ -345,8 +345,8 @@ namespace Neo.Debugger.Core.Utils
             _debugContent[_avmFilePath] = avmDisassemble.ToString();
 
             //Save the settings
-            _settings.lastOpenedFile = avmPath;
-            _settings.Save();
+            Settings.lastOpenedFile = avmPath;
+            Settings.Save();
             _avmFileLoaded = true;
 
             //Force a reset now that we're loaded
@@ -571,6 +571,7 @@ namespace Neo.Debugger.Core.Utils
         public IEnumerable<Breakpoint> Breakpoints => _breakpoints;
         private List<Breakpoint> _breakpoints = new List<Breakpoint>();
 
+        // NOTE line Number starts at zero not 1, so make sure if using a "logical/visual line number" you subtract 1 from it before passing it here
         public bool AddBreakpoint(int lineNumber, string fileName = null)
         {
             if (string.IsNullOrEmpty(fileName))
@@ -689,11 +690,11 @@ namespace Neo.Debugger.Core.Utils
         public bool SetDebugParameters(DebugParameters debugParams)
         {
             //Save all the params for settings later
-            _settings.lastPrivateKey = debugParams.PrivateKey;
-            _settings.lastParams.Clear();
+            Settings.lastPrivateKey = debugParams.PrivateKey;
+            Settings.lastParams.Clear();
             foreach (var param in debugParams.DefaultParams)
-                _settings.lastParams.Add(param.Key, param.Value);
-            _settings.Save();
+                Settings.lastParams.Add(param.Key, param.Value);
+            Settings.Save();
 
             //Set the emulator context
             _emulator.checkWitnessMode = debugParams.WitnessMode;
@@ -723,15 +724,15 @@ namespace Neo.Debugger.Core.Utils
 
         public bool CompileContract(string sourceCode, SourceLanguage language, string outputFile = null)
         {
-            Compiler compiler = new Compiler(_settings);
+            Compiler compiler = new Compiler(Settings);
             compiler.SendToLog += Compiler_SendToLog;
 
             var extension = LanguageSupport.GetExtension(language);
 
             var sourceFile = TempContractName + extension;
 
-            Directory.CreateDirectory(_settings.path);
-            var fileName = Path.Combine(_settings.path, sourceFile);
+            Directory.CreateDirectory(Settings.path);
+            var fileName = Path.Combine(Settings.path, sourceFile);
 
             var avmPath = fileName.Replace(extension, ".avm");
 
