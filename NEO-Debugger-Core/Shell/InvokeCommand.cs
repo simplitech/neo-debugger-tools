@@ -11,14 +11,29 @@ namespace Neo.Debugger.Shell
 {
     public static class ShellRunner
     {
-        public static void Run(DebuggerShell Shell, Action<ShellMessageType, string> output)
+        public static void UpdateState(DebuggerShell Shell, Action<ShellMessageType, string> output)
         {
-            Shell.Debugger.Run();
             var state = Shell.Debugger.State;
+
+            output(ShellMessageType.Default, $"VM state: {state.state}");
+            output(ShellMessageType.Default, $"Instruction pointer: {state.offset}");
 
             switch (state.state)
             {
-                case DebuggerState.State.Finished: OnFinished(Shell, output); break;
+                case DebuggerState.State.Finished:
+                    {
+                        var val = Shell.Debugger.Emulator.GetOutput();
+
+                        Shell.Debugger.Blockchain.Save();
+
+                        var methodName = Shell.Debugger.Emulator.currentMethod;
+                        var hintType = !string.IsNullOrEmpty(methodName) && Shell.Debugger.ABI != null && Shell.Debugger.ABI.functions.ContainsKey(methodName) ? Shell.Debugger.ABI.functions[methodName].returnType : Emulator.Type.Unknown;
+
+                        output(ShellMessageType.Success, "Result: " + FormattingUtils.StackItemAsString(val, false, hintType));
+                        output(ShellMessageType.Default, "GAS used: " + Shell.Debugger.Emulator.usedGas);
+
+                        break;
+                    }
 
                 case DebuggerState.State.Break:
                     {
@@ -44,26 +59,7 @@ namespace Neo.Debugger.Shell
                         }
                         break;
                     }
-
-                default:
-                    {
-                        output(ShellMessageType.Default, "VM state: " + state.state);
-                        break;
-                    }
             }
-        }
-
-        private static void OnFinished(DebuggerShell Shell, Action<ShellMessageType, string> output)
-        {
-            var val = Shell.Debugger.Emulator.GetOutput();
-
-            Shell.Debugger.Blockchain.Save();
-
-            var methodName = Shell.Debugger.Emulator.currentMethod;
-            var hintType = !string.IsNullOrEmpty(methodName) && Shell.Debugger.ABI != null && Shell.Debugger.ABI.functions.ContainsKey(methodName) ? Shell.Debugger.ABI.functions[methodName].returnType : Emulator.Type.Unknown;
-
-            output(ShellMessageType.Success, "Result: " + FormattingUtils.StackItemAsString(val, false, hintType));
-            output(ShellMessageType.Default, "GAS used: " + Shell.Debugger.Emulator.usedGas);
         }
     }
 
@@ -127,7 +123,8 @@ namespace Neo.Debugger.Shell
             output(ShellMessageType.Default, "Executing transaction...");
             Shell.Debugger.Emulator.Reset(inputs, Shell.Debugger.ABI);
 
-            ShellRunner.Run(Shell, output);
+            Shell.Debugger.Run();
+            ShellRunner.UpdateState(Shell, output);
         }
 
     }

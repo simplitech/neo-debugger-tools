@@ -19,18 +19,36 @@ namespace Neo.Debugger.Shell
             {
                 case "run":
                     {
-                        if (Shell.Debugger.IsSteppingOrOnBreakpoint)
+                        if (Shell.Debugger.State.state == DebuggerState.State.Running || Shell.Debugger.State.state == DebuggerState.State.Break)
                         {
                             output(ShellMessageType.Default, "Resuming invoke.");
-                            ShellRunner.Run(Shell, output);
+                            Shell.Debugger.Run();
+                            ShellRunner.UpdateState(Shell, output);
                         }
                         else
                         {
                             output(ShellMessageType.Error, "Start a transaction with invoke first.");
                         }
-                        
+
                         break;
                     }
+
+                case "step":
+                    {
+                        if (Shell.Debugger.State.state == DebuggerState.State.Running || Shell.Debugger.State.state == DebuggerState.State.Break)
+                        {
+                            output(ShellMessageType.Default, "Stepping invoke.");
+                            Shell.Debugger.Step();
+                            ShellRunner.UpdateState(Shell, output);
+                        }
+                        else
+                        {
+                            output(ShellMessageType.Error, "Start a transaction with invoke first.");
+                        }
+
+                        break;
+                    }
+
             }
         }
     }
