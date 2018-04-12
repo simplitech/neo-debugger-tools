@@ -52,7 +52,7 @@ namespace Neo.Debugger.Core.Utils
                 return _resetFlag;
             }
         }
-        public DebuggerState State
+        public DebuggerState Info
         {
             get
             {
@@ -731,15 +731,27 @@ namespace Neo.Debugger.Core.Utils
 
             var sourceFile = TempContractName + extension;
 
-            Directory.CreateDirectory(Settings.path);
-            var fileName = Path.Combine(Settings.path, sourceFile);
+            string fileName;
+
+            if (outputFile == null)
+            {
+                Directory.CreateDirectory(Settings.path);
+                fileName = Path.Combine(Settings.path, sourceFile);
+            }
+            else
+            {
+                fileName = outputFile.Replace(".avm", extension);
+            }
 
             var avmPath = fileName.Replace(extension, ".avm");
 
+            string abiFile = avmPath.Replace(".avm", ".abi.json");
+            string debugMapFile = avmPath.Replace(".avm", ".debug.json");
+
             try
             {
-                File.Delete(avmPath.Replace(".avm", ".abi.json"));
-                File.Delete(avmPath.Replace(".avm", ".debug.json"));
+                File.Delete(abiFile);
+                File.Delete(debugMapFile);
             }
             catch
             {
@@ -752,10 +764,20 @@ namespace Neo.Debugger.Core.Utils
             {
                 _avmFilePath = avmPath;
 
-                if (outputFile != null)
+                /*if (outputFile != null)
                 {
                     File.Copy(_avmFilePath, outputFile, true);
-                }
+
+                    if (File.Exists(abiFile))
+                    {
+                        File.Copy(abiFile, outputFile.Replace(".avm", ".abi.json"), true);
+                    }
+
+                    if (File.Exists(debugMapFile))
+                    {
+                        File.Copy(debugMapFile, outputFile.Replace(".avm", ".debug.json"), true);
+                    }
+                }*/
             }
 
             _isCompiled = success;

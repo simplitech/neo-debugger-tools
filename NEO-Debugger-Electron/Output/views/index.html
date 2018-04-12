@@ -11,6 +11,7 @@
 	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>	
 	<script src="/js/jquery-3.3.1.min.js"></script>
 	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/bootbox.min.js"></script>
 	<script src="/js/jquery.console.js"></script>
 	
 	<script>if (window.module) module = window.module;</script>
@@ -37,6 +38,13 @@
 		<pre id="editor">Loading...</pre>
 	</div>
 
+	<div class="view_toolbar">
+		<span class="glyphicon glyphicon-play toolbar-icon" title="Run" onclick="runClick()"></span>
+		<span class="glyphicon glyphicon-step-forward toolbar-icon" title="Step" onclick="stepClick()"></span>
+		<span class="glyphicon glyphicon-stop toolbar-icon" title="Stop" onclick="stopClick()"></span>
+		<span class="glyphicon glyphicon-cog toolbar-icon" title="Settings" onclick="settingsClick()"></span>
+	</div>
+	
 </div>
 
 <div class="footer">
@@ -45,7 +53,7 @@
 		
 	</div>
 
-	<div class="view_stack">
+	<div class="view_stack">		
 		 <table class="table">
 			<thead>
 			  <tr>
@@ -58,17 +66,17 @@
 			  <tr>
 				<td>0</td>
 				<td>Doe</td>
-				<td>john@example.com</td>
+				<td>Something</td>
 			  </tr>
 			  <tr>
 				<td>1</td>
 				<td>Moe</td>
-				<td>mary@example.com</td>
+				<td>Other</td>
 			  </tr>
 			  <tr>
 				<td>2</td>
 				<td>Dooley</td>
-				<td>july@example.com</td>
+				<td>Another</td>
 			  </tr>
 			</tbody>
 		  </table>
@@ -108,9 +116,33 @@
     }
     langTools.addCompleter(syntaxCompleter);
 
-	/*var lineNumber = 2;
-	var marker = editor.session.addMarker(new Range(lineNumber, 0, lineNumber, 1), "myMarker", "fullLine");	
-	//editor.session.removeMarker(marker);*/
+	var currentLine = null;
+	var currentMarker = null;
+	
+	function jumpToLine(lineNumber) {
+		if (lineNumber == currentLine) {
+			return;
+		}
+		
+		if (currentMarker != null) {
+			editor.session.removeMarker(currentMarker);
+		}
+		
+		currentMarker = editor.session.addMarker(new Range(lineNumber, 0, lineNumber, 1), "myMarker", "fullLine");			
+		currentLine = lineNumber;
+	}
+
+	function updateState(obj)	 {
+		if (obj.state == 'Break' || obj.state == 'Running') {
+			if (obj.line) {
+				jumpToLine(obj.line);
+			}
+		}
+		else
+		if (obj.state == 'Finished') {
+			bootbox.alert("Result: "+obj.result+"<br>GAS used: "+obj.gas);
+		}
+	}
 	
   // add command to lazy-load keybinding_menu extension
     editor.commands.addCommand({
@@ -125,7 +157,7 @@
     })
     //editor.execCommand("showKeyboardShortcuts");	
 
-	    editor.commands.addCommand({
+	editor.commands.addCommand({
         name: "compileCode",
         bindKey: {win: "Alt-5", mac: "Alt-5"},
         exec: function(editor) {
@@ -219,6 +251,49 @@
 		});
 	}
 	
+	function runClick() {		
+		bootbox.prompt("Insert input (in JSON format)", function(result){ 
+			if (result != null) {
+				executeCommand("invoke "+result, function(obj, error) {
+					if (error != null) {
+						bootbox.alert(error.message);
+						return;						
+					}										
+				});
+			}
+		});
+	}
+	
+	function stepClick() {
+		bootbox.alert("Not implemented!");
+	}
+	
+	function stopClick() {
+		bootbox.alert("Not implemented!");
+	}
+	
+	function settingsClick() {
+		bootbox.alert("Not implemented!");
+	}
+	
+	function executeCommand(input, callback) {
+		$.post("/shell", { input:input } ,function(data){
+			let consoleClass = "jquery-console-message-value";						
+			let ret = [];
+			
+			try {
+				let obj = $.parseJSON(data );						
+				
+				debugger;
+				updateState(obj);
+				
+				callback(obj, null);
+			} catch (err) {
+				callback(null, err);
+			}														
+		});
+	}
+	
 	$( document ).ready(function() {
 		reloadDocument();
 		
@@ -235,19 +310,23 @@
              else return true;
            },
            commandHandle:function(input, callback){					
-					$.post("/shell", { input:input } ,function(data){
-						debugger;
+					executeCommand(input, function(obj, error){
 						let consoleClass = "jquery-console-message-value";						
 						let ret = [];
 						
-						try {
-							let arr = $.parseJSON(data );						
-							for (let i=0; i< arr.length;i++){
-								ret.push({msg:arr[i], className:consoleClass});
+						if (obj != null) {
+							if (obj.lines) {
+								let arr = obj.lines;
+								for (let i=0; i< arr.length;i++){
+									ret.push({msg:arr[i], className:consoleClass});
+								}
 							}
-						} catch (err) {
-							ret.push({msg:err.message, className:consoleClass});
-						}						
+						}
+						
+						if (error) {
+							ret.push({msg:err.message+"\n"+data, className:consoleClass});
+						}
+						
 						callback(ret);						
 					});
 				

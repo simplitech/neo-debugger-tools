@@ -1,9 +1,12 @@
 ﻿// NOTE - For this project to run it is necessary to download Electron and copy its contents to folder "Output/electron"
 using LunarParser;
+using LunarParser.JSON;
 using Neo.Debugger.Core.Data;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
 using Neo.Debugger.Shell;
+using Neo.Emulation;
+using Neo.Emulation.Utils;
 using SynkServer.Core;
 using SynkServer.HTTP;
 using SynkServer.Templates;
@@ -197,18 +200,28 @@ namespace Neo.Debugger.Electron
             {
                 int line = int.Parse(request.args["line"]);
 
-                var breakpoints = projectFiles[activeDocumentID].breakpoints;
-                breakpoints.Add(line);
+                var file = projectFiles[activeDocumentID];
+                if (_debugger.AddBreakpoint(line, file.path))
+                {
+                    var breakpoints = file.breakpoints;
+                    breakpoints.Add(line);
 
-                return "ok";
+                    return "ok";
+                }
+
+                return "fail";
             });
 
             site.Post("/breakpoint/remove", (request) =>
             {
                 int line = int.Parse(request.args["line"]);
 
-                var breakpoints = projectFiles[activeDocumentID].breakpoints;
+                var file = projectFiles[activeDocumentID];
+                var breakpoints = file.breakpoints;
+
                 breakpoints.Remove(line);
+
+                _debugger.RemoveBreakpoint(line, file.path);
 
                 return "ok";
             });
@@ -229,21 +242,43 @@ namespace Neo.Debugger.Electron
             site.Post("/shell", (request) =>
             {
                 var input = request.args["input"];
-                var output = new StringBuilder();
-                output.Append('[');
+                var output = DataNode.CreateObject();
+
+                var lines = DataNode.CreateArray("lines");
+                output.AddNode(lines);
 
                 if (!_shell.Execute(input, (type, text) =>
                 {
-                    output.Append('"');
-                    output.AppendLine(text);
-                    output.Append('"');
+                    lines.AddValue(text);
                 }))
                 {
-                    output.Append("\"Invalid command\"");
+                    output.AddValue("Invalid command");
                 }
 
-                output.Append(']');
-                return output.ToString();
+                string filePath;
+                var curLine = _shell.Debugger.ResolveLine(_shell.Debugger.Info.offset, true, out filePath);
+
+                output.AddField("state", _shell.Debugger.Info.state);
+                output.AddField("offset", _shell.Debugger.Info.offset);
+                output.AddField("line", curLine);
+                output.AddField("path", filePath);
+
+                if (_shell.Debugger.Info.state == Emulation.DebuggerState.State.Finished)
+                {
+                    var val = _debugger.Emulator.GetOutput();
+
+                    _debugger.Blockchain.Save();
+
+                    var methodName = _debugger.Emulator.currentMethod;
+                    var hintType = !string.IsNullOrEmpty(methodName) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(methodName) ? _debugger.ABI.functions[methodName].returnType : Emulator.Type.Unknown;
+
+                    var temp = FormattingUtils.StackItemAsString(val, false, hintType);
+                    output.AddField("result", temp);
+                    output.AddField("gas", _debugger.Emulator.usedGas);
+                }
+
+                var json = JSONWriter.WriteToString(output);
+                return json;
             });
 
             server.Run();

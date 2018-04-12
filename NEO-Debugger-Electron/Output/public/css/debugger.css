@@ -143,3 +143,41 @@ div.console span.jquery-console-prompt-label { font-weight:bold }
 	color:white;
 	z-index: 99;
 }
+
+.view_toolbar {
+	position: absolute;
+	right:50px;
+	top:50px;
+	height:50px;
+	background:#212121;
+	color:#363636;
+	padding:10px;
+	box-shadow: 5px 5px rgba(0,0,0,0.25);
+	border-radius: 5px; 
+}
+
+.toolbar-icon {
+	margin:4px;
+	margin-left:10px;
+	margin-right:10px;
+	cursor:pointer;
+}
+
+.toolbar-icon:hover {
+	color: white;
+}
+
+span.dropt {border-bottom: thin dotted; background: #ffeedd;}
+span.dropt:hover {text-decoration: none; background: #ffffff; z-index: 6; }
+span.dropt span {position: absolute; left: -9999px;
+  margin: 20px 0 0 0px; padding: 3px 3px 3px 3px;
+  border-style:solid; border-color:black; border-width:1px; z-index: 6;}
+span.dropt:hover span {left: 2%; background: #ffffff;} 
+span.dropt span {position: absolute; left: -9999px;
+  margin: 4px 0 0 0px; padding: 3px 3px 3px 3px; 
+  border-style:solid; border-color:black; border-width:1px;}
+span.dropt:hover span {margin: 20px 0 0 170px; background: #ffffff; z-index:6;} 
+
+.modal-title {
+	color:black;
+}

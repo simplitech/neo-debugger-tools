@@ -8,7 +8,7 @@ namespace Neo.Debugger.Shell
     {
         public static void UpdateState(DebuggerShell Shell, Action<ShellMessageType, string> output)
         {
-            var state = Shell.Debugger.State;
+            var state = Shell.Debugger.Info;
 
             output(ShellMessageType.Default, $"VM state: {state.state}");
             output(ShellMessageType.Default, $"Instruction pointer: {state.offset}");
@@ -65,7 +65,7 @@ namespace Neo.Debugger.Shell
 
         public override void Execute(string[] args, Action<ShellMessageType, string> output)
         {
-            if (Shell.Debugger.State.state == DebuggerState.State.Running || Shell.Debugger.State.state == DebuggerState.State.Break)
+            if (Shell.Debugger.Info.state == DebuggerState.State.Running || Shell.Debugger.Info.state == DebuggerState.State.Break)
             {
                 output(ShellMessageType.Default, "Resuming invoke.");
                 Shell.Debugger.Run();
@@ -85,7 +85,7 @@ namespace Neo.Debugger.Shell
 
         public override void Execute(string[] args, Action<ShellMessageType, string> output)
         {
-            if (Shell.Debugger.State.state == DebuggerState.State.Running || Shell.Debugger.State.state == DebuggerState.State.Break)
+            if (Shell.Debugger.Info.state == DebuggerState.State.Running || Shell.Debugger.Info.state == DebuggerState.State.Break)
             {
                 output(ShellMessageType.Default, "Stepping invoke.");
                 Shell.Debugger.Step();
