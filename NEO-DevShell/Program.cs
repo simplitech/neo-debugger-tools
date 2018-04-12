@@ -28,15 +28,25 @@ namespace NEO_DevShell
 
             if (args.Length>0)
             {
-                var lines = args[0].Split(';');
+                var input = args[0];
+                if (input.StartsWith("\"") && input.EndsWith("\""))
+                {
+                    input = input.Substring(1, input.Length - 2);
+                }
+
+                var lines = input.Split(';');
                 foreach (var line in lines)
                 {
-                    shell.Execute(line, OutputMessage);
+                    if (!string.IsNullOrEmpty(line))
+                    {
+                        shell.Execute(line, OutputMessage);
+                    }
                 }
             }
 
             while (true)
             {
+                Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Write(">");
                 var input = Console.ReadLine();
 

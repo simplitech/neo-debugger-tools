@@ -1,5 +1,6 @@
 ﻿using LunarParser;
 using LunarParser.JSON;
+using Neo.Emulation;
 using Neo.Emulation.API;
 using Neo.Emulation.Utils;
 using System;
@@ -7,10 +8,10 @@ using System.Numerics;
 
 namespace Neo.Debugger.Shell
 {
-    public class InputCommand : Command
+    public class InvokeCommand : Command
     {
-        public override string Name => "input";
-        public override string Help => "Set the input for a contract";
+        public override string Name => "invoke";
+        public override string Help => "Invokes a contract";
 
         public override void Execute(string[] args, Action<ShellMessageType, string> output)
         {
@@ -56,19 +57,22 @@ namespace Neo.Debugger.Shell
                     output(ShellMessageType.Error, "Invalid sintax.");
                     return;
                 }
-
-                output(ShellMessageType.Default, "Executing transaction...");
-
-                Shell.Debugger.Emulator.Reset(inputs, null);
-                Shell.Debugger.Emulator.Run();
-
-                var val = Shell.Debugger.Emulator.GetOutput();
-
-                Shell.Debugger.Blockchain.Save();
-
-                output(ShellMessageType.Success, "Result: " + FormattingUtils.StackItemAsString(val));
-                output(ShellMessageType.Default, "GAS used: " + Shell.Debugger.Emulator.usedGas);
             }
+
+            output(ShellMessageType.Default, "Executing transaction...");
+
+            Shell.Debugger.Emulator.Reset(inputs, null);
+            Shell.Debugger.Emulator.Run();
+
+            var val = Shell.Debugger.Emulator.GetOutput();
+
+            Shell.Debugger.Blockchain.Save();
+
+            string functionName = inputs.ChildCount>0 ? inputs[0].Value : null;
+            var hintType = !string.IsNullOrEmpty(functionName) && Shell.Debugger.ABI != null && Shell.Debugger.ABI.functions.ContainsKey(functionName) ? Shell.Debugger.ABI.functions[functionName].returnType : Emulator.Type.Unknown;
+
+            output(ShellMessageType.Success, "Result: " + FormattingUtils.StackItemAsString(val, false, hintType));
+            output(ShellMessageType.Default, "GAS used: " + Shell.Debugger.Emulator.usedGas);
         }
     }
 }

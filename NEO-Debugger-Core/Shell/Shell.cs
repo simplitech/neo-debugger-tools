@@ -45,7 +45,7 @@ namespace Neo.Debugger.Shell
             AddCommand(new HelpCommand());            
             AddCommand(new LoadCommand());
             AddCommand(new ContractCommand());
-            AddCommand(new InputCommand());
+            AddCommand(new InvokeCommand());
             AddCommand(new StorageCommand());
         }
 

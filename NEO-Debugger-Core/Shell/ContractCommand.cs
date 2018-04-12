@@ -18,55 +18,30 @@ namespace Neo.Debugger.Shell
             {
                 case "load":
                     {
-                        var filePath = args[1];
+                        var filePath = args[2];
 
                         if (File.Exists(filePath))
                         {
-                            Shell.avmPath = filePath;
-
-                            var bytes = File.ReadAllBytes(filePath);
-
-                            var avmName = Path.GetFileName(filePath);
-                            output(ShellMessageType.Success, $"Loaded {avmName} ({bytes.Length} bytes)");
-
-                            string contractName;
-
-                            var mapFile = avmName.Replace(".avm", ".debug.json");
-                            if (File.Exists(mapFile))
+                            if (!Shell.Debugger.LoadContract(filePath))
                             {
-                                var map = new NeoMapFile();
-                                map.LoadFromFile(mapFile, bytes);
-
-                                contractName = map.contractName;
-                            }
-                            else
-                            {
-                                contractName = avmName.Replace(".avm", "");
+                                output(ShellMessageType.Error, $"Error loading contract.");
+                                return;
                             }
 
-                            var address = Shell.Debugger.Blockchain.FindAddressByName(contractName);
-
-                            if (address == null)
-                            {
-                                address = Shell.Debugger.Blockchain.DeployContract(contractName, bytes);
-                                output(ShellMessageType.Success, $"Deployed {contractName} at address {address.keys.address}");
-                            }
-                            else
-                            {
-                                output(ShellMessageType.Default, $"Updated {contractName} at address {address.keys.address}");
-                            }
+                            output(ShellMessageType.Success, $"Loaded {Shell.Debugger.AvmFilePath} ({Shell.Debugger.Emulator.ContractByteCode.Length} bytes)");
 
                             Runtime.OnLogMessage = (x => output(ShellMessageType.Default, x));
-                        }
+
+                        }                    
                         else
                         {
-                            output(ShellMessageType.Error, "File not found.");
+                            output(ShellMessageType.Error, $"File not found: {filePath}");
                         }
 
                         break;
                     }
 
-                case "input":
+                case "compile":
                     {
 
                         break;

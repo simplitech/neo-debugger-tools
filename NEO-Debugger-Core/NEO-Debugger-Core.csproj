@@ -73,7 +73,7 @@
     <Compile Include="Shell\ContractCommand.cs" />
     <Compile Include="Shell\HelpCommand.cs" />
     <Compile Include="Shell\ChainCommand.cs" />
-    <Compile Include="Shell\InputCommand.cs" />
+    <Compile Include="Shell\InvokeCommand.cs" />
     <Compile Include="Shell\Shell.cs" />
     <Compile Include="Shell\StorageCommand.cs" />
     <Compile Include="Utils\InspectorSupport.cs" />
