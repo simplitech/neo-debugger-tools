@@ -48,7 +48,8 @@ namespace Neo.Debugger.Shell
             AddCommand(new StorageCommand());
             AddCommand(new BreakpointCommand());
             AddCommand(new FileCommand());
-            AddCommand(new DebugCommand());
+            AddCommand(new RunCommand());
+            AddCommand(new StepCommand());
         }
 
         public void AddCommand(Command cmd)
