@@ -28,7 +28,11 @@ namespace NEO_DevShell
 
             if (args.Length>0)
             {
-                shell.Execute("load " + args[0], OutputMessage);
+                var lines = args[0].Split(';');
+                foreach (var line in lines)
+                {
+                    shell.Execute(line, OutputMessage);
+                }
             }
 
             while (true)
