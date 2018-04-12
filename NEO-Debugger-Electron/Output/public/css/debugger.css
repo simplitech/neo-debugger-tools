@@ -141,4 +141,5 @@ div.console span.jquery-console-prompt-label { font-weight:bold }
 	padding:10px;
 	width:100%;
 	color:white;
+	z-index: 99;
 }
