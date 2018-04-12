@@ -88,7 +88,18 @@ namespace Neo.Debugger.Shell
             if (Shell.Debugger.Info.state == DebuggerState.State.Running || Shell.Debugger.Info.state == DebuggerState.State.Break)
             {
                 output(ShellMessageType.Default, "Stepping invoke.");
-                Shell.Debugger.Step();
+
+                string startFile;
+                var startLine = Shell.Debugger.ResolveLine(Shell.Debugger.Info.offset, true, out startFile);
+
+                string currentFile;
+                int currentLine;
+                do
+                {
+                    Shell.Debugger.Step();
+                    currentLine = Shell.Debugger.ResolveLine(Shell.Debugger.Info.offset, true, out currentFile);
+                } while (currentFile == startFile && currentLine == startLine);
+
                 ShellRunner.UpdateState(Shell, output);
             }
             else
