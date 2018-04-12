@@ -1355,7 +1355,7 @@ namespace Neo.Debugger.Forms
 
             _debugger.Emulator.ClearAssignments();
 
-            if (_debugger.MapLoaded)
+            if (_debugger.IsMapLoaded)
             {
                 foreach (var path in _debugger.Map.FileNames)
                 {

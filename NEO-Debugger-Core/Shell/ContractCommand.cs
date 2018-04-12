@@ -31,7 +31,7 @@ namespace Neo.Debugger.Shell
                             Runtime.OnLogMessage = (x => output(ShellMessageType.Default, x));
 
 
-                            if (Shell.Debugger.MapLoaded)
+                            if (Shell.Debugger.IsMapLoaded)
                             {
                                 foreach (var entry in Shell.Debugger.Map.FileNames)
                                 {

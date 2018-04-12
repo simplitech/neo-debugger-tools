@@ -125,7 +125,7 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
-        public bool MapLoaded
+        public bool IsMapLoaded
         {
             get
             {
@@ -372,7 +372,7 @@ namespace Neo.Debugger.Core.Utils
 
             this.IsCompiled = true;
 
-            if (MapLoaded && Map.FileNames.Any())
+            if (IsMapLoaded && Map.FileNames.Any())
             {
                 this.CurrentFilePath = Map.FileNames.FirstOrDefault();
             }

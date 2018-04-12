@@ -16,9 +16,12 @@ namespace Neo.Debugger.Shell
                 case "list":
                     {
                         output(ShellMessageType.Default, Shell.Debugger.AvmFilePath);
-                        foreach (var entry in Shell.Debugger.Map.FileNames)
+                        if (Shell.Debugger.IsMapLoaded)
                         {
-                            output(ShellMessageType.Default, entry);
+                            foreach (var entry in Shell.Debugger.Map.FileNames)
+                            {
+                                output(ShellMessageType.Default, entry);
+                            }
                         }
 
                         break;
