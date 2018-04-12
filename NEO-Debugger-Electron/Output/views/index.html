@@ -116,6 +116,8 @@
     }
     langTools.addCompleter(syntaxCompleter);
 
+	var controller;
+	var consoleClass = "jquery-console-message-value";						
 	var currentLine = null;
 	var currentMarker = null;
 	var currentState = "Invalid";
@@ -253,24 +255,27 @@
 		});
 	}
 	
+	function parseState(obj, error) {
+		debugger;
+		if (error && error != null) {
+			bootbox.alert(error.message);
+			return;						
+		} else {
+			let ret = parseLog(obj, error);
+			for (let i=0; i<ret.length; i++) {			
+				controller.report(ret[i].msg, ret[i].className);
+			}
+		}
+	}
+			
 	function runClick() {		
 		if (currentState == "Break" || currentState == "Running") {
-			executeCommand("run", function(obj, error) {
-				if (error != null) {
-					bootbox.alert(error.message);
-					return;						
-				}										
-			});					
+			executeCommand("run", parseState);
 		}
 		else {
 			bootbox.prompt("Insert input (in JSON format)", function(result){ 
 				if (result != null) {
-					executeCommand("invoke "+result, function(obj, error) {
-						if (error != null) {
-							bootbox.alert(error.message);
-							return;						
-						}										
-					});
+					executeCommand("invoke "+result, parseState);
 				}
 			});
 		}
@@ -279,12 +284,7 @@
 	
 	function stepClick() {
 		if (currentState == "Break" || currentState == "Running") {
-			executeCommand("step", function(obj, error) {
-				if (error != null) {
-					bootbox.alert(error.message);
-					return;						
-				}										
-			});		
+			executeCommand("step", parseState);		
 		}
 		else {
 			bootbox.alert("Not running!");
@@ -299,17 +299,33 @@
 		bootbox.alert("Not implemented!");
 	}
 	
+	function parseLog(obj, error) {
+		let ret = [];
+				
+		if (obj != null) {
+			if (obj.lines) {
+				let arr = obj.lines;
+				for (let i=0; i< arr.length;i++){
+					ret.push({msg:arr[i], className:consoleClass});
+				}
+			}
+		}
+		
+		if (error) {
+			ret.push({msg:err.message+"\n"+data, className:consoleClass});
+		}
+		
+		return ret;
+	}	
+	
 	function executeCommand(input, callback) {
 		$.post("/shell", { input:input } ,function(data){
 			let consoleClass = "jquery-console-message-value";						
 			let ret = [];
 			
 			try {
-				let obj = $.parseJSON(data );						
-				
-				debugger;
-				updateState(obj);
-				
+				let obj = $.parseJSON(data );										
+				updateState(obj);				
 				callback(obj, null);
 			} catch (err) {
 				callback(null, err);
@@ -326,7 +342,7 @@
 		var shell = $('<div class="shell">');
         $('#log').append(shell);
 		 
-        var controller = shell.console({
+        controller = shell.console({
            promptLabel: '> ',
            commandValidate:function(line){
              if (line == "") return false;
@@ -334,22 +350,7 @@
            },
            commandHandle:function(input, callback){					
 					executeCommand(input, function(obj, error){
-						let consoleClass = "jquery-console-message-value";						
-						let ret = [];
-						
-						if (obj != null) {
-							if (obj.lines) {
-								let arr = obj.lines;
-								for (let i=0; i< arr.length;i++){
-									ret.push({msg:arr[i], className:consoleClass});
-								}
-							}
-						}
-						
-						if (error) {
-							ret.push({msg:err.message+"\n"+data, className:consoleClass});
-						}
-						
+						let ret = parseLog(obj, error);
 						callback(ret);						
 					});
 				
@@ -358,7 +359,7 @@
            animateScroll:true,
            promptHistory:true,
          });
-		 
+				 
 	});	
 </script>
 

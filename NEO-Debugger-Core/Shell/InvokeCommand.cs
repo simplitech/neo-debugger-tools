@@ -69,6 +69,8 @@ namespace Neo.Debugger.Shell
             output(ShellMessageType.Default, "Executing transaction...");
             Shell.Debugger.Emulator.Reset(inputs, Shell.Debugger.ABI);
 
+            Runtime.OnLogMessage = (x => output(ShellMessageType.Default, x));
+
             Shell.Debugger.Run();
             ShellRunner.UpdateState(Shell, output);
         }

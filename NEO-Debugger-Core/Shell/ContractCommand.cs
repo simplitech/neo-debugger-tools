@@ -28,9 +28,6 @@ namespace Neo.Debugger.Shell
 
                             output(ShellMessageType.Success, $"Loaded {Shell.Debugger.AvmFilePath} ({Shell.Debugger.Emulator.ContractByteCode.Length} bytes)");
 
-                            Runtime.OnLogMessage = (x => output(ShellMessageType.Default, x));
-
-
                             if (Shell.Debugger.IsMapLoaded)
                             {
                                 foreach (var entry in Shell.Debugger.Map.FileNames)
