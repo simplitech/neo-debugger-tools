@@ -1,5 +1,6 @@
 ﻿using LunarParser;
 using LunarParser.JSON;
+using Neo.Debugger.Core.Utils;
 using Neo.Emulation;
 using Neo.Emulation.API;
 using Neo.Emulation.Utils;
@@ -8,6 +9,59 @@ using System.Numerics;
 
 namespace Neo.Debugger.Shell
 {
+    public static class ShellRunner
+    {
+        public static void Run(DebuggerShell Shell, Action<ShellMessageType, string> output)
+        {
+            Shell.Debugger.Run();
+            var state = Shell.Debugger.State;
+
+            switch (state.state)
+            {
+                case DebuggerState.State.Finished: OnFinished(Shell, output); break;
+
+                case DebuggerState.State.Break:
+                    {
+                        string filePath;
+                        int lineNumber;
+                        lineNumber = Shell.Debugger.ResolveLine(state.offset, true, out filePath);
+
+                        lineNumber++;
+                        output(ShellMessageType.Default, $"Breakpoint hit, line {lineNumber} in {filePath}");
+
+                        int count = 0;
+
+                        foreach (var entry in Shell.Debugger.Emulator.Variables)
+                        {
+                            var val = FormattingUtils.StackItemAsString(entry.value, false, entry.type);
+                            output(ShellMessageType.Default, $"\t{entry.name} = {val}");
+                            count++;
+                        }
+                        break;
+                    }
+
+                default:
+                    {
+                        output(ShellMessageType.Default, "VM state: " + state.state);
+                        break;
+                    }
+            }
+        }
+
+        private static void OnFinished(DebuggerShell Shell, Action<ShellMessageType, string> output)
+        {
+            var val = Shell.Debugger.Emulator.GetOutput();
+
+            Shell.Debugger.Blockchain.Save();
+
+            var methodName = Shell.Debugger.Emulator.currentMethod;
+            var hintType = !string.IsNullOrEmpty(methodName) && Shell.Debugger.ABI != null && Shell.Debugger.ABI.functions.ContainsKey(methodName) ? Shell.Debugger.ABI.functions[methodName].returnType : Emulator.Type.Unknown;
+
+            output(ShellMessageType.Success, "Result: " + FormattingUtils.StackItemAsString(val, false, hintType));
+            output(ShellMessageType.Default, "GAS used: " + Shell.Debugger.Emulator.usedGas);
+        }
+    }
+
     public class InvokeCommand : Command
     {
         public override string Name => "invoke";
@@ -15,6 +69,12 @@ namespace Neo.Debugger.Shell
 
         public override void Execute(string[] args, Action<ShellMessageType, string> output)
         {
+            if (Shell.Debugger.IsSteppingOrOnBreakpoint)
+            {
+                output(ShellMessageType.Error, $"Please finish debugging the current invoke: {Shell.Debugger.Emulator.currentMethod}");
+                return;
+            }
+
             DataNode inputs;
 
             try
@@ -60,19 +120,10 @@ namespace Neo.Debugger.Shell
             }
 
             output(ShellMessageType.Default, "Executing transaction...");
-
             Shell.Debugger.Emulator.Reset(inputs, null);
-            Shell.Debugger.Emulator.Run();
 
-            var val = Shell.Debugger.Emulator.GetOutput();
-
-            Shell.Debugger.Blockchain.Save();
-
-            string functionName = inputs.ChildCount>0 ? inputs[0].Value : null;
-            var hintType = !string.IsNullOrEmpty(functionName) && Shell.Debugger.ABI != null && Shell.Debugger.ABI.functions.ContainsKey(functionName) ? Shell.Debugger.ABI.functions[functionName].returnType : Emulator.Type.Unknown;
-
-            output(ShellMessageType.Success, "Result: " + FormattingUtils.StackItemAsString(val, false, hintType));
-            output(ShellMessageType.Default, "GAS used: " + Shell.Debugger.Emulator.usedGas);
+            ShellRunner.Run(Shell, output);
         }
+
     }
 }

@@ -23,12 +23,13 @@ namespace NEO_DevShell
         {
             Console.WriteLine("NEO Developer Shell - "+ DebuggerUtils.DebuggerVersion);
             var settings = new DebuggerSettings(Directory.GetCurrentDirectory());
-            var shell = new DebuggerShell(settings);
+            var debugger = new DebugManager(settings);
+            var shell = new DebuggerShell(debugger);
             shell.AddCommand(new ExitCommand());
 
             if (args.Length>0)
             {
-                var input = args[0];
+                var input = args[0].Replace("'","\"");
                 if (input.StartsWith("\"") && input.EndsWith("\""))
                 {
                     input = input.Substring(1, input.Length - 2);
@@ -39,6 +40,7 @@ namespace NEO_DevShell
                 {
                     if (!string.IsNullOrEmpty(line))
                     {
+                        Console.WriteLine(line);
                         shell.Execute(line, OutputMessage);
                     }
                 }
@@ -66,7 +68,7 @@ namespace NEO_DevShell
             {
                 case ShellMessageType.Error: Console.ForegroundColor = ConsoleColor.Red; break;
                 case ShellMessageType.Success: Console.ForegroundColor = ConsoleColor.Green; break;
-                case ShellMessageType.Default: Console.ForegroundColor = ConsoleColor.Gray; break;
+                case ShellMessageType.Default: Console.ForegroundColor = ConsoleColor.DarkGray; break;
             }
             Console.WriteLine(text);
         }

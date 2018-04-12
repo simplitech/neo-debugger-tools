@@ -35,7 +35,8 @@ namespace Neo.Debugger.Shell
                         {
                             int lineNumber = int.Parse(args[2]);
                             var fileName = args[3];
-                            Shell.Debugger.AddBreakpoint(lineNumber, fileName);
+                            
+                            Shell.Debugger.AddBreakpoint(lineNumber - 1, fileName);
                             output(ShellMessageType.Default, $"Breakpoint set in line {lineNumber} of {fileName}");
                         }
                         else
@@ -52,7 +53,7 @@ namespace Neo.Debugger.Shell
                         {
                             int lineNumber = int.Parse(args[2]);
                             var fileName = args[3];
-                            Shell.Debugger.RemoveBreakpoint(lineNumber, fileName);
+                            Shell.Debugger.RemoveBreakpoint(lineNumber - 1, fileName);
                             output(ShellMessageType.Default, $"Breakpoint removd from line {lineNumber} of {fileName}");
                         }
                         else

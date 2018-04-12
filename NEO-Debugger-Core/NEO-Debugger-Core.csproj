@@ -72,6 +72,7 @@
     <Compile Include="Profiler\ProfilerContext.cs" />
     <Compile Include="Shell\BreakpointCommand.cs" />
     <Compile Include="Shell\ContractCommand.cs" />
+    <Compile Include="Shell\DebugCommand.cs" />
     <Compile Include="Shell\FileCommand.cs" />
     <Compile Include="Shell\HelpCommand.cs" />
     <Compile Include="Shell\ChainCommand.cs" />

@@ -82,6 +82,7 @@ namespace Neo.Emulation
         public class Variable
         {
             public StackItem value;
+            public string name;
             public Type type;
         }
 
@@ -114,6 +115,8 @@ namespace Neo.Emulation
 
         public Account currentAccount { get; private set; }
         public API.Transaction currentTransaction { get; private set; }
+
+        public string currentMethod { get; private set; }
 
         private UInt160 currentHash;
 
@@ -278,6 +281,8 @@ namespace Neo.Emulation
             lastState = new DebuggerState(DebuggerState.State.Reset, 0);
             currentTransaction = null;
 
+            this.currentMethod = inputs.ChildCount > 0 ? inputs[0].Value : null;
+
             _variables.Clear();
             this._ABI = ABI;
         }
@@ -329,7 +334,7 @@ namespace Neo.Emulation
                                 varType = prevVal.type;
                             }
 
-                            _variables[entry.name] = new Variable() { value = val, type = varType };
+                            _variables[entry.name] = new Variable() { value = val, type = varType, name = entry.name };
 
                             index++;
                         }
@@ -358,7 +363,7 @@ namespace Neo.Emulation
                         try
                         {
                             var val = engine.EvaluationStack.Peek();
-                            _variables[ass.name] =  new Variable() { value = val, type = ass.type };
+                            _variables[ass.name] =  new Variable() { value = val, type = ass.type, name = ass.name };
                         }
                         catch
                         {
@@ -611,6 +616,8 @@ namespace Neo.Emulation
 
         private Dictionary<int, Assignment> _assigments = new Dictionary<int, Assignment>();
         private Dictionary<string, Variable> _variables = new Dictionary<string, Variable>();
+
+        public IEnumerable<Variable> Variables => _variables.Values;
 
         public void ClearAssignments()
         {

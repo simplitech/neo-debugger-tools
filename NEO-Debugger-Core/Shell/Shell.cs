@@ -33,14 +33,13 @@ namespace Neo.Debugger.Shell
 
         public string avmPath;
 
-        public DebugManager Debugger { get; private set; }
+        public readonly DebugManager Debugger;
         private DebuggerSettings _settings;
 
-        public DebuggerShell(DebuggerSettings settings)
+        public DebuggerShell(DebugManager debugger) 
         {
-            this._settings = settings;
-
-            this.Debugger = new DebugManager(_settings);
+            this.Debugger = debugger;
+            this._settings = debugger.Settings;
 
             AddCommand(new HelpCommand());            
             AddCommand(new LoadCommand());
@@ -49,6 +48,7 @@ namespace Neo.Debugger.Shell
             AddCommand(new StorageCommand());
             AddCommand(new BreakpointCommand());
             AddCommand(new FileCommand());
+            AddCommand(new DebugCommand());
         }
 
         public void AddCommand(Command cmd)
