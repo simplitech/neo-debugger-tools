@@ -1361,22 +1361,7 @@ namespace Neo.Debugger.Forms
                 {
                     AddNodeToProjectTree(path);
 
-                    var content = _debugger.GetContentFor(path);
-                    var lang = LanguageSupport.DetectLanguage(path);
-                    var assignments = InspectorSupport.ParseAssigments(content, lang);
-                    foreach (var entry in assignments)
-                    {
-                        try
-                        {
-                            var ofs = _debugger.Map.ResolveEndOffset(entry.Key, path);
-                            _debugger.Emulator.AddAssigment(ofs, entry.Value.name, entry.Value.type);
-                        }
-                        catch
-                        {
-                            continue;
-                        }
-                    }
-
+                    _debugger.LoadAssignmentsFromContent(path);
                 }
             }
         }

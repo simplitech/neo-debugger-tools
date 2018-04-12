@@ -766,5 +766,25 @@ namespace Neo.Debugger.Core.Utils
         {
             Log("Compiler: " + e.Message);
         }
+
+        public void LoadAssignmentsFromContent(string path)
+        {
+            var content = this.GetContentFor(path);
+            var lang = LanguageSupport.DetectLanguage(path);
+            var assignments = InspectorSupport.ParseAssigments(content, lang);
+            foreach (var entry in assignments)
+            {
+                try
+                {
+                    var ofs = this.Map.ResolveEndOffset(entry.Key, path);
+                    this.Emulator.AddAssigment(ofs, entry.Value.name, entry.Value.type);
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+        }
+
     }
 }
