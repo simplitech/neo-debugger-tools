@@ -65,6 +65,18 @@ namespace Neo.Debugger.Forms
             //Use settings from the My Documents folder
             _settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
 
+            //Init the UI controls
+            InitUI();
+
+            //Setup emulator log
+            Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
+
+            //Init the debugger
+            InitDebugger();
+
+            // load all templates in the Contracts folder and sort them by languuage
+            LoadTemplates();
+
             if (string.IsNullOrEmpty(_sourceAvmPath))
             {
                 if (!String.IsNullOrEmpty(_settings.lastOpenedFile))
@@ -76,20 +88,7 @@ namespace Neo.Debugger.Forms
                     //Let's create a new file since we have nothing loaded from the command line and we haven't opened any files before
                     LoadContractTemplate("HelloWorld.cs");
                 }
-                
             }
-
-            //Init the UI controls
-            InitUI();
-
-            // load all templates in the Contracts folder and sort them by languuage
-            LoadTemplates();
-
-            //Setup emulator log
-            Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
-
-            //Init the debugger
-            InitDebugger();
         }
 
         private void LoadTemplates()
