@@ -49,9 +49,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="IcoContract.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="build.tasks" />
     <None Include="nmap.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
