@@ -36,8 +36,8 @@
     <Reference Include="LunarParser, Version=1.0.32.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LunarParser.1.0.32\lib\net471\LunarParser.dll</HintPath>
     </Reference>
-    <Reference Include="Neo.Lux, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NeoLux.0.5.0\lib\net461\Neo.Lux.dll</HintPath>
+    <Reference Include="Neo.Lux, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NeoLux.0.6.0\lib\net461\Neo.Lux.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

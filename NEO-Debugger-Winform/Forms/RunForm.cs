@@ -24,14 +24,7 @@ namespace Neo.Debugger.Forms
 
         public AVMFunction currentMethod { get; private set; }
 
-        private DebugParameters _debugParameters;
-        public DebugParameters DebugParameters
-        {
-            get
-            {
-                return _debugParameters;
-            }
-        }
+        public DebugParameters DebugParameters { get; private set; }
 
         private string _defaultPrivateKey;
         private Dictionary<string, string> _defaultParams;
@@ -87,10 +80,10 @@ namespace Neo.Debugger.Forms
             var key = paramsList.Text;
             var f = _abi.functions[key];
 
-            _debugParameters = new DebugParameters();
+            DebugParameters = new DebugParameters();
 
             //Get the private key used
-            _debugParameters.PrivateKey = privateKeyInput.Text;
+            DebugParameters.PrivateKey = privateKeyInput.Text;
 
             //Get the witness mode
             CheckWitnessMode witnessMode;
@@ -100,7 +93,7 @@ namespace Neo.Debugger.Forms
             {
                 return false;
             }
-            _debugParameters.WitnessMode = witnessMode;
+            DebugParameters.WitnessMode = witnessMode;
 
             //Get the trigger type
             TriggerType type;
@@ -110,155 +103,160 @@ namespace Neo.Debugger.Forms
             {
                 return false;
             }
-            _debugParameters.TriggerType = type;
-            
+            DebugParameters.TriggerType = type;
+
+            var HasRawScript = RawScriptText.Text.Length != 0;
+
             //Get the arguments list
-            var argList = "";
-            if (f.inputs != null)
+            if (!HasRawScript)
             {
-                int index = 0;
-                foreach (var p in f.inputs)
+                var argList = "";
+                if (f.inputs != null)
                 {
-                    var temp = ($"{key}_{f.name}").ToLower();
-                    var name = inputGrid.Rows[index].Cells[0].Value;
-
-                    object val;
-
-                    // detect placeholder
-                    if (inputGrid.Rows[index].Cells[1].Style.ForeColor == Color.Gray)
+                    int index = 0;
+                    foreach (var p in f.inputs)
                     {
-                        val = "";
-                    }
-                    else
-                    {
-                        val = ReadCellVal(index, 1);
-                    }
+                        var temp = ($"{key}_{f.name}").ToLower();
+                        var name = inputGrid.Rows[index].Cells[0].Value;
 
-                    if (val == null)
-                    {
-                        val = ""; // temporary hack, necessary to avoid VM crash
-                    }
+                        object val;
 
-                    if (val != null && !val.Equals(""))
-                    {
-                        var param_key = (currentContractName + "_" + f.name + "_" + p.name).ToLower();
-                        //Add our default running parameters for next time
-                        _debugParameters.DefaultParams[param_key] = val.ToString();
-                    }
-
-                    if (index > 0)
-                    {
-                        argList += ",";
-                    }
-
-                    if (p.type == Emulator.Type.Array || p.type == Emulator.Type.ByteArray)
-                    {
-                        var s = val.ToString();
-
-                        if (s.StartsWith("[") && s.EndsWith("]"))
+                        // detect placeholder
+                        if (inputGrid.Rows[index].Cells[1].Style.ForeColor == Color.Gray)
                         {
-                            val = s;
+                            val = "";
                         }
                         else
-                        if (s.StartsWith("\"") && s.EndsWith("\""))
                         {
-                            s = s.Substring(1, s.Length - 2);
-                            if (DebuggerUtils.IsHex(s))
+                            val = ReadCellVal(index, 1);
+                        }
+
+                        if (val == null)
+                        {
+                            val = ""; // temporary hack, necessary to avoid VM crash
+                        }
+
+                        if (val != null && !val.Equals(""))
+                        {
+                            var param_key = (currentContractName + "_" + f.name + "_" + p.name).ToLower();
+                            //Add our default running parameters for next time
+                            DebugParameters.DefaultParams[param_key] = val.ToString();
+                        }
+
+                        if (index > 0)
+                        {
+                            argList += ",";
+                        }
+
+                        if (p.type == Emulator.Type.Array || p.type == Emulator.Type.ByteArray)
+                        {
+                            var s = val.ToString();
+
+                            if (s.StartsWith("[") && s.EndsWith("]"))
                             {
-                                var bytes = s.HexToBytes();
-                                s = DebuggerUtils.BytesToString(bytes);
+                                val = s;
                             }
-                            else if (DebuggerUtils.IsValidWallet(s))
+                            else
+                            if (s.StartsWith("\"") && s.EndsWith("\""))
                             {
-                                var scriptHash = s.AddressToScriptHash();
-                                s = DebuggerUtils.BytesToString(scriptHash);
+                                s = s.Substring(1, s.Length - 2);
+                                if (DebuggerUtils.IsHex(s))
+                                {
+                                    var bytes = s.HexToBytes();
+                                    s = DebuggerUtils.BytesToString(bytes);
+                                }
+                                else if (DebuggerUtils.IsValidWallet(s))
+                                {
+                                    var scriptHash = s.AddressToScriptHash();
+                                    s = DebuggerUtils.BytesToString(scriptHash);
+                                }
+                                else
+                                {
+                                    ShowArgumentError(f, index, val);
+                                    return false;
+                                }
+
+                                val = $"[{s}]";
                             }
                             else
                             {
                                 ShowArgumentError(f, index, val);
                                 return false;
                             }
-
-                            val = $"[{s}]";
                         }
                         else
-                        {
-                            ShowArgumentError(f, index, val);
-                            return false;
-                        }
+                            switch (p.type)
+                            {
+                                case Emulator.Type.String:
+                                    {
+                                        var s = val.ToString();
+                                        if (!s.StartsWith("\"") || !s.EndsWith("\""))
+                                        {
+                                            ShowArgumentError(f, index, val);
+                                            return false;
+                                        }
+
+                                        break;
+                                    }
+
+                                case Emulator.Type.Integer:
+                                    {
+                                        BigInteger n;
+                                        var s = val.ToString();
+                                        if (string.IsNullOrEmpty(s) || !BigInteger.TryParse(s, out n))
+                                        {
+                                            ShowArgumentError(f, index, val);
+                                            ResetTabs();
+                                            return false;
+                                        }
+                                        break;
+                                    }
+
+                                case Emulator.Type.Boolean:
+                                    {
+                                        switch (val.ToString().ToLower())
+                                        {
+                                            case "true": val = true; break;
+                                            case "false": val = false; break;
+                                            default:
+                                                {
+                                                    ShowArgumentError(f, index, val);
+                                                    ResetTabs();
+                                                    return false;
+                                                }
+
+                                        }
+                                        break;
+                                    }
+                            }
+
+                        argList += val;
+                        index++;
                     }
-                    else
-                        switch (p.type)
-                        {
-                            case Emulator.Type.String:
-                                {
-                                    var s = val.ToString();
-                                    if (!s.StartsWith("\"") || !s.EndsWith("\""))
-                                    {
-                                        ShowArgumentError(f, index, val);
-                                        return false;
-                                    }
-
-                                    break;
-                                }
-
-                            case Emulator.Type.Integer:
-                                {
-                                    BigInteger n;
-                                    var s = val.ToString();
-                                    if (string.IsNullOrEmpty(s) || !BigInteger.TryParse(s, out n))
-                                    {
-                                        ShowArgumentError(f, index, val);
-                                        ResetTabs();
-                                        return false;
-                                    }
-                                    break;
-                                }
-
-                            case Emulator.Type.Boolean:
-                                {
-                                    switch (val.ToString().ToLower())
-                                    {
-                                        case "true": val = true; break;
-                                        case "false": val = false; break;
-                                        default:
-                                            {
-                                                ShowArgumentError(f, index, val);
-                                                ResetTabs();
-                                                return false;
-                                            }
-
-                                    }
-                                    break;
-                                }
-                        }
-
-                    argList += val;
-                    index++;
                 }
-            }
-            if (key != _abi.entryPoint.name)
-            {
-                if (f.inputs == null || f.inputs.Count == 0)
+                if (key != _abi.entryPoint.name)
                 {
-                    argList = "[null]";
+                    if (f.inputs == null || f.inputs.Count == 0)
+                    {
+                        argList = "[null]";
+                    }
+                    var operation = Char.ToLowerInvariant(key[0]) + key.Substring(1);
+                    argList = $"\"{operation}\", {argList}";
                 }
-                var operation = Char.ToLowerInvariant(key[0]) + key.Substring(1);
-                argList = $"\"{operation}\", {argList}";
+
+                //Set the arguments list
+                try
+                {
+                    DebugParameters.ArgList = DebuggerUtils.GetArgsListAsNode(argList);
+                }
+                catch
+                {
+                    MessageBox.Show("Error parsing input!");
+                    ResetTabs();
+                    return false;
+                }
             }
 
-            //Set the arguments list
-            try
-            {
-                _debugParameters.ArgList = DebuggerUtils.GetArgsListAsNode(argList);
-            }
-            catch
-            {
-                MessageBox.Show("Error parsing input!");
-                ResetTabs();
-                return false;
-            }
-            
             if (assetComboBox.SelectedIndex > 0)
             {
                 foreach (var entry in Asset.Entries)
@@ -275,7 +273,7 @@ namespace Neo.Debugger.Forms
                             amount *= Asset.Decimals; // fix decimals
 
                             //Add the transaction info
-                            _debugParameters.Transaction.Add(entry.id, amount);
+                            DebugParameters.Transaction.Add(entry.id, amount);
                         }
                         else
                         {
@@ -296,8 +294,10 @@ namespace Neo.Debugger.Forms
             }
             else
             {
-                _debugParameters.Timestamp = timestamp;
+                DebugParameters.Timestamp = timestamp;
             }
+
+            DebugParameters.RawScript = HasRawScript ? RawScriptText.Text.HexToBytes() : null;
 
             return true;
         }

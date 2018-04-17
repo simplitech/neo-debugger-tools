@@ -148,79 +148,15 @@ namespace Neo.Emulation
 
         private int lastOffset = -1;
 
-        private static void EmitObject(ScriptBuilder sb, object item)
-        {
-            if (item is byte[])
-            {
-                var arr = (byte[])item;
-
-                for (int index = arr.Length - 1; index >= 0; index--)
-                {
-                    sb.EmitPush(arr[index]);
-                }
-
-                sb.EmitPush(arr.Length);
-                sb.Emit(OpCode.PACK);
-            }
-            else
-            if (item is List<object>)
-            {
-                var list = (List<object>)item;
-
-                for (int index = 0; index < list.Count; index++)
-                {
-                    EmitObject(sb, list[index]);
-                }              
-
-                sb.EmitPush(list.Count);
-                sb.Emit(OpCode.PACK);
-
-                /*sb.Emit((OpCode)((int)OpCode.PUSHT + list.Count - 1));
-                sb.Emit(OpCode.NEWARRAY);
-
-                for (int index = 0; index < list.Count; index++)
-                {
-                    sb.Emit(OpCode.DUP); // duplicates array reference into top of stack
-                    sb.EmitPush(new BigInteger(index));
-                    EmitObject(sb, list[index]);
-                    sb.Emit(OpCode.SETITEM);
-                }*/
-            }
-            else
-            if (item == null)
-            {
-                sb.EmitPush("");
-            }
-            else
-            if (item is string)
-            {
-                sb.EmitPush((string)item);
-            }
-            else
-            if (item is bool)
-            {
-                sb.EmitPush((bool)item);
-            }
-            else
-            if (item is BigInteger)
-            {
-                sb.EmitPush((BigInteger)item);
-            }
-            else
-            {
-                throw new Exception("Unsupport contract param: " + item.ToString());
-            }
-        }
-
         private ABI _ABI;
 
-        public void Reset(DataNode inputs, ABI ABI)
+        public void Reset(byte[] inputScript, ABI ABI, string methodName)
         {
             if (ContractByteCode == null || ContractByteCode.Length == 0)
             {
                 throw new Exception("Contract bytecode is not set yet!");
             }
-            
+
             if (lastState.state == DebuggerState.State.Reset)
             {
                 return;
@@ -238,6 +174,9 @@ namespace Neo.Emulation
             currentTransaction.emulator = this;
             engine = new ExecutionEngine(currentTransaction, null, interop);
             engine.LoadScript(ContractByteCode);
+            engine.LoadScript(inputScript);
+
+            this.currentMethod = methodName;
 
             foreach (var output in currentTransaction.outputs)
             {
@@ -252,6 +191,17 @@ namespace Neo.Emulation
                 engine.AddBreakPoint((uint)pos);
             }
 
+            //engine.Reset();
+
+            lastState = new DebuggerState(DebuggerState.State.Reset, 0);
+            currentTransaction = null;
+
+            _variables.Clear();
+            this._ABI = ABI;
+        }
+
+        public byte[] GenerateLoaderScriptFromInputs(DataNode inputs)
+        {
             using (ScriptBuilder sb = new ScriptBuilder())
             {
                 var items = new Stack<object>();
@@ -268,23 +218,14 @@ namespace Neo.Emulation
                 while (items.Count > 0)
                 {
                     var item = items.Pop();
-                    EmitObject(sb, item);
+                    NeoAPI.EmitObject(sb, item);
                 }
 
                 var loaderScript = sb.ToArray();
                 //System.IO.File.WriteAllBytes("loader.avm", loaderScript);
-                engine.LoadScript(loaderScript);
+
+                return loaderScript;
             }
-
-            //engine.Reset();
-
-            lastState = new DebuggerState(DebuggerState.State.Reset, 0);
-            currentTransaction = null;
-
-            this.currentMethod = inputs.ChildCount > 0 ? inputs[0].Value : null;
-
-            _variables.Clear();
-            this._ABI = ABI;
         }
 
         public void SetBreakpointState(int ofs, bool enabled)
@@ -314,6 +255,11 @@ namespace Neo.Emulation
                 while (engine.CurrentContext == initialContext)
                 {
                     engine.StepInto();
+
+                    if (engine.State != VMState.NONE)
+                    {
+                        return false;
+                    }
                 }
 
                 if (this._ABI != null && _ABI.entryPoint != null)

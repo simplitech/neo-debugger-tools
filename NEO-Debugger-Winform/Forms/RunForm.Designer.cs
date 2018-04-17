@@ -48,13 +48,15 @@
             this.privateKeyInput = new System.Windows.Forms.TextBox();
             this.assetComboBox = new System.Windows.Forms.ComboBox();
             this.optionsPage = new System.Windows.Forms.TabPage();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.timestampBox = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.witnessComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.triggerComboBox = new System.Windows.Forms.ComboBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.timestampBox = new System.Windows.Forms.TextBox();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.RawScriptText = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.inputGrid)).BeginInit();
             this.runTabs.SuspendLayout();
             this.methodTab.SuspendLayout();
@@ -262,6 +264,8 @@
             // 
             // optionsPage
             // 
+            this.optionsPage.Controls.Add(this.label8);
+            this.optionsPage.Controls.Add(this.RawScriptText);
             this.optionsPage.Controls.Add(this.dateTimePicker1);
             this.optionsPage.Controls.Add(this.timestampBox);
             this.optionsPage.Controls.Add(this.label7);
@@ -276,6 +280,31 @@
             this.optionsPage.TabIndex = 2;
             this.optionsPage.Text = "Options";
             this.optionsPage.UseVisualStyleBackColor = true;
+            // 
+            // dateTimePicker1
+            // 
+            this.dateTimePicker1.Location = new System.Drawing.Point(226, 92);
+            this.dateTimePicker1.Name = "dateTimePicker1";
+            this.dateTimePicker1.Size = new System.Drawing.Size(200, 20);
+            this.dateTimePicker1.TabIndex = 6;
+            this.dateTimePicker1.ValueChanged += new System.EventHandler(this.dateTimePicker1_ValueChanged);
+            // 
+            // timestampBox
+            // 
+            this.timestampBox.Location = new System.Drawing.Point(99, 92);
+            this.timestampBox.Name = "timestampBox";
+            this.timestampBox.Size = new System.Drawing.Size(121, 20);
+            this.timestampBox.TabIndex = 5;
+            this.timestampBox.TextChanged += new System.EventHandler(this.timestampBox_TextChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(6, 95);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(58, 13);
+            this.label7.TabIndex = 4;
+            this.label7.Text = "Timestamp";
             // 
             // label5
             // 
@@ -320,30 +349,22 @@
             this.triggerComboBox.Size = new System.Drawing.Size(121, 21);
             this.triggerComboBox.TabIndex = 0;
             // 
-            // label7
+            // RawScriptText
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(6, 95);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(58, 13);
-            this.label7.TabIndex = 4;
-            this.label7.Text = "Timestamp";
+            this.RawScriptText.Location = new System.Drawing.Point(99, 132);
+            this.RawScriptText.Multiline = true;
+            this.RawScriptText.Name = "RawScriptText";
+            this.RawScriptText.Size = new System.Drawing.Size(327, 153);
+            this.RawScriptText.TabIndex = 7;
             // 
-            // timestampBox
+            // label8
             // 
-            this.timestampBox.Location = new System.Drawing.Point(99, 92);
-            this.timestampBox.Name = "timestampBox";
-            this.timestampBox.Size = new System.Drawing.Size(121, 20);
-            this.timestampBox.TabIndex = 5;
-            this.timestampBox.TextChanged += new System.EventHandler(this.timestampBox_TextChanged);
-            // 
-            // dateTimePicker1
-            // 
-            this.dateTimePicker1.Location = new System.Drawing.Point(226, 92);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(200, 20);
-            this.dateTimePicker1.TabIndex = 6;
-            this.dateTimePicker1.ValueChanged += new System.EventHandler(this.dateTimePicker1_ValueChanged);
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(6, 132);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(63, 13);
+            this.label8.TabIndex = 8;
+            this.label8.Text = "RAW Script";
             // 
             // RunForm
             // 
@@ -400,5 +421,7 @@
         private System.Windows.Forms.TextBox timestampBox;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.DateTimePicker dateTimePicker1;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.TextBox RawScriptText;
     }
 }

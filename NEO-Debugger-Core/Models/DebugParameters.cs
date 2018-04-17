@@ -30,5 +30,7 @@ namespace Neo.Debugger.Core.Models
         public DataNode ArgList { get; set; }
 
         public uint Timestamp { get; set; }
+
+        public byte[] RawScript;
     }
 }

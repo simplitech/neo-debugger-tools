@@ -67,7 +67,11 @@ namespace Neo.Debugger.Shell
             }
 
             output(ShellMessageType.Default, "Executing transaction...");
-            Shell.Debugger.Emulator.Reset(inputs, Shell.Debugger.ABI);
+
+            var loaderScript = Shell.Debugger.Emulator.GenerateLoaderScriptFromInputs(inputs);
+            var methodName = inputs.ChildCount > 0 ? inputs[0].Value : null;
+
+            Shell.Debugger.Emulator.Reset(loaderScript, Shell.Debugger.ABI, methodName);
 
             Runtime.OnLogMessage = (x => output(ShellMessageType.Default, x));
 
