@@ -30,7 +30,8 @@ namespace ICO_Unit_Tests
             inputs.AddValue("symbol");
             inputs.AddValue(null);
 
-            emulator.Reset(inputs, null);
+            var script = emulator.GenerateLoaderScriptFromInputs(inputs);
+            emulator.Reset(script, null, null);
             emulator.Run();
 
             var result = emulator.GetOutput();
