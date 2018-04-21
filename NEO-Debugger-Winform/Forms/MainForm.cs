@@ -240,6 +240,8 @@ namespace Neo.Debugger.Forms
 
         private bool CompileContract()
         {
+            ClearLog();
+
             if (!_settings.compilerPaths.ContainsKey(_sourceLanguage))
             {
                 string compilerPath = "";
@@ -340,7 +342,10 @@ namespace Neo.Debugger.Forms
             }
 
             if (_debugger.ResetFlag && !ResetDebugger())
+            {
+                //MessageBox.Show("Error initializing debugger");
                 return;
+            }
 
             _debugger.Run();
             UpdateDebuggerStateUI();
@@ -730,6 +735,7 @@ namespace Neo.Debugger.Forms
             openFileDialog.Filter = "NEO AVM files|*.avm";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
+                ClearLog();
                 LoadContract(openFileDialog.FileName);
             }
         }
