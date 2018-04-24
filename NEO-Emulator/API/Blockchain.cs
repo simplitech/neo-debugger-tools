@@ -35,7 +35,7 @@ namespace Neo.Emulation.API
             }
         }
 
-        public static readonly string InitialPrivateWIF = "L1nqvvVGGesAQ5vLyyR21Q2gVt4ifw8ZrKGJa58tv9xP7hGa2SMx";
+        public static readonly string InitialPrivateWIF = "KxDgvEKzgSBPPfuVfw67oPQBSjidEiqTHURKSDL1R7yGaGYAeYnr";
 
         public Blockchain()
         {
