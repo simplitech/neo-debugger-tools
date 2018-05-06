@@ -461,8 +461,8 @@ namespace Neo.Emulation
 
             var tx = new API.Transaction(block);
             //tx.inputs.Add(new TransactionInput(-1, src_hash));
-            tx.outputs.Add(new TransactionOutput(assetID, amount, dst_hash));
-            tx.outputs.Add(new TransactionOutput(assetID, total_amount - amount, src_hash));
+            tx.outputs.Add(new API.TransactionOutput(assetID, amount, dst_hash));
+            tx.outputs.Add(new API.TransactionOutput(assetID, total_amount - amount, src_hash));
 
             blockchain.ConfirmBlock(block);
           
