@@ -862,23 +862,30 @@ namespace Neo.Debugger.Forms
                 return;
             }
 
-            _sourceFileName = fileName;
-            _debugger.Clear();
-
-            string templateCode = File.ReadAllText(templatePath);
-
-            var language = LanguageSupport.DetectLanguage(fileName);
-
-            ReloadTextArea(fileName, templateCode);
-
-            if (!this.CompileContract())
+            try
             {
-                MessageBox.Show($"Could not compile {LanguageSupport.GetLanguageName(language)} template!");
-                return;
-            }
+                _sourceFileName = fileName;
+                _debugger.Clear();
 
-            // We force reload of the avm in order to initialize everything properly (eg: build the project file explorer)
-            LoadContract(_debugger.AvmFilePath);
+                string templateCode = File.ReadAllText(templatePath);
+
+                var language = LanguageSupport.DetectLanguage(fileName);
+
+                ReloadTextArea(fileName, templateCode);
+
+                if (!this.CompileContract())
+                {
+                    MessageBox.Show($"Could not compile {LanguageSupport.GetLanguageName(language)} template!");
+                    return;
+                }
+
+                // We force reload of the avm in order to initialize everything properly (eg: build the project file explorer)
+                LoadContract(_debugger.AvmFilePath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"Loading contract template failed with exception: "+e.Message);
+            }
         }
 
         private SourceLanguage FromMenuItem(ToolStripItem item)
