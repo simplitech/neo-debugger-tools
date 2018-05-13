@@ -500,7 +500,7 @@ namespace Neo.Emulation
                 else
                 {
                     var list = new List<object>();
-                    for (int i=item.ChildCount-1; i>=0; i--)
+                    for (int i = 0; i< item.ChildCount; i++)
                     {
                         var child = item.GetNodeByIndex(i);
                         list.Add(ConvertArgument(child));
