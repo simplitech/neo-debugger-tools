@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿// PROVIDE NEOLUX API to interact with the emulator
+
+using System.Collections.Generic;
 using Neo.Lux.Cryptography;
 using Neo.Emulation.API;
 using Neo.Lux.Core;
@@ -9,10 +11,12 @@ namespace Neo.Emulation
     public class NeoEmulator : NeoAPI
     {
         private Blockchain blockchain;
+        private Emulator emulator;
 
         public NeoEmulator()
         {
             this.blockchain = new Blockchain();
+            this.emulator = new Emulator(this.blockchain);
         }
 
         public override Dictionary<string, decimal> GetAssetBalancesOf(string address)
@@ -55,6 +59,31 @@ namespace Neo.Emulation
         }
 
         public override bool SendRawTransaction(string hexTx)
+        {
+            var bytes = hexTx.HexToBytes();
+            var tx = Neo.Lux.Core.Transaction.Unserialize(bytes);
+
+            switch (tx.type)
+            {
+                case Lux.Core.TransactionType.ContractTransaction:
+                    {
+                        var loaderScript = tx.script;
+                        string methodName = null;
+
+                        emulator.Reset(loaderScript, null, methodName);
+
+                        var state = emulator.Run();
+                        return true;
+                    }
+
+                default:
+                    {
+                        return false;
+                    }
+            }
+        }
+
+        public override Lux.Core.Transaction GetTransaction(string hash)
         {
             throw new System.NotImplementedException();
         }
