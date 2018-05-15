@@ -53,11 +53,11 @@ namespace Neo.Debugger.Core.Utils
             {
                 case SourceLanguage.CSharp:
                     {
-                        var file = Path.Combine(info.WorkingDirectory, "neon.exe");
-                        if (!File.Exists(file))
-                            throw new FileNotFoundException("File not found", file);
+                        var compilePath = Path.Combine(info.WorkingDirectory, "neon.exe");
+                        if (!File.Exists(compilePath))
+                            throw new FileNotFoundException("Compiler not found.\nExpected path: "+ compilePath, compilePath);
 
-                        info.FileName = file;
+                        info.FileName = compilePath;
                         info.Arguments = "\"" + outputFilePath + "\"";
                         break;
                     }

@@ -884,7 +884,7 @@ namespace Neo.Debugger.Forms
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Loading contract template failed with exception: "+e.Message);
+                MessageBox.Show($"Loading contract template failed with exception: " + e.Message);
             }
         }
 

@@ -200,7 +200,7 @@ namespace Neo.Emulation
             this._ABI = ABI;
         }
 
-        public byte[] GenerateLoaderScriptFromInputs(DataNode inputs)
+        public byte[] GenerateLoaderScriptFromInputs(DataNode inputs, string methodName, ABI abi)
         {
             using (ScriptBuilder sb = new ScriptBuilder())
             {
@@ -208,10 +208,18 @@ namespace Neo.Emulation
 
                 if (inputs != null)
                 {
+                    AVMFunction method = methodName != null && abi.functions.ContainsKey(methodName) ? abi.functions[methodName] : null;
+
+                    int index = 0;
                     foreach (var item in inputs.Children)
                     {
-                        var obj = Emulator.ConvertArgument(item);
+                        Emulator.Type hint = method != null ? method.inputs[index].type : Emulator.Type.Unknown;
+
+                        var obj = Emulator.ConvertArgument(item, hint);
+                        
                         items.Push(obj);
+
+                        index++;
                     }
                 }
 
@@ -470,7 +478,7 @@ namespace Neo.Emulation
         }
         #endregion
 
-        public static object ConvertArgument(DataNode item)
+        public static object ConvertArgument(DataNode item, Emulator.Type hintType = Emulator.Type.Unknown)
         {
             if (item.HasChildren)
             {
@@ -484,6 +492,11 @@ namespace Neo.Emulation
                         isByteArray = false;
                         break;
                     }
+                }
+
+                if (hintType == Type.Array)
+                {
+                    isByteArray = false;
                 }
 
                 if (isByteArray)

@@ -68,8 +68,8 @@ namespace Neo.Debugger.Shell
 
             output(ShellMessageType.Default, "Executing transaction...");
 
-            var loaderScript = Shell.Debugger.Emulator.GenerateLoaderScriptFromInputs(inputs);
             var methodName = inputs.ChildCount > 0 ? inputs[0].Value : null;
+            var loaderScript = Shell.Debugger.Emulator.GenerateLoaderScriptFromInputs(inputs, Shell.Debugger.ABI != null ? Shell.Debugger.ABI.entryPoint.name : null, Shell.Debugger.ABI);
 
             Shell.Debugger.Emulator.Reset(loaderScript, Shell.Debugger.ABI, methodName);
 
