@@ -275,7 +275,11 @@ namespace Neo.Debugger.Forms
                         }
                 }
 
-                compilerPath = DebuggerUtils.FindExecutablePath(compilerFile);
+                var paths = new List<string>();
+                var exePath = AppDomain.CurrentDomain.BaseDirectory;
+                var potentialPath = exePath + "Compilers/" + _sourceLanguage.ToString().ToLower();
+                paths.Add(potentialPath);
+                compilerPath = DebuggerUtils.FindExecutablePath(compilerFile, paths);
 
                 browserFolder:
 

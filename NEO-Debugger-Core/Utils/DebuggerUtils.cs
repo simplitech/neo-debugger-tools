@@ -3,6 +3,7 @@ using LunarParser.JSON;
 using Neo.Lux.Cryptography;
 using Neo.Lux.Utils;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -18,14 +19,21 @@ namespace Neo.Debugger.Core.Utils
             return node.GetNode("params");
         }
 
-        public static string FindExecutablePath(string exeName)
+        public static string FindExecutablePath(string exeName, IEnumerable<string> extraPaths = null)
         {
             string envPath = Environment.ExpandEnvironmentVariables("%PATH%");
             var paths = envPath.Split(';').ToList();
 
             var exePath = AppDomain.CurrentDomain.BaseDirectory;
             paths.Add(exePath);
-            paths.Add(exePath + "Compilers");
+
+            if (extraPaths != null)
+            {
+                foreach (var path in extraPaths)
+                {
+                    paths.Add(path);
+                }
+            }
 
             foreach (var entry in paths)
             {
