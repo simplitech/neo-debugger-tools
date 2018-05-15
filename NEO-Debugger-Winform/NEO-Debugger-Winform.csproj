@@ -38,17 +38,17 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LunarParser, Version=1.0.32.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\LunarParser.1.0.32\lib\net461\LunarParser.dll</HintPath>
+    <Reference Include="LunarParser, Version=1.0.33.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LunarParser.1.0.33\lib\net461\LunarParser.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis, Version=2.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.2.7.0\lib\netstandard1.3\Microsoft.CodeAnalysis.dll</HintPath>
+    <Reference Include="Microsoft.CodeAnalysis, Version=2.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.2.8.0\lib\netstandard1.3\Microsoft.CodeAnalysis.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=2.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.2.7.0\lib\netstandard1.3\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=2.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.2.8.0\lib\netstandard1.3\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Neo.Lux, Version=0.6.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NeoLux.0.6.3\lib\net461\Neo.Lux.dll</HintPath>
+    <Reference Include="Neo.Lux, Version=0.6.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NeoLux.0.6.5\lib\net461\Neo.Lux.dll</HintPath>
     </Reference>
     <Reference Include="Neo.SmartContract.Framework, Version=2.5.4.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Neo.SmartContract.Framework.2.5.4\lib\net40\Neo.SmartContract.Framework.dll</HintPath>

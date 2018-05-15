@@ -83,6 +83,11 @@ namespace Neo.Emulation
             }
         }
 
+        protected override string GetRPCEndpoint()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override Lux.Core.Transaction GetTransaction(string hash)
         {
             throw new System.NotImplementedException();
