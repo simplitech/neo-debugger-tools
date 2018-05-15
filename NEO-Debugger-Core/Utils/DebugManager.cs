@@ -713,7 +713,7 @@ namespace Neo.Debugger.Core.Utils
 
                 if (loaderScript == null)
                 {
-                    loaderScript = _emulator.GenerateLoaderScriptFromInputs(inputs, this.ABI != null ? this.ABI.entryPoint.name : null, this.ABI);
+                    loaderScript = _emulator.GenerateLoaderScriptFromInputs(inputs, this.ABI);
                 }
 
                 var methodName = inputs != null && inputs.ChildCount > 0 ? inputs[0].Value : null;

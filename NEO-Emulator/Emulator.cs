@@ -200,8 +200,10 @@ namespace Neo.Emulation
             this._ABI = ABI;
         }
 
-        public byte[] GenerateLoaderScriptFromInputs(DataNode inputs, string methodName, ABI abi)
+        public byte[] GenerateLoaderScriptFromInputs(DataNode inputs, ABI abi)
         {
+            var methodName = abi != null && abi.entryPoint != null ? abi.entryPoint.name : null;
+
             using (ScriptBuilder sb = new ScriptBuilder())
             {
                 var items = new Stack<object>();
