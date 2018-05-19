@@ -10,6 +10,7 @@ using System.IO;
 using System.Numerics;
 using System.Windows.Forms;
 using Neo.Lux.Cryptography;
+using LunarParser.JSON;
 
 namespace Neo.Debugger.Forms
 {
@@ -73,6 +74,26 @@ namespace Neo.Debugger.Forms
             {
                 testCasesList.Items.Add(entry);
             }
+        }
+
+        private string ConvertArray(string s)
+        {
+            if (DebuggerUtils.IsHex(s))
+            {
+                var bytes = s.HexToBytes();
+                s = DebuggerUtils.BytesToString(bytes);
+            }
+            else if (DebuggerUtils.IsValidWallet(s))
+            {
+                var scriptHash = s.AddressToScriptHash();
+                s = DebuggerUtils.BytesToString(LuxUtils.ReverseHex(scriptHash.ByteToHex()).HexToBytes());
+            }
+            else
+            {
+                return null;
+            }
+
+            return  s;
         }
 
         private bool InitInvoke()
@@ -160,29 +181,53 @@ namespace Neo.Debugger.Forms
                             if (s.StartsWith("\"") && s.EndsWith("\""))
                             {
                                 s = s.Substring(1, s.Length - 2);
-                                if (DebuggerUtils.IsHex(s))
-                                {
-                                    var bytes = s.HexToBytes();
-                                    s = DebuggerUtils.BytesToString(bytes);
-                                }
-                                else if (DebuggerUtils.IsValidWallet(s))
-                                {
-                                    var scriptHash = s.AddressToScriptHash();
-                                    s = DebuggerUtils.BytesToString(scriptHash);
-                                }
-                                else
+                                val = ConvertArray(s);
+
+                                if (val == null)
                                 {
                                     ShowArgumentError(f, index, val);
                                     return false;
                                 }
 
-                                val = $"[{s}]";
+                                val = $"[{val}]";
                             }
                             else
                             {
                                 ShowArgumentError(f, index, val);
                                 return false;
                             }
+
+                            var items = JSONReader.ReadFromString(val.ToString());
+
+                            val = "";
+                            int itemIndex = 0;
+                            foreach (var item in items)
+                            {
+                                if (itemIndex >0)
+                                {
+                                    val += ",";
+                                }
+
+                                if (item.Kind == LunarParser.NodeKind.String)
+                                {
+                                    var vv = ConvertArray(item.Value);
+                                    if (vv != null)
+                                    {
+                                        val += vv;
+                                    }
+                                    else
+                                    {
+                                        val += "\""+item.Value+"\"";
+                                    }
+                                }
+                                else
+                                {
+                                    val += item.Value;
+                                }
+
+                                itemIndex++;
+                            }
+                            val = $"[{val}]";
                         }
                         else
                             switch (p.type)
