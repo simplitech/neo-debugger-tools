@@ -711,16 +711,18 @@ namespace Neo.Debugger.Core.Utils
                 var inputs = debugParams.ArgList;
                 byte[] loaderScript = debugParams.RawScript;
 
+
                 if (loaderScript == null)
                 {
                     loaderScript = _emulator.GenerateLoaderScriptFromInputs(inputs, this.ABI);
                 }
 
                 var methodName = inputs != null && inputs.ChildCount > 0 ? inputs[0].Value : null;
+
                 _emulator.Reset(loaderScript, this.ABI, methodName);
             }
-            catch
-            {
+            catch (Exception e)
+            {                
                 return false;
             }
 

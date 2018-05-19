@@ -183,13 +183,19 @@ namespace Neo.Debugger.Forms
                                 s = s.Substring(1, s.Length - 2);
                                 val = ConvertArray(s);
 
-                                if (val == null)
+                                if (val == null && p.type == Emulator.Type.ByteArray)
                                 {
-                                    ShowArgumentError(f, index, val);
-                                    return false;
+                                    val = DebuggerUtils.BytesToString(System.Text.Encoding.UTF8.GetBytes(s));
+                                }
+                                else
+                                {
+                                    if (val == null)
+                                    {
+                                        ShowArgumentError(f, index, val);
+                                        return false;
+                                    }
                                 }
 
-                                val = $"[{val}]";
                             }
                             else
                             {
@@ -227,6 +233,7 @@ namespace Neo.Debugger.Forms
 
                                 itemIndex++;
                             }
+
                             val = $"[{val}]";
                         }
                         else
@@ -283,10 +290,10 @@ namespace Neo.Debugger.Forms
                 {
                     if (f.inputs == null || f.inputs.Count == 0)
                     {
-                        argList = "[null]";
+                        argList = "[]";
                     }
                     var operation = Char.ToLowerInvariant(key[0]) + key.Substring(1);
-                    argList = $"\"{operation}\", {argList}";
+                    argList = $"\"{operation}\", [{argList}]";
                 }
 
                 //Set the arguments list
