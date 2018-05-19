@@ -71,6 +71,11 @@ namespace Neo.Debugger.Forms
             //Setup emulator log
             Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
 
+            if (string.IsNullOrEmpty(_sourceAvmPath) && !String.IsNullOrEmpty(_settings.lastOpenedFile))
+            {
+                _sourceAvmPath = _settings.lastOpenedFile;
+            }
+
             //Init the debugger
             InitDebugger();
 
@@ -79,15 +84,8 @@ namespace Neo.Debugger.Forms
 
             if (string.IsNullOrEmpty(_sourceAvmPath))
             {
-                if (!String.IsNullOrEmpty(_settings.lastOpenedFile))
-                {
-                    _sourceAvmPath = _settings.lastOpenedFile;
-                }
-                else
-                {
-                    //Let's create a new file since we have nothing loaded from the command line and we haven't opened any files before
-                    LoadContractTemplate("HelloWorld.cs");
-                }
+                //Let's create a new file since we have nothing loaded from the command line and we haven't opened any files before
+                LoadContractTemplate("HelloWorld.cs");
             }
         }
 
@@ -740,7 +738,12 @@ namespace Neo.Debugger.Forms
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 ClearLog();
-                LoadContract(openFileDialog.FileName);
+                
+                if (LoadContract(openFileDialog.FileName))
+                {
+                    _settings.lastOpenedFile = openFileDialog.FileName;
+                    _settings.Save();
+                }
             }
         }
 
