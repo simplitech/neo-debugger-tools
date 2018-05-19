@@ -1,4 +1,5 @@
 ﻿using Neo.Lux.Core;
+using Neo.Lux.Cryptography;
 using Neo.Lux.Utils;
 using System;
 using System.Collections.Generic;
@@ -28,13 +29,13 @@ namespace Neo.VM
 
         public OpCode NextInstruction => (OpCode)Script[OpReader.BaseStream.Position];
 
-        private byte[] _script_hash = null;
-        public byte[] ScriptHash
+        private UInt160 _script_hash = null;
+        public UInt160 ScriptHash
         {
             get
             {
                 if (_script_hash == null)
-                    _script_hash = CryptoUtils.Hash160(Script);
+                    _script_hash = CryptoUtils.ToScriptHash(Script);
                 return _script_hash;
             }
         }

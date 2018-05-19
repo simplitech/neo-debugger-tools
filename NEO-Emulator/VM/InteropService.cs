@@ -70,19 +70,19 @@ namespace Neo.VM
 
         private static bool GetExecutingScriptHash(ExecutionEngine engine)
         {
-            engine.EvaluationStack.Push(engine.CurrentContext.ScriptHash);
+            engine.EvaluationStack.Push(engine.CurrentContext.ScriptHash.ToArray());
             return true;
         }
 
         private static bool GetCallingScriptHash(ExecutionEngine engine)
         {
-            engine.EvaluationStack.Push(engine.CallingContext.ScriptHash);
+            engine.EvaluationStack.Push(engine.CallingContext.ScriptHash.ToArray());
             return true;
         }
 
         private static bool GetEntryScriptHash(ExecutionEngine engine)
         {
-            engine.EvaluationStack.Push(engine.EntryContext.ScriptHash);
+            engine.EvaluationStack.Push(engine.EntryContext.ScriptHash.ToArray());
             return true;
         }
     }

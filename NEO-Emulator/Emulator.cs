@@ -178,13 +178,13 @@ namespace Neo.Emulation
 
             this.currentMethod = methodName;
 
-            foreach (var output in currentTransaction.outputs)
+            /*foreach (var output in currentTransaction.outputs)
             {
                 if (output.hash == this.currentHash)
                 {
-                    output.hash = new UInt160(engine.CurrentContext.ScriptHash);
+                    output.hash = engine.CurrentContext.ScriptHash;
                 }
-            }
+            }*/
 
             foreach (var pos in _breakpoints)
             {
@@ -461,7 +461,9 @@ namespace Neo.Emulation
             var bytes = key != null ? CryptoUtils.AddressToScriptHash(key.address) : new byte[20];
 
             var src_hash = new UInt160(bytes);
-            var dst_hash = new UInt160(CryptoUtils.AddressToScriptHash(this.currentAccount.keys.address));
+            var dst_hash = CryptoUtils.ToScriptHash(ContractByteCode);
+            //var dst_hash = new UInt160(LuxUtils.ReverseHex(LuxUtils.ByteToHex(CryptoUtils.ToScriptHash(ContractByteCode).ToArray())).HexToBytes()); 
+            //new UInt160(CryptoUtils.AddressToScriptHash(this.currentAccount.keys.address));
             this.currentHash = dst_hash;
 
             BigInteger asset_decimals = 100000000;
