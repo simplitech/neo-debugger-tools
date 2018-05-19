@@ -1,6 +1,9 @@
 ﻿using Neo.Emulation;
 using Neo.Emulation.Utils;
+using Neo.Lux.Cryptography;
+using Neo.Lux.Utils;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Neo.Debugger.Forms
@@ -37,7 +40,33 @@ namespace Neo.Debugger.Forms
             {
                 // TODO : Proper type detection?
                 Emulator.Type hintType = entry.Key.Length == 20 ? Emulator.Type.Integer : Emulator.Type.Integer;
-                dataGridView1.Rows.Add(FormattingUtils.OutputData(entry.Key, false), FormattingUtils.OutputData(entry.Value, false, hintType));
+
+                string key = null;
+
+                if (entry.Key.Length == 24)
+                {
+                    var prefixData = entry.Key.Take(4).ToArray();
+                    var hash = entry.Key.Skip(4).ToArray();
+
+                    //https://stackoverflow.com/questions/38199136/check-if-c-sharp-byte-array-contains-a-string
+                    var isAscii = prefixData.All(b => b >= 32 && b <= 127);
+
+                    if (isAscii)
+                    {
+                        var prefix = System.Text.Encoding.ASCII.GetString(prefixData);
+
+                        var signatureHash = new UInt160(hash);
+
+                        key = prefix + "." + CryptoUtils.ToAddress(signatureHash);
+                    }
+                }
+
+                if (key == null)
+                {
+                    key = FormattingUtils.OutputData(entry.Key, false);
+                }
+
+                dataGridView1.Rows.Add(key, FormattingUtils.OutputData(entry.Value, false, hintType));
             }
         }
     }
