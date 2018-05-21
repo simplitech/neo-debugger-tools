@@ -185,7 +185,7 @@ namespace Neo.Debugger.Forms
 
                                 if (val == null && p.type == Emulator.Type.ByteArray)
                                 {
-                                    val = DebuggerUtils.BytesToString(System.Text.Encoding.UTF8.GetBytes(s));
+                                    val = DebuggerUtils.BytesToString(LuxUtils.ReverseHex(LuxUtils.ByteToHex(System.Text.Encoding.UTF8.GetBytes(s))).HexToBytes());
                                 }
                                 else
                                 {
