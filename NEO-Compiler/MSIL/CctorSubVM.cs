@@ -1,5 +1,4 @@
-﻿using Neo.Compiler.AVM;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -95,6 +94,9 @@ namespace Neo.Compiler.MSIL
                     case CodeEx.Ldc_I4_S:
                         calcStack.Push((int)src.tokenI32);
                         break;
+                    case CodeEx.Ldc_I8:
+                        calcStack.Push((long)src.tokenI64);
+                        break;
                     case CodeEx.Newarr:
                         {
                             if (src.tokenType == "System.Byte")
@@ -134,6 +136,30 @@ namespace Neo.Compiler.MSIL
                                     p2[i] = p1[i];
                                 }
                             }
+                            else if (m.DeclaringType.FullName == "System.Numerics.BigInteger" && m.Name == "op_Implicit")
+                            {
+                                var type = m.Parameters[0].ParameterType.FullName;
+                                if (type == "System.UInt64")
+                                {
+                                    var p = (ulong)(long)calcStack.Pop();
+                                    calcStack.Push(new System.Numerics.BigInteger(p).ToByteArray());
+                                }
+                                else if (type == "System.UInt32")
+                                {
+                                    var p = (ulong)(int)calcStack.Pop();
+                                    calcStack.Push(new System.Numerics.BigInteger(p).ToByteArray());
+                                }
+                                else if (type == "System.Int64")
+                                {
+                                    var p = (long)calcStack.Pop();
+                                    calcStack.Push(new System.Numerics.BigInteger(p).ToByteArray());
+                                }
+                                else
+                                {
+                                    var p =(int)calcStack.Pop();
+                                    calcStack.Push(new System.Numerics.BigInteger(p).ToByteArray());
+                                }
+                            }
                             else
                             {
                                 foreach (var attr in m.Resolve().CustomAttributes)
@@ -144,9 +170,9 @@ namespace Neo.Compiler.MSIL
                                         var value = (int)attr.ConstructorArguments[0].Value;
                                         var type = attr.ConstructorArguments[0].Type.Resolve();
                                         string attrname = "";
-                                        foreach(var f in type.Fields)
+                                        foreach (var f in type.Fields)
                                         {
-                                            if(f.Constant!=null&& (int)f.Constant== value)
+                                            if (f.Constant != null && (int)f.Constant == value)
                                             {
                                                 attrname = f.Name;
                                                 break;

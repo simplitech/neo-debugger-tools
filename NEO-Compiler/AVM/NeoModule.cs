@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Neo.Compiler.AVM
+namespace Neo.Compiler
 {
     public class NeoModule
     {
@@ -25,7 +25,6 @@ namespace Neo.Compiler.AVM
                         bytes.Add(c.bytes[i]);
                     }
             }
-
             return bytes.ToArray();
             //将body链接，生成this.code       byte[]
             //并计算 this.codehash            byte[]
@@ -156,7 +155,7 @@ namespace Neo.Compiler.AVM
 
     public class NeoCode
     {
-        public Lux.Core.OpCode code = Lux.Core.OpCode.NOP;
+        public Lux.VM.OpCode code = Lux.VM.OpCode.NOP;
         public int addr;
         public byte[] bytes;
         public string debugcode;

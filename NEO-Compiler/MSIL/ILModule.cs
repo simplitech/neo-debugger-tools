@@ -1,5 +1,4 @@
-﻿using Neo.Compiler.AVM;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 /// <summary>
@@ -43,7 +42,7 @@ namespace Neo.Compiler.MSIL
             {
                 foreach (var t in module.Types)
                 {
-                    if (t.FullName.Contains(".My."))//vb 系统类不要 - System class do not
+                    if (t.FullName.Contains(".My."))//vb 系统类不要
                         continue;
 
                     mapType[t.FullName] = new ILType(this, t);
@@ -78,7 +77,7 @@ namespace Neo.Compiler.MSIL
                 if (m.IsStatic == false)
                 {
                     var method = new ILMethod(this, null);
-                    method.fail = "只能导出static 函数";  //Only export static function
+                    method.fail = "只能导出static 函数";
                     methods[m.FullName] = method;
                 }
                 else
