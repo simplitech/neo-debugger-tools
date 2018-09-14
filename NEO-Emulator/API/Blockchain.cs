@@ -3,6 +3,7 @@ using LunarParser.JSON;
 using Neo.Lux.Cryptography;
 using Neo.Lux.Utils;
 using Neo.VM;
+using NEO_Emulator.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -74,7 +75,7 @@ namespace Neo.Emulation.API
 
         public Block GenerateBlock()
         {
-            var block = new Block(currentHeight + 1, DateTime.Now.ToTimestamp());
+            var block = new Block(currentHeight + 1, DateTime.Now.ToTimestamp(), RandomUtils.RandomUInt());
             return block;
         }
 
@@ -168,7 +169,7 @@ namespace Neo.Emulation.API
                 if (child.Name.Equals("block"))
                 {
                     uint index = (uint)(_blocks.Count + 1);
-                    var block = new Block(index, 0);
+                    var block = new Block(index, 0, RandomUtils.RandomUInt());
                     if (block.Load(child))
                     {
                         _blocks[index] = block;
@@ -301,7 +302,7 @@ namespace Neo.Emulation.API
                 if (height <= blockchain.currentHeight)
                 {
                     uint index = height + 1;
-                    block = new Block(index, 1506787300);
+                    block = new Block(index, 1506787300, RandomUtils.RandomUInt());
                     blockchain._blocks[index] = block;
                 }
             }
