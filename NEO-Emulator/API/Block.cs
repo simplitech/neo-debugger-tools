@@ -14,7 +14,7 @@ namespace Neo.Emulation.API
 
         public int TransactionCount { get { return _transactions.Count; } }
 
-        public Block(uint height, uint timestamp) : base(timestamp)
+        public Block(uint height, uint timestamp, uint consensusData) : base(timestamp, consensusData)
         {
             this.height = height;
         }
@@ -37,6 +37,7 @@ namespace Neo.Emulation.API
         internal bool Load(DataNode root)
         {
             this.timestamp = root.GetUInt32("timestamp");
+			this.consensusData = root.GetUInt32("consensusData");
 
             this._transactions.Clear();
 
@@ -62,6 +63,7 @@ namespace Neo.Emulation.API
             }
 
             result.AddField("timestamp", timestamp);
+			result.AddField("consensusData", consensusData);
 
             return result;
         }

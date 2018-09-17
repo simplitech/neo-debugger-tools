@@ -1,16 +1,19 @@
 ﻿using Neo.VM;
 using System;
+using System.Numerics;
 
 namespace Neo.Emulation.API
 {
     public class Header: IInteropInterface
     {
         public uint timestamp;
+		public BigInteger consensusData = 0;
 
-        public Header(uint timestamp)
+        public Header(uint timestamp, uint consensusData)
         {
             this.timestamp = timestamp;
-        }
+			this.consensusData = consensusData;
+		}
 
         [Syscall("Neo.Header.GetHash")]
         public static bool GetHash(ExecutionEngine engine)
@@ -63,9 +66,18 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Header.GetConsensusData")]
         public static bool GetConsensusData(ExecutionEngine engine)
         {
-            // Header
-            //returns ulong 
-            throw new NotImplementedException();
+			var obj = engine.EvaluationStack.Pop() as VM.Types.InteropInterface;
+
+			if (obj == null)
+			{
+				return false;
+			}
+
+			var header = obj.GetInterface<Header>();
+			engine.EvaluationStack.Push(header.consensusData);
+			// Header
+			//returns ulong 
+			return true;
         }
 
         [Syscall("Neo.Header.GetNextConsensus")]
