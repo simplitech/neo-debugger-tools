@@ -150,7 +150,7 @@ namespace Neo.Emulation
 
         private ABI _ABI;
 
-        public void Reset(byte[] inputScript, ABI ABI, string methodName)
+        public void Reset(byte[] inputScript, ABI ABI, string methodName, IScriptTable table = null)
         {
             if (ContractByteCode == null || ContractByteCode.Length == 0)
             {
@@ -172,7 +172,7 @@ namespace Neo.Emulation
             usedOpcodeCount = 0;
 
             currentTransaction.emulator = this;
-            engine = new ExecutionEngine(currentTransaction, null, interop);
+            engine = new ExecutionEngine(currentTransaction, table, interop);
             engine.LoadScript(ContractByteCode);
             engine.LoadScript(inputScript);
 
