@@ -1,9 +1,9 @@
-﻿using LunarParser;
-using Neo.Emulation.Utils;
+﻿using Neo.Emulation.Utils;
 using Neo.VM;
 using Neo.Lux.Cryptography;
 using System.Numerics;
 using System;
+using LunarLabs.Parser;
 
 namespace Neo.Emulation.API
 {

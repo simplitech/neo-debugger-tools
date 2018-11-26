@@ -10,7 +10,7 @@ using System.IO;
 using System.Numerics;
 using System.Windows.Forms;
 using Neo.Lux.Cryptography;
-using LunarParser.JSON;
+using LunarLabs.Parser.JSON;
 
 namespace Neo.Debugger.Forms
 {
@@ -214,7 +214,7 @@ namespace Neo.Debugger.Forms
                                     val += ",";
                                 }
 
-                                if (item.Kind == LunarParser.NodeKind.String)
+                                if (item.Kind == LunarLabs.Parser.NodeKind.String)
                                 {
                                     var vv = ConvertArray(item.Value);
                                     if (vv != null)

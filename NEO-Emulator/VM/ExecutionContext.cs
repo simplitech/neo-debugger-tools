@@ -27,7 +27,7 @@ namespace Neo.VM
             }
         }
 
-        public OpCode NextInstruction => (OpCode)Script[OpReader.BaseStream.Position];
+        public Lux.VM.OpCode NextInstruction => (Lux.VM.OpCode)Script[OpReader.BaseStream.Position];
 
         private UInt160 _script_hash = null;
         public UInt160 ScriptHash

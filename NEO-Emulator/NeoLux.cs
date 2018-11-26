@@ -19,16 +19,16 @@ namespace Neo.Emulation
             this.emulator = new Emulator(this.blockchain);
         }
 
-        public override Dictionary<string, decimal> GetAssetBalancesOf(string address)
-        {
-            var acc = blockchain.FindAccountByAddress(address);
-            var result = new Dictionary<string, decimal>();
-            foreach (var entry in acc.balances)
-            {
-                result[entry.Key] = entry.Value;
-            }
-            return result;
-        }
+        //public override Dictionary<string, decimal> GetAssetBalancesOf(string address)
+        //{
+        //    var acc = blockchain.FindAccountByAddress(address);
+        //    var result = new Dictionary<string, decimal>();
+        //    foreach (var entry in acc.balances)
+        //    {
+        //        result[entry.Key] = entry.Value;
+        //    }
+        //    return result;
+        //}
 
         public override byte[] GetStorage(string scriptHash, byte[] key)
         {
@@ -44,56 +44,101 @@ namespace Neo.Emulation
             return acc.storage.Read(key);
         }
 
-        public override Dictionary<string, List<UnspentEntry>> GetUnspent(string address)
-        {
-            var acc = blockchain.FindAccountByAddress(address);
-            var result = new Dictionary<string, List<UnspentEntry>>();
-            foreach (var entry in acc.balances)
-            {
-                var unspents = new List<UnspentEntry>();
-                unspents.Add(new UnspentEntry() { index = 0, txid = "", value = entry.Value });
-                result[entry.Key] = unspents;
-            }
+        //public override Dictionary<string, List<UnspentEntry>> GetUnspent(string address)
+        //{
+        //    var acc = blockchain.FindAccountByAddress(address);
+        //    var result = new Dictionary<string, List<UnspentEntry>>();
+        //    foreach (var entry in acc.balances)
+        //    {
+        //        var unspents = new List<UnspentEntry>();
+        //        unspents.Add(new UnspentEntry() { index = 0, txid = "", value = entry.Value });
+        //        result[entry.Key] = unspents;
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        public override bool SendRawTransaction(string hexTx)
-        {
-            var bytes = hexTx.HexToBytes();
-            var tx = Neo.Lux.Core.Transaction.Unserialize(bytes);
+        //public override bool SendRawTransaction(string hexTx)
+        //{
+        //    var bytes = hexTx.HexToBytes();
+        //    var tx = Neo.Lux.Core.Transaction.Unserialize(bytes);
 
-            switch (tx.type)
-            {
-                case Lux.Core.TransactionType.ContractTransaction:
-                    {
-                        var loaderScript = tx.script;
-                        string methodName = null;
+        //    switch (tx.type)
+        //    {
+        //        case Lux.Core.TransactionType.ContractTransaction:
+        //            {
+        //                var loaderScript = tx.script;
+        //                string methodName = null;
 
-                        emulator.Reset(loaderScript, null, methodName);
+        //                emulator.Reset(loaderScript, null, methodName);
 
-                        var state = emulator.Run();
-                        return true;
-                    }
+        //                var state = emulator.Run();
+        //                return true;
+        //            }
 
-                default:
-                    {
-                        return false;
-                    }
-            }
-        }
+        //        default:
+        //            {
+        //                return false;
+        //            }
+        //    }
+        //}
 
-        protected override string GetRPCEndpoint()
+        //protected override string GetRPCEndpoint()
+        //{
+        //    throw new System.NotImplementedException();
+        //}
+
+        //public override Lux.Core.Transaction GetTransaction(string hash)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
+
+        //public override InvokeResult TestInvokeScript(byte[] scriptHash, object[] args)
+        //{
+        //    throw new System.NotImplementedException();
+        //}
+
+        public override InvokeResult InvokeScript(byte[] script)
         {
             throw new System.NotImplementedException();
         }
 
-        public override Lux.Core.Transaction GetTransaction(string hash)
+        protected override bool SendTransaction(Lux.Core.Transaction tx)
         {
             throw new System.NotImplementedException();
         }
 
-        public override InvokeResult TestInvokeScript(byte[] scriptHash, object[] args)
+        public override Lux.Core.Transaction GetTransaction(UInt256 hash)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Dictionary<string, decimal> GetAssetBalancesOf(UInt160 hash)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override List<UnspentEntry> GetClaimable(UInt160 hash, out decimal amount)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Dictionary<string, List<UnspentEntry>> GetUnspent(UInt160 scripthash)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override uint GetBlockHeight()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Lux.Core.Block GetBlock(UInt256 hash)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override Lux.Core.Block GetBlock(uint height)
         {
             throw new System.NotImplementedException();
         }

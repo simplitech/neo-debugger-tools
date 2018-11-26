@@ -6,9 +6,9 @@ namespace Neo.Emulation
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
     public class OpCodeAttribute : Attribute
     {
-        public OpCode OpCode { get; }
+        public Lux.VM.OpCode OpCode { get; }
 
-        public OpCodeAttribute(OpCode opcode)
+        public OpCodeAttribute(Lux.VM.OpCode opcode)
         {
             this.OpCode = opcode;
         }

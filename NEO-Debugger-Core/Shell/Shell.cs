@@ -1,8 +1,5 @@
-﻿using LunarParser;
-using Neo.Debugger.Core.Models;
+﻿using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
-using Neo.Emulation;
-using Neo.Emulation.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;

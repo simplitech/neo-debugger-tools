@@ -3,11 +3,12 @@ using Neo.Lux.Cryptography;
 using System.Collections.Generic;
 using System;
 using System.Numerics;
-using Neo.Emulation.API;
-using LunarParser;
-using Neo.Emulation.Utils;
 using Neo.Lux.Utils;
+using Neo.Emulation.API;
+using LunarLabs.Parser;
 using Neo.Lux.Core;
+using Account = Neo.Emulation.API.Account;
+using Neo.Emulation.Utils;
 
 namespace Neo.Emulation
 {
@@ -60,7 +61,7 @@ namespace Neo.Emulation
             return emulator.blockchain;
         }
 
-        public static Storage GetStorage(this ExecutionEngine engine)
+        public static API.Storage GetStorage(this ExecutionEngine engine)
         {
             var emulator = engine.GetEmulator();
             return emulator.currentAccount.storage;
@@ -96,7 +97,7 @@ namespace Neo.Emulation
         {
             public byte[] byteCode;
             public int offset;
-            public OpCode opcode;
+            public Lux.VM.OpCode opcode;
             public decimal gasCost;
             public string sysCall;
         }
@@ -355,45 +356,45 @@ namespace Neo.Emulation
                 var opcode = engine.lastOpcode;
                 decimal opCost;
 
-                if (opcode <= OpCode.PUSH16)
+                if (opcode <= Lux.VM.OpCode.PUSH16)
                 {
                     opCost = 0;
                 }
                 else
                     switch (opcode)
                     {
-                        case OpCode.SYSCALL:
+                        case Lux.VM.OpCode.SYSCALL:
                             {
                                 var callInfo = interop.FindCall(engine.lastSysCall);
                                 opCost = (callInfo != null) ? callInfo.gasCost : 0;
 
                                 if (engine.lastSysCall.EndsWith("Storage.Put"))
                                 {
-                                    opCost *= (Storage.lastStorageLength / 1024.0m);
+                                    opCost *= (API.Storage.lastStorageLength / 1024.0m);
                                     if (opCost < 1) opCost = 1;
                                 }
                                 break;
                             }
 
-                        case OpCode.CHECKMULTISIG:
-                        case OpCode.CHECKSIG: opCost = 0.1m; break;
+                        case Lux.VM.OpCode.CHECKMULTISIG:
+                        case Lux.VM.OpCode.CHECKSIG: opCost = 0.1m; break;
 
-                        case OpCode.APPCALL:
-                        case OpCode.TAILCALL:
-                        case OpCode.SHA256:
-                        case OpCode.SHA1: opCost = 0.01m; break;
+                        case Lux.VM.OpCode.APPCALL:
+                        case Lux.VM.OpCode.TAILCALL:
+                        case Lux.VM.OpCode.SHA256:
+                        case Lux.VM.OpCode.SHA1: opCost = 0.01m; break;
 
-                        case OpCode.HASH256:
-                        case OpCode.HASH160: opCost = 0.02m; break;
+                        case Lux.VM.OpCode.HASH256:
+                        case Lux.VM.OpCode.HASH160: opCost = 0.02m; break;
 
-                        case OpCode.NOP: opCost = 0; break;
+                        case Lux.VM.OpCode.NOP: opCost = 0; break;
                         default: opCost = 0.001m; break;
                     }
 
                 usedGas += opCost;
                 usedOpcodeCount++;
 
-                OnStep?.Invoke(new EmulatorStepInfo() { byteCode = engine.CurrentContext.Script, offset = engine.CurrentContext.InstructionPointer, opcode = opcode, gasCost = opCost, sysCall = opcode == OpCode.SYSCALL? engine.lastSysCall : null });
+                OnStep?.Invoke(new EmulatorStepInfo() { byteCode = engine.CurrentContext.Script, offset = engine.CurrentContext.InstructionPointer, opcode = opcode, gasCost = opCost, sysCall = opcode == Lux.VM.OpCode.SYSCALL? engine.lastSysCall : null });
             }
             catch
             {

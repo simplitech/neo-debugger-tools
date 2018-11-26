@@ -1,6 +1,7 @@
 ﻿using Neo.Lux.Core;
 using Neo.Lux.Cryptography;
 using Neo.Lux.Utils;
+using Neo.Lux.VM;
 using Neo.VM.Types;
 using System;
 using System.Collections;
@@ -96,7 +97,7 @@ namespace Neo.VM
                 State |= VMState.FAULT;
                 return;
             }
-            if (opcode >= OpCode.PUSHBYTES1 && opcode <= OpCode.PUSHBYTES75)
+            if (opcode >= OpCode.PUSHBYTES1 && opcode <=OpCode.PUSHBYTES75)
                 EvaluationStack.Push(context.OpReader.ReadBytes((byte)opcode));
             else
                 switch (opcode)

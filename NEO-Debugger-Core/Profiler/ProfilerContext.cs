@@ -1,4 +1,5 @@
 ﻿using Neo.Lux.Core;
+using Neo.Lux.VM;
 using Neo.VM;
 using System;
 using System.Collections.Generic;
@@ -53,7 +54,7 @@ namespace Neo.Debugger.Profiler
         {
             dictStmtInfo = new Dictionary<string, SourceStmtInfo>();
 
-            var interopService = new InteropService();
+            var interopService = new VM.InteropService();
             foreach (var sysCall in interopService.Calls)
             {
                 var name = sysCall.name.Replace("Neo.", "");
