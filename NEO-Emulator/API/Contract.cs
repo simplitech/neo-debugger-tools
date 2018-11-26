@@ -29,8 +29,6 @@ namespace Neo.Emulation.API
             return true;
         }
 
-        //Register("System.Runtime.Deserialize", Runtime_Deserialize, 1);
-
         [Syscall("System.Runtime.Serialize")]
         protected bool Serialize(ExecutionEngine engine)
         {
@@ -52,6 +50,32 @@ namespace Neo.Emulation.API
             }
             return true;
         }
+
+        [Syscall("System.Runtime.Deserialize")]
+        protected bool Deserialize(ExecutionEngine engine)
+        {
+            byte[] data = engine.EvaluationStack.Pop().GetByteArray();
+            using (MemoryStream ms = new MemoryStream(data, false))
+            using (BinaryReader reader = new BinaryReader(ms))
+            {
+                StackItem item;
+                try
+                {
+                    item = DeserializeStackItem(reader);
+                }
+                catch (FormatException)
+                {
+                    return false;
+                }
+                catch (IOException)
+                {
+                    return false;
+                }
+                engine.EvaluationStack.Push(item);
+            }
+            return true;
+        }
+
 
         [Syscall("Neo.Contract.GetStorageContext")]
         public static bool GetStorageContext(ExecutionEngine engine)
