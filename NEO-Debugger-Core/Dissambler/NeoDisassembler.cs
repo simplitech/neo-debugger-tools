@@ -477,7 +477,7 @@ namespace Neo.Debugger.Dissambler
                                         if (!Enum.IsDefined(typeof(OpCode), opcode))
                                         {
                                             var s = ((byte)opcode).ToString();
-                                            throw new DisassembleException("Invalid opcode " + s);
+                                            //throw new DisassembleException("Invalid opcode " + s);
                                         }
 
                                         break;

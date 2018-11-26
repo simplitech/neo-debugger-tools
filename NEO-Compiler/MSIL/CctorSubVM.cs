@@ -54,7 +54,7 @@ namespace Neo.Compiler.MSIL
             {
                 if (bEnd)
                     break;
-
+                Console.WriteLine("Src.Code " + src.code);
                 switch (src.code)
                 {
                     case CodeEx.Ret:

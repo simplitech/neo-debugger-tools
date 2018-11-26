@@ -73,6 +73,7 @@ namespace Neo.Compiler.MSIL
             this.outModule.option = option == null ? ConvOption.Default : option;
             foreach (var t in _in.mapType)
             {
+                logger.Log("Key: " +t.Key);
                 if (t.Key.Contains("<"))
                     continue;//系统的，不要
                 if (t.Key.Contains("_API_")) continue;//api的，不要
@@ -84,8 +85,10 @@ namespace Neo.Compiler.MSIL
                     if (m.Value.method.IsAddOn || m.Value.method.IsRemoveOn)
                         continue;//event 自动生成的代码，不要
                     NeoMethod nm = new NeoMethod();
+                    
                     if (m.Key.Contains(".cctor"))
                     {
+                        logger.Log("Neo Method: " + m.Value);
                         CctorSubVM.Parse(m.Value, this.outModule);
                         continue;
                     }

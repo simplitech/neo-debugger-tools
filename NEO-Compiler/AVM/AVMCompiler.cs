@@ -64,6 +64,7 @@ namespace Neo.Compiler.AVM
                 var conv = new ModuleConverter(log);
                 ConvOption option = new ConvOption();
                 option.useNep8 = true;
+                option.useSysCallInteropHash = true;
                 NeoModule am = conv.Convert(mod, option);
 
                 Directory.SetCurrentDirectory(curPath);
