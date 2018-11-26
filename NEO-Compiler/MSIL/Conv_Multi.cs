@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -504,8 +505,8 @@ namespace Neo.Compiler.MSIL
                     }
                     else
                     {
-                        _Convert1by1(Lux.VM.OpCode.INVERT, src, to);
-                        _Insert1(Lux.VM.OpCode.EQUAL, "", to);
+                        _Convert1by1(Lux.VM.OpCode.EQUAL, src, to);
+                        _Convert1by1(Lux.VM.OpCode.NOT, null, to);
                     }
                     ////各类!=指令
                     ////有可能有一些会特殊处理，故还保留独立判断
@@ -671,13 +672,25 @@ namespace Neo.Compiler.MSIL
             }
 
             if (calltype == 0)
-                throw new Exception("unknown call: " + src.tokenMethod + "\r\n   in: " + to.name + "\r\n");
+            {
+                //之前的所有尝试都无效，那也不一定是个不存在的函数，有可能在别的模块里
+                if (TryInsertMethod(outModule, defs))
+                {
+                    calltype = 1;
+                    //ILModule module = new ILModule();
+                    //module.LoadModule
+                    //ILType type =new ILType()
+                    //ILMethod method = new ILMethod(defs)
+                }
+                else
+                    throw new Exception("unknown call: " + src.tokenMethod + "\r\n   in: " + to.name + "\r\n");
+            }
             var md = src.tokenUnknown as Mono.Cecil.MethodReference;
             var pcount = md.Parameters.Count;
             bool havethis = md.HasThis;
             if (calltype == 2)
             {
-                //opcode call 
+                //opcode call
             }
             else
             {//翻转参数顺序
@@ -724,9 +737,22 @@ namespace Neo.Compiler.MSIL
             }
             if (calltype == 1)
             {
-                var c = _Convert1by1(Lux.VM.OpCode.CALL, null, to, new byte[] { 5, 0 });
-                c.needfixfunc = true;
-                c.srcfunc = src.tokenMethod;
+                if (this.outModule.option.useNep8)
+                {
+                    byte _pcount = (byte)defs.Parameters.Count;
+                    byte _rvcount = (byte)(defs.ReturnType.FullName == "System.Void" ? 0 : 1);
+
+                    var c = _Convert1by1(Lux.VM.OpCode.CALL_I, null, to, new byte[] { _rvcount, _pcount, 0, 0 });
+                    c.needfixfunc = true;
+                    c.srcfunc = src.tokenMethod;
+
+                }
+                else
+                {
+                    var c = _Convert1by1(Lux.VM.OpCode.CALL, null, to, new byte[] { 5, 0 });
+                    c.needfixfunc = true;
+                    c.srcfunc = src.tokenMethod;
+                }
                 return 0;
             }
             else if (calltype == 2)
@@ -736,8 +762,17 @@ namespace Neo.Compiler.MSIL
             }
             else if (calltype == 3)
             {
-                var bytes = Encoding.UTF8.GetBytes(callname);
-                if (bytes.Length > 252) throw new Exception("string is to long");
+                byte[] bytes = null;
+                if (this.outModule.option.useSysCallInteropHash)
+                {
+                    //now neovm use ineropMethod hash for syscall.
+                    bytes = BitConverter.GetBytes(callname.ToInteropMethodHash());
+                }
+                else
+                {
+                    bytes = System.Text.Encoding.UTF8.GetBytes(callname);
+                    if (bytes.Length > 252) throw new Exception("string is to long");
+                }
                 byte[] outbytes = new byte[bytes.Length + 1];
                 outbytes[0] = (byte)bytes.Length;
                 Array.Copy(bytes, 0, outbytes, 1, bytes.Length);
@@ -747,7 +782,28 @@ namespace Neo.Compiler.MSIL
             }
             else if (calltype == 4)
             {
-                _Convert1by1(Lux.VM.OpCode.APPCALL, null, to, callhash);
+                if (this.outModule.option.useNep8)
+                {
+                    byte _pcount = (byte)defs.Parameters.Count;
+                    byte _rvcount = (byte)(defs.ReturnType.FullName == "System.Void" ? 0 : 1);
+
+
+                    if (callhash.All(v => v == 0))//empty nep4
+                    {
+                        throw new Exception("nep4 calltype==6");
+                    }
+                    else
+                    {
+                        var bytes = new byte[] { _rvcount, _pcount }.Concat(callhash).ToArray();
+                        _Convert1by1(Lux.VM.OpCode.CALL_E, null, to, bytes);
+
+                    }
+
+                }
+                else
+                {
+                    _Convert1by1(Lux.VM.OpCode.APPCALL, null, to, callhash);
+                }
 
             }
             else if (calltype == 5)
@@ -775,18 +831,97 @@ namespace Neo.Compiler.MSIL
             {
                 _ConvertPush(callpcount, src, to);
                 _Convert1by1(Lux.VM.OpCode.ROLL, null, to);
-                byte[] nullhash = new byte[20];
+
                 //dyn appcall
-                _Convert1by1(Lux.VM.OpCode.APPCALL, null, to, nullhash);
+                if (this.outModule.option.useNep8)
+                {
+                    byte _pcount = (byte)defs.Parameters.Count;
+                    byte _rvcount = (byte)(defs.ReturnType.FullName == "System.Void" ? 0 : 1);
+                    //byte signature = (byte)(
+                    //    (retcount << 7)
+                    //    |
+                    //    defs.Parameters.Count
+                    //    );
+                    _Convert1by1(Lux.VM.OpCode.CALL_ED, null, to, new byte[] { _rvcount, _pcount });
+                }
+                else
+                {
+                    byte[] nullhash = new byte[20];
+                    _Convert1by1(Lux.VM.OpCode.APPCALL, null, to, nullhash);
+                }
 
             }
             return 0;
         }
+        private bool TryInsertMethod(NeoModule outModule, Mono.Cecil.MethodDefinition method)
+        {
+            var oldaddr = this.addr;
+            var oldaddrconv = new Dictionary<int, int>();
+            foreach (int k in addrconv.Keys)
+            {
+                oldaddrconv[k] = addrconv[k];
+            }
+            var typename = method.DeclaringType.FullName;
+            ILType type;
+            if (inModule.mapType.TryGetValue(typename, out type) == false)
+            {
+                type = new ILType(null, method.DeclaringType);
+                inModule.mapType[typename] = type;
+            }
 
+            var _method = type.methods[method.FullName];
+            try
+            {
+                NeoMethod nm = new NeoMethod();
+                if (method.FullName.Contains(".cctor"))
+                {
+                    CctorSubVM.Parse(_method, this.outModule);
+                    //continue;
+                    return false;
+                }
+                if (method.IsConstructor)
+                {
+                    return false;
+                    //continue;
+                }
+                nm._namespace = method.DeclaringType.FullName;
+                nm.name = method.FullName;
+                nm.displayName = method.Name;
+                Mono.Collections.Generic.Collection<Mono.Cecil.CustomAttribute> ca = method.CustomAttributes;
+                foreach (var attr in ca)
+                {
+                    if (attr.AttributeType.Name == "DisplayNameAttribute")
+                    {
+                        nm.displayName = (string)attr.ConstructorArguments[0].Value;
+                    }
+                }
+                nm.inSmartContract = method.DeclaringType.BaseType.Name == "SmartContract";
+                nm.isPublic = method.IsPublic;
+                this.methodLink[_method] = nm;
+                outModule.mapMethods[nm.name] = nm;
+
+                ConvertMethod(_method, nm);
+                return true;
+            }
+            catch
+            {
+                return false;
+
+            }
+            finally
+            {
+                this.addr = oldaddr;
+                this.addrconv.Clear();
+                foreach (int k in oldaddrconv.Keys)
+                {
+                    addrconv[k]=oldaddrconv[k];
+                }
+            }
+        }
         private int _ConvertNewArr(ILMethod method, OpCode src, NeoMethod to)
         {
             var type = src.tokenType;
-            if (type != "System.Byte")
+            if ((type != "System.Byte") && (type != "System.SByte"))
             {
                 _Convert1by1(Lux.VM.OpCode.NEWARRAY, src, to);
                 int n = method.GetNextCodeAddr(src.addr);
@@ -807,13 +942,13 @@ namespace Neo.Compiler.MSIL
                         }
                         return 3;
                     }
-                    throw new Exception("not support this type's init array.");
+                    throw new Exception($"not support this type's init array. type: {type}");
 
                 }
                 return 0;
                 //this.logger.Log("_ConvertNewArr::not support type " + type + " for array.");
             }
-            else
+            else // (type == "System.Byte") || (type == "System.SByte")
             {
                 var code = to.body_Codes.Last().Value;
                 //we need a number
@@ -838,6 +973,7 @@ namespace Neo.Compiler.MSIL
                 if (n >= 0 && n2 >= 0 && n3 >= 0 && method.body_Codes[n].code == CodeEx.Dup && method.body_Codes[n2].code == CodeEx.Ldtoken && method.body_Codes[n3].code == CodeEx.Call)
                 {//這是在初始化數組
 
+                    // System.Byte or System.SByte
                     var data = method.body_Codes[n2].tokenUnknown as byte[];
                     this._ConvertPush(data, src, to);
 
@@ -1064,7 +1200,7 @@ namespace Neo.Compiler.MSIL
             //_Convert1by1(Lux.VM.OpCode.CLONESTRUCTONLY, src, to);
 
             _ConvertPush(id, null, to);//index
-            _Convert1by1(Lux.VM.OpCode.SWAP, null, to);//把item 拿上來 
+            _Convert1by1(Lux.VM.OpCode.SWAP, null, to);//把item 拿上來
 
             _Convert1by1(Lux.VM.OpCode.SETITEM, null, to);//修改值 //item //index //array
             return 0;

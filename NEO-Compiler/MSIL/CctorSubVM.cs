@@ -99,11 +99,15 @@ namespace Neo.Compiler.MSIL
                         break;
                     case CodeEx.Newarr:
                         {
-                            if (src.tokenType == "System.Byte")
+                            if ((src.tokenType == "System.Byte") || (src.tokenType == "System.SByte"))
                             {
                                 var count = (int)calcStack.Pop();
                                 byte[] data = new byte[count];
                                 calcStack.Push(data);
+                            }
+                            else
+                            {
+                              throw new Exception("only byte[] can be defined in here.");
                             }
                         }
                         break;
@@ -190,6 +194,11 @@ namespace Neo.Compiler.MSIL
                                             var hex = HexString2Bytes(text);
                                             calcStack.Push(hex);
                                         }
+                                        else if(attrname=="ToBigInteger")
+                                        {
+                                            var n = System.Numerics.BigInteger.Parse(text);
+                                            calcStack.Push(n);
+                                        }
                                     }
                                 }
                             }
@@ -200,6 +209,14 @@ namespace Neo.Compiler.MSIL
                             var field = src.tokenUnknown as Mono.Cecil.FieldReference;
                             var fname = field.DeclaringType.FullName + "::" + field.Name;
                             to.staticfields[fname] = calcStack.Pop();
+                        }
+                        break;
+                    case CodeEx.Stelem_I1:
+                        {
+                            var v =(byte)(int)calcStack.Pop();
+                            var index =(int)calcStack.Pop();
+                            var array = calcStack.Pop() as byte[];
+                            array[index] = v;
                         }
                         break;
                 }
