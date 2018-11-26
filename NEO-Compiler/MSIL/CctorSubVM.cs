@@ -107,7 +107,7 @@ namespace Neo.Compiler.MSIL
                             }
                             else
                             {
-                              throw new Exception("only byte[] can be defined in here.");
+                                throw new Exception("only byte[] can be defined in here.");
                             }
                         }
                         break;

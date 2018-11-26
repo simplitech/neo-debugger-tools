@@ -19,14 +19,14 @@ namespace Neo.Compiler.MSIL
         public void LoadModule(System.IO.Stream dllStream, System.IO.Stream pdbStream)
         {
             this.module = Mono.Cecil.ModuleDefinition.ReadModule(dllStream);
-#if WITHPDB
+//#if WITHPDB
             if (pdbStream != null)
             {
                 var debugInfoLoader = new Mono.Cecil.Pdb.PdbReaderProvider();
 
                 module.ReadSymbols(debugInfoLoader.GetSymbolReader(module, pdbStream));
             }
-#endif
+//#endif
             if (module.HasAssemblyReferences)
             {
                 foreach (var ar in module.AssemblyReferences)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace Neo.Compiler.MSIL
 {
@@ -971,7 +972,9 @@ namespace Neo.Compiler.MSIL
                 int n3 = method.GetNextCodeAddr(n2);
                 int n4 = method.GetNextCodeAddr(n3);
                 if (n >= 0 && n2 >= 0 && n3 >= 0 && method.body_Codes[n].code == CodeEx.Dup && method.body_Codes[n2].code == CodeEx.Ldtoken && method.body_Codes[n3].code == CodeEx.Call)
-                {//這是在初始化數組
+                {
+                    // 這是在初始化數組
+                    // en: this is the initialization array
 
                     // System.Byte or System.SByte
                     var data = method.body_Codes[n2].tokenUnknown as byte[];
