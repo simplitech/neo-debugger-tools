@@ -1,6 +1,7 @@
 ﻿using Neo.Lux.Core;
 using Neo.Lux.Cryptography;
 using Neo.Lux.Utils;
+using Neo.Lux.VM;
 using Neo.VM.Types;
 using System;
 using System.Collections;
@@ -15,6 +16,38 @@ namespace Neo.VM
 {
     public class ExecutionEngine : IDisposable
     {
+
+        #region Limits
+        /// <summary>
+        /// Max value for SHL and SHR
+        /// </summary>
+        public const int Max_SHL_SHR = ushort.MaxValue;
+        /// <summary>
+        /// Min value for SHL and SHR
+        /// </summary>
+        public const int Min_SHL_SHR = -Max_SHL_SHR;
+        /// <summary>
+        /// Set the max size allowed size for BigInteger
+        /// </summary>
+        public const int MaxSizeForBigInteger = 32;
+        /// <summary>
+        /// Set the max Stack Size
+        /// </summary>
+        public const uint MaxStackSize = 2 * 1024;
+        /// <summary>
+        /// Set Max Item Size
+        /// </summary>
+        public const uint MaxItemSize = 1024 * 1024;
+        /// <summary>
+        /// Set Max Invocation Stack Size
+        /// </summary>
+        public const uint MaxInvocationStackSize = 1024;
+        /// <summary>
+        /// Set Max Array Size
+        /// </summary>
+        public const uint MaxArraySize = 1024;
+        #endregion
+
         private readonly IScriptTable table;
         private readonly InteropService service;
 
@@ -64,7 +97,7 @@ namespace Neo.VM
                 State |= VMState.FAULT;
                 return;
             }
-            if (opcode >= OpCode.PUSHBYTES1 && opcode <= OpCode.PUSHBYTES75)
+            if (opcode >= OpCode.PUSHBYTES1 && opcode <=OpCode.PUSHBYTES75)
                 EvaluationStack.Push(context.OpReader.ReadBytes((byte)opcode));
             else
                 switch (opcode)

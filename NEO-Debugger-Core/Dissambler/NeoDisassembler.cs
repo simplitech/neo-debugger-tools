@@ -1,5 +1,6 @@
 ﻿using Neo.Emulation.Utils;
 using Neo.Lux.Core;
+using Neo.Lux.VM;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -476,7 +477,7 @@ namespace Neo.Debugger.Dissambler
                                         if (!Enum.IsDefined(typeof(OpCode), opcode))
                                         {
                                             var s = ((byte)opcode).ToString();
-                                            throw new DisassembleException("Invalid opcode " + s);
+                                            //throw new DisassembleException("Invalid opcode " + s);
                                         }
 
                                         break;

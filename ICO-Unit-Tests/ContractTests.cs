@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using LunarParser;
+using LunarLabs.Parser;
 using Neo.Emulation;
 using Neo.Emulation.API;
 using NUnit.Framework;

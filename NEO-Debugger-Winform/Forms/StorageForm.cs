@@ -63,10 +63,10 @@ namespace Neo.Debugger.Forms
 
                 if (key == null)
                 {
-                    key = FormattingUtils.OutputData(entry.Key, false);
+                    key = Emulation.Utils.FormattingUtils.OutputData(entry.Key, false);
                 }
 
-                dataGridView1.Rows.Add(key, FormattingUtils.OutputData(entry.Value, false, hintType));
+                dataGridView1.Rows.Add(key, Emulation.Utils.FormattingUtils.OutputData(entry.Value, false, hintType));
             }
         }
     }

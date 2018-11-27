@@ -1,4 +1,4 @@
-﻿using LunarParser;
+﻿using LunarLabs.Parser;
 using Neo.Lux.Utils;
 using Neo.VM;
 using System;

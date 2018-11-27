@@ -1,5 +1,6 @@
-﻿using LunarParser;
-using LunarParser.JSON;
+﻿
+using LunarLabs.Parser;
+using LunarLabs.Parser.JSON;
 using Neo.Debugger.Core.Data;
 using Neo.Emulation.API;
 using System;
