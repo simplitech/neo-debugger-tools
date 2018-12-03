@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Neo.Lux.Cryptography;
 
 namespace NEO_Emulator.Utils
 {
@@ -19,5 +20,13 @@ namespace NEO_Emulator.Utils
 
 			return (uint)_random.Next(int.MaxValue);
 		}
-	}
+
+        public static UInt256 RandomHash()
+        {
+            byte[] array = new byte[32];
+            var random = new Random();
+            random.NextBytes(array);
+            return new UInt256(array);
+        }
+    }
 }

@@ -1,4 +1,5 @@
-﻿using Neo.VM;
+﻿using Neo.Lux.Cryptography;
+using Neo.VM;
 using System;
 using System.Numerics;
 
@@ -8,19 +9,30 @@ namespace Neo.Emulation.API
     {
         public uint timestamp;
 		public BigInteger consensusData = 0;
+        public UInt256 hash;
 
-        public Header(uint timestamp, uint consensusData)
+        public Header(uint timestamp, uint consensusData, UInt256 hash)
         {
             this.timestamp = timestamp;
 			this.consensusData = consensusData;
+            this.hash = hash;
 		}
 
         [Syscall("Neo.Header.GetHash")]
         public static bool GetHash(ExecutionEngine engine)
         {
-            // Header
-            //returns  byte[] 
-            throw new NotImplementedException();
+
+            var obj = engine.EvaluationStack.Pop() as VM.Types.InteropInterface;
+
+            if (obj == null)
+            {
+                return false;
+            }
+
+            var header = obj.GetInterface<Header>();
+
+            engine.EvaluationStack.Push(header.hash.ToArray());
+            return true;
         }
 
         [Syscall("Neo.Header.GetVersion")]
