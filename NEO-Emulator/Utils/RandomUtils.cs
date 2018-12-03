@@ -24,7 +24,7 @@ namespace NEO_Emulator.Utils
         public static UInt256 RandomHash()
         {
             byte[] array = new byte[32];
-            var random = new Random();
+            _random = new Random();
             random.NextBytes(array);
             return new UInt256(array);
         }
