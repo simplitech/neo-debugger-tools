@@ -76,7 +76,7 @@ namespace Neo.Emulation.API
 
         public Block GenerateBlock()
         {
-            var block = new Block(currentHeight + 1, DateTime.Now.ToTimestamp(), RandomUtils.RandomUInt());
+            var block = new Block(currentHeight + 1, DateTime.Now.ToTimestamp(), RandomUtils.RandomUInt(), RandomUtils.RandomHash());
             return block;
         }
 
@@ -170,7 +170,7 @@ namespace Neo.Emulation.API
                 if (child.Name.Equals("block"))
                 {
                     uint index = (uint)(_blocks.Count + 1);
-                    var block = new Block(index, 0, RandomUtils.RandomUInt());
+                    var block = new Block(index, 0, RandomUtils.RandomUInt(), RandomUtils.RandomHash());
                     if (block.Load(child))
                     {
                         _blocks[index] = block;
@@ -303,7 +303,7 @@ namespace Neo.Emulation.API
                 if (height <= blockchain.currentHeight)
                 {
                     uint index = height + 1;
-                    block = new Block(index, 1506787300, RandomUtils.RandomUInt());
+                    block = new Block(index, 1506787300, RandomUtils.RandomUInt(), RandomUtils.RandomHash());
                     blockchain._blocks[index] = block;
                 }
             }

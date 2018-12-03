@@ -1,4 +1,5 @@
 ﻿using LunarLabs.Parser;
+using Neo.Lux.Cryptography;
 using Neo.VM;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace Neo.Emulation.API
 
         public int TransactionCount { get { return _transactions.Count; } }
 
-        public Block(uint height, uint timestamp, uint consensusData) : base(timestamp, consensusData)
+        public Block(uint height, uint timestamp, uint consensusData, UInt256 hash) : base(timestamp, consensusData, hash)
         {
             this.height = height;
         }
