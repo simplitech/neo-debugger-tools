@@ -29,8 +29,8 @@ namespace Neo.Emulation.API
             return true;
         }
 
-        [Syscall("System.Runtime.Serialize")]
-        protected bool Serialize(ExecutionEngine engine)
+        [Syscall("Neo.Runtime.Serialize")]
+        public static bool Serialize(ExecutionEngine engine)
         {
             using (MemoryStream ms = new MemoryStream())
             using (BinaryWriter writer = new BinaryWriter(ms))
@@ -51,8 +51,8 @@ namespace Neo.Emulation.API
             return true;
         }
 
-        [Syscall("System.Runtime.Deserialize")]
-        protected bool Deserialize(ExecutionEngine engine)
+        [Syscall("Neo.Runtime.Deserialize")]
+        public static bool Deserialize(ExecutionEngine engine)
         {
             byte[] data = engine.EvaluationStack.Pop().GetByteArray();
             using (MemoryStream ms = new MemoryStream(data, false))
@@ -128,7 +128,7 @@ namespace Neo.Emulation.API
         }
 
 
-        private void SerializeStackItem(StackItem item, BinaryWriter writer)
+        private static void SerializeStackItem(StackItem item, BinaryWriter writer)
         {
             List<StackItem> serialized = new List<StackItem>();
             Stack<StackItem> unserialized = new Stack<StackItem>();
@@ -181,7 +181,7 @@ namespace Neo.Emulation.API
         }
 
 
-        private StackItem DeserializeStackItem(BinaryReader reader)
+        private static StackItem DeserializeStackItem(BinaryReader reader)
         {
             Stack<StackItem> deserialized = new Stack<StackItem>();
             int undeserialized = 1;
