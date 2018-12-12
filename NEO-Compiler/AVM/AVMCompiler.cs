@@ -19,7 +19,7 @@ namespace Neo.Compiler.AVM
         {
             string onlyname = System.IO.Path.GetFileNameWithoutExtension(filename);
 
-            ILModule mod = new ILModule();
+            ILModule mod = new ILModule(log);
             System.IO.Stream fs = null;
             System.IO.Stream fspdb = null;
 
