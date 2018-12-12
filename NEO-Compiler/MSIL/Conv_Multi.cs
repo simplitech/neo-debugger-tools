@@ -14,12 +14,14 @@ namespace Neo.Compiler.MSIL
         private void _ConvertStLoc(ILMethod method, OpCode src, NeoMethod to, int pos)
         {
 
-            //get array
-            _Convert1by1(Lux.VM.OpCode.FROMALTSTACK, src, to);
-            _Convert1by1(Lux.VM.OpCode.DUP, null, to);
-            _Convert1by1(Lux.VM.OpCode.TOALTSTACK, null, to);
-            //get i
-            _ConvertPush(pos + method.paramtypes.Count, null, to);//翻转取参数顺序
+			//get array
+			//_Convert1by1(Lux.VM.OpCode.FROMALTSTACK, src, to);
+			//_Convert1by1(Lux.VM.OpCode.DUP, null, to);
+			//_Convert1by1(Lux.VM.OpCode.TOALTSTACK, null, to);
+			_Convert1by1(Lux.VM.OpCode.DUPFROMALTSTACK, src, to);
+
+			//get i
+			_ConvertPush(pos + method.paramtypes.Count, null, to);//翻转取参数顺序
 
             //getitem
             _ConvertPush(2, null, to);
@@ -60,12 +62,13 @@ namespace Neo.Compiler.MSIL
         }
         private void _ConvertLdLoc(ILMethod method, OpCode src, NeoMethod to, int pos)
         {
-            //get array
-            _Convert1by1(Lux.VM.OpCode.FROMALTSTACK, src, to);
-            _Convert1by1(Lux.VM.OpCode.DUP, null, to);
-            _Convert1by1(Lux.VM.OpCode.TOALTSTACK, null, to);
-            //get i
-            _ConvertPush(pos + method.paramtypes.Count, null, to);//翻转取参数顺序
+			//get array
+			//_Convert1by1(Lux.VM.OpCode.FROMALTSTACK, src, to);
+			//_Convert1by1(Lux.VM.OpCode.DUP, null, to);
+			//_Convert1by1(Lux.VM.OpCode.TOALTSTACK, null, to);
+			_Convert1by1(Lux.VM.OpCode.DUPFROMALTSTACK, src, to);
+			//get i
+			_ConvertPush(pos + method.paramtypes.Count, null, to);//翻转取参数顺序
             _Convert1by1(Lux.VM.OpCode.PICKITEM, null, to);
 
 
@@ -138,9 +141,10 @@ namespace Neo.Compiler.MSIL
             }
             //}
             //get array
-            _Convert1by1(Lux.VM.OpCode.FROMALTSTACK, src, to);
-            _Convert1by1(Lux.VM.OpCode.DUP, null, to);
-            _Convert1by1(Lux.VM.OpCode.TOALTSTACK, null, to);
+            //_Convert1by1(Lux.VM.OpCode.FROMALTSTACK, src, to);
+            //_Convert1by1(Lux.VM.OpCode.DUP, null, to);
+            //_Convert1by1(Lux.VM.OpCode.TOALTSTACK, null, to);
+			_Convert1by1(Lux.VM.OpCode.DUPFROMALTSTACK, src, to);
             //get i
             _ConvertPush(pos, null, to);//翻转取参数顺序
             _Convert1by1(Lux.VM.OpCode.PICKITEM, null, to);
@@ -866,7 +870,7 @@ namespace Neo.Compiler.MSIL
             ILType type;
             if (inModule.mapType.TryGetValue(typename, out type) == false)
             {
-                type = new ILType(null, method.DeclaringType);
+                type = new ILType(null, method.DeclaringType, logger);
                 inModule.mapType[typename] = type;
             }
 
@@ -1098,14 +1102,15 @@ namespace Neo.Compiler.MSIL
             {
                 _Insert1(Lux.VM.OpCode.NEWARRAY, null, to);
             }
-            //now stack  a index, a value
+			//now stack  a index, a value
 
-            //getarray
-            _Insert1(Lux.VM.OpCode.FROMALTSTACK, null, to);
-            _Insert1(Lux.VM.OpCode.DUP, null, to);
-            _Insert1(Lux.VM.OpCode.TOALTSTACK, null, to);
+			//getarray
+			//_Insert1(Lux.VM.OpCode.FROMALTSTACK, null, to);
+			//_Insert1(Lux.VM.OpCode.DUP, null, to);
+			//_Insert1(Lux.VM.OpCode.TOALTSTACK, null, to);
+			_Convert1by1(Lux.VM.OpCode.DUPFROMALTSTACK, null, to);
 
-            _InsertPush(2, "", to);//move item
+			_InsertPush(2, "", to);//move item
             _Insert1(Lux.VM.OpCode.ROLL, null, to);
 
             _InsertPush(2, "", to);//move value
@@ -1172,8 +1177,8 @@ namespace Neo.Compiler.MSIL
                             //var _type = attr.ConstructorArguments[0].Type;
                             var value = (byte)attr.ConstructorArguments[0].Value;
                             Lux.VM.OpCode v = (Lux.VM.OpCode)value;
-                            _Insert1(v, null, to);
-                            return 0;
+							_Convert1by1(v, src, to);
+							return 0;
                         }
 
                     }

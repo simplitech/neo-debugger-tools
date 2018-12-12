@@ -25,7 +25,7 @@ namespace NEO_Emulator.Utils
         {
             byte[] array = new byte[32];
             _random = new Random();
-            random.NextBytes(array);
+            _random.NextBytes(array);
             return new UInt256(array);
         }
     }

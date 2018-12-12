@@ -39,8 +39,10 @@ namespace Neo.Emulation.API
         {
             this.timestamp = root.GetUInt32("timestamp");
 			this.consensusData = root.GetUInt32("consensusData");
+			this.hash = UInt256.Parse(root.GetString("hash"));
 
-            this._transactions.Clear();
+
+			this._transactions.Clear();
 
             foreach (var child in root.Children)
             {
@@ -65,6 +67,7 @@ namespace Neo.Emulation.API
 
             result.AddField("timestamp", timestamp);
 			result.AddField("consensusData", consensusData);
+			result.AddField("hash", hash.ToString());
 
             return result;
         }
