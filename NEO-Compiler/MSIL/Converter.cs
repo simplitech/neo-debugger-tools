@@ -174,17 +174,15 @@ namespace Neo.Compiler.MSIL
                             nm.paramtypes.Add(new NeoParam(src.name, src.type));
                         }
 
-                        byte[] outcall; string name;
-                        if (IsAppCall(m.Value.method, out outcall))
-                            continue;
-                        if (IsNonCall(m.Value.method))
-                            continue;
-                        if (IsOpCall(m.Value.method, out name))
-                            continue;
-                        if (IsSysCall(m.Value.method, out name))
-                            continue;
+						byte[] outcall; string name; Lux.VM.OpCode[] opcodes; string[] opdata;
+						if (IsAppCall(m.Value.method, out outcall))
+							continue;
+						if (IsNonCall(m.Value.method))
+							continue;
+						if (IsMixAttribute(m.Value.method, out opcodes, out opdata))
+							continue;
 
-                        this.ConvertMethod(m.Value, nm);
+						this.ConvertMethod(m.Value, nm);
                     }
                     //catch (Exception err)
                     //{
