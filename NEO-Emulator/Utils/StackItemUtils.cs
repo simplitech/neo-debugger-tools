@@ -1,6 +1,7 @@
 ﻿using Neo.Lux.Cryptography;
 using Neo.Lux.Utils;
 using Neo.VM;
+using Neo.VM.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace Neo.Emulation.Utils
     {
         public static string StackItemAsString(StackItem item, bool addQuotes = false, Emulator.Type hintType = Emulator.Type.Unknown)
         {
-            if (item is ICollection)
+            if (item is ICollection && !(item is Map))
             {
                 var bytes = item.GetByteArray();
                 if (bytes != null && bytes.Length == 20)
@@ -42,6 +43,22 @@ namespace Neo.Emulation.Utils
 
 
                 return s.ToString();
+            }else if(item is Map)
+            {
+                Map mapItem = (Map)item;
+                var builder = new StringBuilder();
+                builder.Append("{\n");
+                foreach(var key in mapItem.Keys)
+                {
+                    builder.Append(StackItemAsString(key));
+                    builder.Append(" : ");
+                    builder.Append(StackItemAsString(mapItem[key]));
+                    builder.Append("\n");
+                }
+                builder.Append("}");
+
+
+                return builder.ToString();
             }
 
             if (item is Neo.VM.Types.Boolean && hintType == Emulator.Type.Unknown)
@@ -66,7 +83,6 @@ namespace Neo.Emulation.Utils
             }
             catch
             {
-
             }
             
             if ((data == null || data.Length == 0) && hintType == Emulator.Type.Unknown)
@@ -299,14 +315,14 @@ namespace Neo.Emulation.Utils
                 if (Equals(source, separator, i))
                 {
                     part = new byte[i - index];
-                    Array.Copy(source, index, part, 0, part.Length);
+                    System.Array.Copy(source, index, part, 0, part.Length);
                     parts.Add(part);
                     index = i + separator.Length;
                     i += separator.Length - 1;
                 }
             }
             part = new byte[source.Length - index];
-            Array.Copy(source, index, part, 0, part.Length);
+            System.Array.Copy(source, index, part, 0, part.Length);
             parts.Add(part);
             return parts.ToArray();
         }
