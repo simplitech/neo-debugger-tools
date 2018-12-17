@@ -24,6 +24,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NEO-WebDebugger", "NEO-WebD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NEO-Debugger-Electron", "NEO-Debugger-Electron\NEO-Debugger-Electron.csproj", "{DC8A5BC7-A582-4B0E-A26C-3A2F36ADAE5F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NEO-EmulatorTests", "NEO-EmulatorTests\NEO-EmulatorTests.csproj", "{E3F8F767-EBB3-4B0D-8B5B-E2AE6CB0DEC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NEO-Debugger-CoreTests", "NEO-Debugger-CoreTests\NEO-Debugger-CoreTests.csproj", "{4CFFE4EE-6ABD-49B5-99B1-28C4BCDD711D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +70,14 @@ Global
 		{DC8A5BC7-A582-4B0E-A26C-3A2F36ADAE5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC8A5BC7-A582-4B0E-A26C-3A2F36ADAE5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC8A5BC7-A582-4B0E-A26C-3A2F36ADAE5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3F8F767-EBB3-4B0D-8B5B-E2AE6CB0DEC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3F8F767-EBB3-4B0D-8B5B-E2AE6CB0DEC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3F8F767-EBB3-4B0D-8B5B-E2AE6CB0DEC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3F8F767-EBB3-4B0D-8B5B-E2AE6CB0DEC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CFFE4EE-6ABD-49B5-99B1-28C4BCDD711D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CFFE4EE-6ABD-49B5-99B1-28C4BCDD711D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CFFE4EE-6ABD-49B5-99B1-28C4BCDD711D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CFFE4EE-6ABD-49B5-99B1-28C4BCDD711D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
