@@ -11,16 +11,16 @@ namespace Neo.Debugger.Core.Models
 {
     public class DebuggerSettings
     {
-        public string lastOpenedFile;
-        public string lastPrivateKey;
+        public string lastOpenedFile = "";
+        public string lastPrivateKey = "";
 
-        public string lastFunction;
+        public string lastFunction = "";
 
         public Dictionary<SourceLanguage, string> compilerPaths = new Dictionary<SourceLanguage, string>();
 
         public Dictionary<string, string> lastParams = new Dictionary<string, string>();
 
-        private string fileName;
+        private string fileName = "";
 
         public readonly string path;
 

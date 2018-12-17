@@ -9,6 +9,7 @@ using System.Linq;
 using Neo.Debugger.Dissambler;
 using Neo.Debugger.Profiler;
 using Neo.Lux.Utils;
+using NEO_Emulator.SmartContractTestSuite;
 
 namespace Neo.Debugger.Core.Utils
 {
@@ -21,7 +22,7 @@ namespace Neo.Debugger.Core.Utils
         public delegate void DebugManagerLogEventHandler(object sender, DebugManagerLogEventArgs e);
 
         //Public props
-        public TestSuite Tests { get { return _tests; } }
+        public SmartContractTestSuite Tests { get { return _tests; } }
         public Emulator Emulator
         {
             get
@@ -182,8 +183,9 @@ namespace Neo.Debugger.Core.Utils
         private ABI _ABI { get; set; }
         private NeoMapFile _map { get; set; }
         private bool _isCompiled { get; set; }
+		private Dictionary<byte[], AVMDisassemble> _disassembles = new Dictionary<byte[], AVMDisassemble>(new ByteArrayComparer());
 
-        public AVMDisassemble avmDisassemble { get; private set; }
+		public AVMDisassemble avmDisassemble { get; private set; }
 
         //Profiler context
         public ProfilerContext profiler { get; private set; }
@@ -200,7 +202,7 @@ namespace Neo.Debugger.Core.Utils
         }
 
         //Tests
-        private TestSuite _tests { get; set; }
+        private SmartContractTestSuite _tests { get; set; }
 
         //File paths
         private string _avmFilePath { get; set; }
@@ -229,6 +231,10 @@ namespace Neo.Debugger.Core.Utils
         }
 
         private string _blockchainFilePath;
+
+		public DebugManager() : this(new DebuggerSettings(Directory.GetCurrentDirectory()))
+		{
+		}
 
         public DebugManager(DebuggerSettings settings)
         {
@@ -455,11 +461,10 @@ namespace Neo.Debugger.Core.Utils
 
         public bool LoadTests()
         {
-            _tests = new TestSuite(_avmFilePath);
+            _tests = new SmartContractTestSuite(_avmFilePath);
             return true;
         }
 
-        private Dictionary<byte[], AVMDisassemble> _disassembles = new Dictionary<byte[], AVMDisassemble>(new ByteArrayComparer());
 
         public int ResolveLine(int ofs, bool useMap, out string filePath)
         {
@@ -634,6 +639,26 @@ namespace Neo.Debugger.Core.Utils
             _state = _emulator.Run();
             UpdateState();
         }
+
+		public List<object> RunSequence(string sequenceName)
+		{
+			var resultList = new List<object>();
+			var testSequence = _tests.sequences[sequenceName];
+			var debugParams = new DebugParameters();
+			foreach (var testItem in testSequence.Items)
+			{
+				debugParams.PrivateKey = testItem.TestPrivateKey;
+				debugParams.WitnessMode = CheckWitnessMode.Default;
+				var testCase = _tests.cases[testItem.TestName];
+				debugParams.ArgList = testCase.args;
+				debugParams.TriggerType = TriggerType.Application;
+				SetDebugParameters(debugParams);
+				Run();
+				var result = _emulator.GetOutput();
+				resultList.Add(result);
+			}
+			return resultList;
+		}
 
         public void Step()
         {

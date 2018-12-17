@@ -11,13 +11,14 @@ using System.Numerics;
 using System.Windows.Forms;
 using Neo.Lux.Cryptography;
 using LunarLabs.Parser.JSON;
+using NEO_Emulator.SmartContractTestSuite;
 
 namespace Neo.Debugger.Forms
 {
     public partial class RunForm : Form
     {
         private ABI _abi;
-        private TestSuite _testSuite;
+        private SmartContractTestSuite _testSuite;
         private string currentContractName = "";
         private bool editMode = false;
         private int editRow;
@@ -30,7 +31,7 @@ namespace Neo.Debugger.Forms
         private string _defaultPrivateKey;
         private Dictionary<string, string> _defaultParams;
 
-        public RunForm(ABI abi, TestSuite tests, string contractName, string defaultPrivateKey, Dictionary<string,string> defaultParams, string defaultFunction)
+        public RunForm(ABI abi, SmartContractTestSuite tests, string contractName, string defaultPrivateKey, Dictionary<string,string> defaultParams, string defaultFunction)
         {
             InitializeComponent();
             _testSuite = tests;
@@ -74,6 +75,11 @@ namespace Neo.Debugger.Forms
             {
                 testCasesList.Items.Add(entry);
             }
+
+			foreach (var entry in _testSuite.sequences.Keys)
+			{
+				testSequenceList.Items.Add(entry);
+			}
         }
 
         private string ConvertArray(string s)

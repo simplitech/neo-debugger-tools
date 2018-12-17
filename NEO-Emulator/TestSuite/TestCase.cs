@@ -28,28 +28,5 @@ namespace Neo.Emulation
             return new TestCase(name, method, argNode);
         }
     }
-
-    public class TestSuite
-    {
-        public Dictionary<string, TestCase> cases = new Dictionary<string, TestCase>();
-
-        public TestSuite(string fileName)
-        {
-            fileName = fileName.Replace(".avm", ".test.json");
-
-            if (File.Exists(fileName))
-            {
-                var json = File.ReadAllText(fileName);
-                var root = JSONReader.ReadFromString(json);
-
-                var casesNode = root["cases"];
-                foreach (var node in casesNode.Children)
-                {
-                    var entry = TestCase.FromNode(node);
-                    cases[entry.name] = entry;
-                }
-            }
-
-        }
-    }
+	
 }
