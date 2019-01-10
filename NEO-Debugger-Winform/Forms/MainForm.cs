@@ -349,7 +349,15 @@ namespace Neo.Debugger.Forms
                 return;
             }
 
-            _debugger.Run();
+            if(RunForm.SelectedTestSequence != null)
+            {
+                _debugger.RunSequence(RunForm.SelectedTestSequence);
+            }
+            else
+            {
+                _debugger.Run();
+            }
+            
             UpdateDebuggerStateUI();
         }
 
@@ -435,7 +443,15 @@ namespace Neo.Debugger.Forms
                 _settings.lastFunction = runForm.currentMethod.name;
             }
 
-           return _debugger.SetDebugParameters(debugParams);
+            if(RunForm.SelectedTestSequence == null)
+            {
+                return _debugger.SetDebugParameters(debugParams);
+            }
+            else
+            {
+                return true;
+            }
+           
         }
 
         #endregion

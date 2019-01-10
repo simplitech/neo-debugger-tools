@@ -647,8 +647,14 @@ namespace Neo.Debugger.Core.Utils
 			var debugParams = new DebugParameters();
 			foreach (var testItem in testSequence.Items)
 			{
+                //TODO: Refactoring required 
 				debugParams.PrivateKey = testItem.TestPrivateKey;
-				debugParams.WitnessMode = CheckWitnessMode.Default;
+                var keyPair = DebuggerUtils.GetKeyFromString(debugParams.PrivateKey);
+                if (keyPair != null)
+                {
+                    Runtime.invokerKeys = keyPair;
+                }
+                debugParams.WitnessMode = CheckWitnessMode.Default;
 				var testCase = _tests.cases[testItem.TestName];
 				debugParams.ArgList = testCase.args;
 				debugParams.TriggerType = TriggerType.Application;
