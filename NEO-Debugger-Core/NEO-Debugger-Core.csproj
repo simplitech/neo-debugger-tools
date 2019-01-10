@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Neo.Debugger.Core</RootNamespace>
     <AssemblyName>Neo.Debugger.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -96,6 +96,7 @@
     <Compile Include="Dissambler\NeoDebugMap.cs" />
     <Compile Include="Dissambler\NeoDisassembler.cs" />
     <Compile Include="Generator\NeoLux.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Profiler\ProfilerContext.cs" />
     <Compile Include="Shell\BreakpointCommand.cs" />
     <Compile Include="Shell\ContractCommand.cs" />

@@ -752,7 +752,9 @@ namespace Neo.Debugger.Core.Utils
 
                 _emulator.Reset(loaderScript, this.ABI, methodName);
             }
+#pragma warning disable CS0168 // A variável "e" está declarada, mas nunca é usada
             catch (Exception e)
+#pragma warning restore CS0168 // A variável "e" está declarada, mas nunca é usada
             {                
                 return false;
             }
