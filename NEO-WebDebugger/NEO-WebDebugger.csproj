@@ -805,13 +805,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NEO-Compiler\NEO-Compiler.csproj">
-      <Project>{36e1ccd1-3c95-459d-88d1-6f14e07eaec9}</Project>
-      <Name>NEO-Compiler</Name>
+    <ProjectReference Include="..\NeoDebuggerCore\NeoDebuggerCore.csproj">
+      <Project>{b0751bc2-2c77-4ae6-b761-415f35fe86c0}</Project>
+      <Name>NeoDebuggerCore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NEO-Debugger-Core\NEO-Debugger-Core.csproj">
-      <Project>{f034e57e-520b-4572-88f0-76e8d28d4e7b}</Project>
-      <Name>NEO-Debugger-Core</Name>
+    <ProjectReference Include="..\NeoEmulator\NeoEmulator.csproj">
+      <Project>{75dcb19f-e7a8-422c-acfd-3245d57358f8}</Project>
+      <Name>NeoEmulator</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

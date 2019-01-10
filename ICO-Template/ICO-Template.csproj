@@ -59,12 +59,6 @@
   <ItemGroup>
     <Content Include="Neo.ConvertTask.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NEO-Emulator\NEO-Emulator.csproj">
-      <Project>{372429c2-71be-41c2-92d0-5a9187bc238a}</Project>
-      <Name>NEO-Emulator</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="Build.tasks" />
   <Target Name="AfterBuild">

@@ -71,12 +71,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NEO-Emulator\NEO-Emulator.csproj">
-      <Project>{372429C2-71BE-41C2-92D0-5A9187BC238A}</Project>
-      <Name>NEO-Emulator</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
