@@ -6,10 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="LunarParser" Version="1.1.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\neo-lux\Neo.Lux\Neo.Lux.csproj" />
+    <PackageReference Include="NeoLux" Version="0.8.3" />
   </ItemGroup>
 
 </Project>
