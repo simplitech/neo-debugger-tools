@@ -7,25 +7,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NEO-Debugger-Winform", "NEO
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NEO-WebDebugger", "NEO-WebDebugger\NEO-WebDebugger.csproj", "{46482A74-05A6-4E6A-9BC1-DBB9D23ADB39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoDebuggerCore", "NeoDebuggerCore\NeoDebuggerCore.csproj", "{B0751BC2-2C77-4AE6-B761-415F35FE86C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoDebuggerCore", "NeoDebuggerCore\NeoDebuggerCore.csproj", "{B0751BC2-2C77-4AE6-B761-415F35FE86C0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neo.Lux", "..\neo-lux\Neo.Lux\Neo.Lux.csproj", "{13CC9641-A9F9-4D23-AE04-376A01ADAEFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoCompiler", "NeoCompiler\NeoCompiler.csproj", "{DBBEBC20-054D-47D3-B279-BBACB17A0EF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoCompiler", "NeoCompiler\NeoCompiler.csproj", "{DBBEBC20-054D-47D3-B279-BBACB17A0EF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoEmulator", "NeoEmulator\NeoEmulator.csproj", "{75DCB19F-E7A8-422C-ACFD-3245D57358F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoEmulator", "NeoEmulator\NeoEmulator.csproj", "{75DCB19F-E7A8-422C-ACFD-3245D57358F8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoDebuggerCoreTests", "NeoDebuggerCoreTests\NeoDebuggerCoreTests.csproj", "{A02BA7AA-A76A-4F1C-8D2B-ED312D2AB4D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoDebuggerCoreTests", "NeoDebuggerCoreTests\NeoDebuggerCoreTests.csproj", "{A02BA7AA-A76A-4F1C-8D2B-ED312D2AB4D5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICOTemplate", "ICOTemplate\ICOTemplate.csproj", "{65141E92-6D6F-40C2-B499-6FE0CF232519}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICOUnitTests", "ICOUnitTests\ICOUnitTests.csproj", "{0F47FA9F-2162-46AB-9595-45E9262B05B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICOUnitTests", "ICOUnitTests\ICOUnitTests.csproj", "{0F47FA9F-2162-46AB-9595-45E9262B05B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoDebuggerElectron", "NeoDebuggerElectron\NeoDebuggerElectron.csproj", "{00FD33F5-134E-4561-80B0-0330B2D9789C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoDebuggerElectron", "NeoDebuggerElectron\NeoDebuggerElectron.csproj", "{00FD33F5-134E-4561-80B0-0330B2D9789C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoEmulatorTests", "NeoEmulatorTests\NeoEmulatorTests.csproj", "{656490D7-F175-4A24-957A-DB9EE5F6EAA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoEmulatorTests", "NeoEmulatorTests\NeoEmulatorTests.csproj", "{656490D7-F175-4A24-957A-DB9EE5F6EAA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoDevShell", "NeoDevShell\NeoDevShell.csproj", "{D44DA2FD-2DC6-4AF9-91F3-60D86F308A1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoDevShell", "NeoDevShell\NeoDevShell.csproj", "{D44DA2FD-2DC6-4AF9-91F3-60D86F308A1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoDebuggerUI", "NeoDebuggerUI\NeoDebuggerUI.csproj", "{ED99FF00-1FBB-469D-B202-1A109F53FA6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,10 +45,6 @@ Global
 		{B0751BC2-2C77-4AE6-B761-415F35FE86C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0751BC2-2C77-4AE6-B761-415F35FE86C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0751BC2-2C77-4AE6-B761-415F35FE86C0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13CC9641-A9F9-4D23-AE04-376A01ADAEFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13CC9641-A9F9-4D23-AE04-376A01ADAEFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13CC9641-A9F9-4D23-AE04-376A01ADAEFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13CC9641-A9F9-4D23-AE04-376A01ADAEFC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DBBEBC20-054D-47D3-B279-BBACB17A0EF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DBBEBC20-054D-47D3-B279-BBACB17A0EF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBBEBC20-054D-47D3-B279-BBACB17A0EF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -81,6 +77,10 @@ Global
 		{D44DA2FD-2DC6-4AF9-91F3-60D86F308A1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D44DA2FD-2DC6-4AF9-91F3-60D86F308A1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D44DA2FD-2DC6-4AF9-91F3-60D86F308A1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED99FF00-1FBB-469D-B202-1A109F53FA6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED99FF00-1FBB-469D-B202-1A109F53FA6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED99FF00-1FBB-469D-B202-1A109F53FA6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED99FF00-1FBB-469D-B202-1A109F53FA6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

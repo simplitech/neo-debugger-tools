@@ -1,0 +1,39 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:NeoDebuggerUI.ViewModels;assembly=NeoDebuggerUI"
+        Icon="resm:NeoDebuggerUI.Assets.avalonia-logo.ico"
+        Title="NeoDebuggerUI"
+	MinHeight="300" MinWidth="400">
+	
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+	<StackPanel Orientation="Vertical">
+		<StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+			<Button>File</Button>
+			<Button>Contract</Button>
+			<Button>Blockchain</Button>
+			<Button>Tools</Button>
+		</StackPanel>
+		<TextBox>File Name</TextBox>
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition/>	
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+						
+			<StackPanel MinHeight="400" MinWidth="340" Grid.Row="0" Grid.Column="0">
+				
+			</StackPanel>
+			
+		</Grid>
+		
+	</StackPanel>
+  
+</Window>
