@@ -40,7 +40,7 @@
               <MenuItem Header="NEP5"/>
             </MenuItem>
             </MenuItem>
-          <MenuItem Header="Open..." />
+          <MenuItem Header="Open..." Command="{Binding Open}" />
           <Separator />
           <MenuItem Header="Exit" />
         </MenuItem>
@@ -84,6 +84,7 @@
           <MenuItem Header="Collapse All" />
           <MenuItem Header="Expand All" />
         </MenuItem>
+        
         <MenuItem Header="Contract">
           <MenuItem Header="Run (F5)" />
           <MenuItem Header="Step (F10)" />
@@ -119,7 +120,7 @@
 				<ColumnDefinition Width="*"/>	
 			</Grid.ColumnDefinitions> 
 		
-			<ListBox Name="FileNames" Grid.Row="0" Grid.Column="0" Items="{Binding FileNames}"/>
+			<ListBox Name="FileNames" Grid.Row="0" Grid.Column="0" Items="{Binding ProjectFiles}"/>
 			<StackPanel Grid.Row="1" Grid.Column="0">
 				<TextBlock>Log: </TextBlock>
 				<TextBlock>Multiline \n\n ABC</TextBlock>
