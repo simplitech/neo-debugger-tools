@@ -1,39 +1,122 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+﻿
+
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:NeoDebuggerUI.ViewModels;assembly=NeoDebuggerUI"
         Icon="resm:NeoDebuggerUI.Assets.avalonia-logo.ico"
         Title="NeoDebuggerUI"
-	MinHeight="300" MinWidth="400">
+		MinHeight="200" MinWidth="300" Background="LightGray">
 	
-
+	
   <Design.DataContext>
-    <vm:MainWindowViewModel/>
+	  <vm:MainWindowViewModel/>
   </Design.DataContext>
 
+	<Window.Styles>
+		<Style Selector="StackPanel.DebuggerLine">
+			<Setter Property="Background" Value="Red"/>
+		</Style>
+	</Window.Styles>
+	
 	<StackPanel Orientation="Vertical">
-		<StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-			<Button>File</Button>
-			<Button>Contract</Button>
-			<Button>Blockchain</Button>
-			<Button>Tools</Button>
-		</StackPanel>
-		<TextBox>File Name</TextBox>
+    <DockPanel>
+      <Menu DockPanel.Dock="Top">
+        <MenuItem Header="File">
+          <MenuItem Header="New" >
+            <MenuItem Header="C#" />
+            <MenuItem Header="Python" />
+          </MenuItem>
+          <MenuItem Header="New from Template">
+            <MenuItem Header="C#">
+              <MenuItem Header="Agency Transaction"/>
+              <MenuItem Header="Domain"/>
+              <MenuItem Header="Hello World"/>
+              <MenuItem Header="ICO Template"/>
+              <MenuItem Header="Lock"/>
+              <MenuItem Header="Struct Example"/>
+            </MenuItem>
+            <MenuItem Header="Python">
+              <MenuItem Header="Hello World"/>
+              <MenuItem Header="NEP5"/>
+            </MenuItem>
+            </MenuItem>
+          <MenuItem Header="Open..." />
+          <Separator />
+          <MenuItem Header="Exit" />
+        </MenuItem>
+        <MenuItem Header="Search">
+          <MenuItem Header="Quick Find... (Ctrl+F)" />
+          <MenuItem Header="Find... (Ctrl+Alt+F)" />
+          <MenuItem Header="Find And Replace..." />
+          <Separator />
+          <MenuItem Header="Go To Line... (Ctrl+G)" />
+        </MenuItem>
+        <MenuItem Header="View">
+          <MenuItem Header="Word Wrap" />
+          <MenuItem Header="Show Ident Guidelines" />
+          <MenuItem Header="Show Whitespace" />
+          <Separator />
+          <MenuItem Header="Zoom In (Ctrl+Plus)" />
+          <MenuItem Header="Zoom Out (Ctrl+Minus)" />
+          <MenuItem Header="Zoom 100% (Ctrl+0)" />
+          <Separator />
+          <MenuItem Header="Collapse All" />
+          <MenuItem Header="Expand All" />
+        </MenuItem>
+        <MenuItem Header="Contract">
+          <MenuItem Header="Run (F5)" />
+          <MenuItem Header="Step (F10)" />
+          <MenuItem Header="Reset" />
+          <MenuItem Header="Rebuild" />
+          <MenuItem Header="Storage (F6)" />
+          <Separator />
+          <MenuItem Header="_Exit" />
+        </MenuItem>
+        <MenuItem Header="Blockchain">
+          <MenuItem Header="View" />
+          <MenuItem Header="Load" />
+          <MenuItem Header="Reset" />
+        </MenuItem>
+        <MenuItem Header="Tools">
+          <MenuItem Header="Compile" />
+          <MenuItem Header="Key Tool" />
+          <MenuItem Header="Code Generator">
+            <MenuItem Header="Neo Lux"/>
+          </MenuItem>
+        </MenuItem>
+      </Menu>
+    </DockPanel>
+		<TextBlock Margin="10,10,0,10">Filename.cs</TextBlock>
 		<Grid>
 			<Grid.RowDefinitions>
-				<RowDefinition/>
-				<RowDefinition/>	
+				<RowDefinition Height="440"/>
+				<RowDefinition Height="AUTO"/>
 			</Grid.RowDefinitions>
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition/>
-				<ColumnDefinition/>
-			</Grid.ColumnDefinitions>
-						
-			<StackPanel MinHeight="400" MinWidth="340" Grid.Row="0" Grid.Column="0">
-				
-			</StackPanel>
-			
-		</Grid>
 		
+				<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="140"/>
+				<ColumnDefinition Width="*"/>	
+			</Grid.ColumnDefinitions> 
+		
+			<ListBox Name="FileNames" Grid.Row="0" Grid.Column="0" Items="{Binding FileNames}"/>
+			<StackPanel Grid.Row="1" Grid.Column="0">
+				<TextBlock>Log: </TextBlock>
+				<TextBlock>Multiline \n\n ABC</TextBlock>
+			</StackPanel>
+			<ListBox Name="FileContent" Grid.Row="0" Grid.Column="1" Items="{Binding FileContent}">
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<StackPanel Orientation="Horizontal" Classes="DebuggerLine">
+							<TextBlock Text="{Binding LineNumber}" Margin="0, 0, 20, 0"></TextBlock>
+							<TextBlock Text="{Binding LineContent}"></TextBlock>
+						</StackPanel>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+				
+				
+			</ListBox>
+			<Button Grid.Row="1" Grid.Column="1"/>
+		</Grid>
 	</StackPanel>
   
 </Window>
