@@ -3,9 +3,11 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:NeoDebuggerUI.ViewModels;assembly=NeoDebuggerUI"
+        xmlns:AvalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
         Icon="resm:NeoDebuggerUI.Assets.avalonia-logo.ico"
         Title="NeoDebuggerUI"
 		MinHeight="200" MinWidth="300" Background="LightGray">
+  
 	
 	
   <Design.DataContext>
@@ -17,7 +19,8 @@
 			<Setter Property="Background" Value="Red"/>
 		</Style>
 	</Window.Styles>
-	
+
+
 	<StackPanel Orientation="Vertical">
     <DockPanel>
       <Menu DockPanel.Dock="Top">
@@ -108,16 +111,17 @@
         </MenuItem>
       </Menu>
     </DockPanel>
-		<TextBlock Margin="10,10,0,10">Filename.cs</TextBlock>
+    <TextBlock Margin="10,10,0,10" Text="{Binding SelectedFile}" />
 		<Grid>
 			<Grid.RowDefinitions>
 				<RowDefinition Height="440"/>
-				<RowDefinition Height="AUTO"/>
+				<RowDefinition Height="*"/>
 			</Grid.RowDefinitions>
-		
+     
+       
 				<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="140"/>
-				<ColumnDefinition Width="*"/>	
+				<ColumnDefinition Width="440"/>	
 			</Grid.ColumnDefinitions> 
 		
 			<ListBox Name="FileNames" Grid.Row="0" Grid.Column="0" Items="{Binding ProjectFiles}"/>
@@ -125,19 +129,14 @@
 				<TextBlock>Log: </TextBlock>
 				<TextBlock>Multiline \n\n ABC</TextBlock>
 			</StackPanel>
-			<ListBox Name="FileContent" Grid.Row="0" Grid.Column="1" Items="{Binding FileContent}">
-				<ListBox.ItemTemplate>
-					<DataTemplate>
-						<StackPanel Orientation="Horizontal" Classes="DebuggerLine">
-							<TextBlock Text="{Binding LineNumber}" Margin="0, 0, 20, 0"></TextBlock>
-							<TextBlock Text="{Binding LineContent}"></TextBlock>
-						</StackPanel>
-					</DataTemplate>
-				</ListBox.ItemTemplate>
-				
-				
-			</ListBox>
-			<Button Grid.Row="1" Grid.Column="1"/>
+      
+        <AvalonEdit:TextEditor Name="Editor"
+                         Margin="30"
+                         HorizontalScrollBarVisibility="Auto"
+                         VerticalScrollBarVisibility="Visible"
+                         TextBlock.FontSize="30" Grid.Row="0" Grid.Column="1"
+                       />
+        <Button Grid.Row="1" Grid.Column="1"/>
 		</Grid>
 	</StackPanel>
   
