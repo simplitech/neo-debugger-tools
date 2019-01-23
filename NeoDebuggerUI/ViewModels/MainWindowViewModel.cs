@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -12,11 +13,18 @@ namespace NeoDebuggerUI.ViewModels
 	public class MainWindowViewModel : ViewModelBase
 	{
 		public ReactiveList<string> ProjectFiles { get; } = new ReactiveList<string>();
-		public string SelectedFile { get; set; }
+
+		private string _selectedFile;
+		public string SelectedFile
+		{
+			get => _selectedFile;
+			set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
+		}
 		private string _fileFolder;
 		private DebugManager _debugger;
 		private DebuggerSettings _settings;
 		private DateTime _lastModificationDate;
+
 
 		public MainWindowViewModel()
 		{
@@ -38,13 +46,17 @@ namespace NeoDebuggerUI.ViewModels
 			{
 				ProjectFiles.Clear();
 				_fileFolder = Path.GetDirectoryName(avmFilePath);
+				ProjectFiles.Add(Path.GetFileName(avmFilePath));
 				foreach (var path in _debugger.Map.FileNames)
 				{
 					_debugger.LoadAssignmentsFromContent(path);
 					var fileName = Path.GetFileName(path);
 					ProjectFiles.Add(fileName);
 				}
+				
+				SelectedFile = avmFilePath;
 			}
+
 
 			//ReloadTextArea(_debugger.CurrentFilePath);
 
