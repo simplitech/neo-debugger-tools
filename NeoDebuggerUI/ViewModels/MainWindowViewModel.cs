@@ -2,17 +2,24 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
 using ReactiveUI;
+using ReactiveUI.Legacy;
+using System.Reactive.Linq;
 
 namespace NeoDebuggerUI.ViewModels
 {
 	public class MainWindowViewModel : ViewModelBase
 	{
 		public ReactiveList<string> ProjectFiles { get; } = new ReactiveList<string>();
+		public delegate void SelectedFileChanged(string selectedFilename);
+		public event SelectedFileChanged EvtFileChanged;
+
+		public ReactiveCommand<Unit, Unit> LoadFiles { get; }
 
 		private string _selectedFile;
 		public string SelectedFile
@@ -20,6 +27,7 @@ namespace NeoDebuggerUI.ViewModels
 			get => _selectedFile;
 			set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
 		}
+
 		private string _fileFolder;
 		private DebugManager _debugger;
 		private DebuggerSettings _settings;
@@ -30,6 +38,14 @@ namespace NeoDebuggerUI.ViewModels
 		{
 			_settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
 			_debugger = new DebugManager(_settings);
+			var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile).ObserveOn(RxApp.MainThreadScheduler);
+			fileChanged.Subscribe(file => LoadSelectedFile());
+		}
+
+		private Unit LoadSelectedFile()
+		{
+			EvtFileChanged?.Invoke(_selectedFile);
+			return Unit.Default;
 		}
 
 		private bool LoadContract(string avmFilePath)
@@ -50,13 +66,11 @@ namespace NeoDebuggerUI.ViewModels
 				foreach (var path in _debugger.Map.FileNames)
 				{
 					_debugger.LoadAssignmentsFromContent(path);
-					var fileName = Path.GetFileName(path);
-					ProjectFiles.Add(fileName);
+					ProjectFiles.Add(path);
 				}
-				
+
 				SelectedFile = avmFilePath;
 			}
-
 
 			//ReloadTextArea(_debugger.CurrentFilePath);
 

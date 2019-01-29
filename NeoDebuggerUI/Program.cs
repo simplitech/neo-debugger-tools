@@ -10,7 +10,7 @@ namespace NeoDebuggerUI
 	{
 		static void Main(string[] args)
 		{
-			BuildAvaloniaApp().Start<MainWindow>(() => new MainWindowViewModel());
+			BuildAvaloniaApp().Start<MainWindow>();
 		}
 
 		public static AppBuilder BuildAvaloniaApp()

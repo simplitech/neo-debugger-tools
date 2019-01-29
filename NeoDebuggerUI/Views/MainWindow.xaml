@@ -10,17 +10,15 @@
   
 	
 	
-  <Design.DataContext>
+  <Window.DataContext>
 	  <vm:MainWindowViewModel/>
-  </Design.DataContext>
+  </Window.DataContext>
 
 	<Window.Styles>
 		<Style Selector="StackPanel.DebuggerLine">
 			<Setter Property="Background" Value="Red"/>
 		</Style>
 	</Window.Styles>
-
-
 	<StackPanel Orientation="Vertical">
     <DockPanel>
       <Menu DockPanel.Dock="Top">
@@ -112,19 +110,20 @@
       </Menu>
     </DockPanel>
     <TextBlock Margin="10,10,0,10" Text="{Binding SelectedFile}" />
-		<Grid>
+		<Grid HorizontalAlignment="Stretch">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="440"/>
-				<RowDefinition Height="*"/>
+				<RowDefinition Height="120"/>
 			</Grid.RowDefinitions>
      
        
 				<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="140"/>
-				<ColumnDefinition Width="440"/>	
+          <!-- Fix dynamic windowing - invalid value for measure-->
+				<ColumnDefinition Width="600"/>	
 			</Grid.ColumnDefinitions> 
 		
-			<ListBox Name="FileNames" Grid.Row="0" Grid.Column="0" Items="{Binding ProjectFiles}"/>
+			<ListBox Name="FileNames" Grid.Row="0" Grid.Column="0" Items="{Binding ProjectFiles}" SelectedItem="{Binding SelectedFile}"  />
 			<StackPanel Grid.Row="1" Grid.Column="0">
 				<TextBlock>Log: </TextBlock>
 				<TextBlock>Multiline \n\n ABC</TextBlock>
@@ -132,10 +131,9 @@
       
         <AvalonEdit:TextEditor Name="Editor"
                          Margin="30"
-                         HorizontalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Visible"
                          VerticalScrollBarVisibility="Visible"
-                         TextBlock.FontSize="30" Grid.Row="0" Grid.Column="1"
-                       />
+                         TextBlock.FontSize="30" Grid.Row="0" Grid.Column="1"/>
         <Button Grid.Row="1" Grid.Column="1"/>
 		</Grid>
 	</StackPanel>

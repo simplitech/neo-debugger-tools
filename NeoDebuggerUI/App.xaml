@@ -14,7 +14,7 @@
       <Setter Property="Foreground"
               Value="#212121" />
       <Setter Property="FontSize"
-              Value="20" />
+              Value="12" />
       <Setter Property="FontWeight"
               Value="Medium" />
     </Style>
