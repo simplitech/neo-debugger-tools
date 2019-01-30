@@ -37,9 +37,11 @@ namespace NeoDebuggerUI.ViewModels
 		{
 			_settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
 			_debugger = new DebugManager(_settings);
+			
+			Log = "Debugger started";
 			Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
 			_debugger.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
-			_log = "Debugger started";
+			
 			var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile).ObserveOn(RxApp.MainThreadScheduler);
 			fileChanged.Subscribe(file => LoadSelectedFile());
 		}
@@ -83,12 +85,12 @@ namespace NeoDebuggerUI.ViewModels
 
 		public void SendLogToPanel(string s)
 		{
-			_log += s + "\n";
+			Log += s + "\n";
 		}
 
 		public void ClearLog()
 		{
-			_log = "";
+			Log = "";
 		}
 
 		public async Task Open()
