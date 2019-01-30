@@ -20,6 +20,13 @@ namespace NeoDebuggerUI.ViewModels
 			get => _selectedFile;
 			set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
 		}
+		private string _log;
+		public string Log
+		{
+			get => _log;
+			set => this.RaiseAndSetIfChanged(ref _log, value);
+		}
+
 		private string _fileFolder;
 		private DebugManager _debugger;
 		private DebuggerSettings _settings;
@@ -30,6 +37,17 @@ namespace NeoDebuggerUI.ViewModels
 		{
 			_settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
 			_debugger = new DebugManager(_settings);
+			Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
+			_debugger.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
+			_log = "Debugger started";
+			var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile).ObserveOn(RxApp.MainThreadScheduler);
+			fileChanged.Subscribe(file => LoadSelectedFile());
+		}
+
+		private Unit LoadSelectedFile()
+		{
+			EvtFileChanged?.Invoke(_selectedFile);
+			return Unit.Default;
 		}
 
 		private bool LoadContract(string avmFilePath)
@@ -53,7 +71,7 @@ namespace NeoDebuggerUI.ViewModels
 					var fileName = Path.GetFileName(path);
 					ProjectFiles.Add(fileName);
 				}
-				
+
 				SelectedFile = avmFilePath;
 			}
 
@@ -63,7 +81,16 @@ namespace NeoDebuggerUI.ViewModels
 			return true;
 		}
 
-		
+		public void SendLogToPanel(string s)
+		{
+			_log += s + "\n";
+		}
+
+		public void ClearLog()
+		{
+			_log = "";
+		}
+
 		public async Task Open()
 		{
 			var dialog = new OpenFileDialog();
@@ -73,7 +100,7 @@ namespace NeoDebuggerUI.ViewModels
 			filters.Add(filter);
 			dialog.Filters = filters;
 			dialog.AllowMultiple = false;
-			
+
 			var result = await dialog.ShowAsync();
 
 			if (result != null)
