@@ -28,6 +28,13 @@ namespace NeoDebuggerUI.ViewModels
 			set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
 		}
 
+		private string _log;
+		public string Log
+		{
+			get => _log;
+			set => this.RaiseAndSetIfChanged(ref _log, value);
+		}
+		
 		private string _fileFolder;
 		private DebugManager _debugger;
 		private DebuggerSettings _settings;
@@ -38,6 +45,9 @@ namespace NeoDebuggerUI.ViewModels
 		{
 			_settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
 			_debugger = new DebugManager(_settings);
+			Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
+			_debugger.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
+			_log = "Debugger started";
 			var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile).ObserveOn(RxApp.MainThreadScheduler);
 			fileChanged.Subscribe(file => LoadSelectedFile());
 		}
@@ -77,7 +87,16 @@ namespace NeoDebuggerUI.ViewModels
 			return true;
 		}
 
-		
+		public void SendLogToPanel(string s)
+		{
+			_log += s + "\n";
+		}
+
+		public void ClearLog()
+		{
+			_log = "";
+		}
+
 		public async Task Open()
 		{
 			var dialog = new OpenFileDialog();
