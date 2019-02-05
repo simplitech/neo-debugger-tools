@@ -10,6 +10,8 @@ using Neo.Debugger.Core.Utils;
 using ReactiveUI;
 using ReactiveUI.Legacy;
 using System.Reactive.Linq;
+using NeoDebuggerUI.Models;
+using NeoDebuggerUI.Views;
 
 namespace NeoDebuggerUI.ViewModels
 {
@@ -36,19 +38,14 @@ namespace NeoDebuggerUI.ViewModels
 		}
 		
 		private string _fileFolder;
-		private DebugManager _debugger;
-		private DebuggerSettings _settings;
 		private DateTime _lastModificationDate;
 
 
 		public MainWindowViewModel()
 		{
-			_settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
-			_debugger = new DebugManager(_settings);
-			
 			Log = "Debugger started";
 			Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
-			_debugger.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
+			DebuggerStore.instance.manager.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
 			
 			var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile).ObserveOn(RxApp.MainThreadScheduler);
 			fileChanged.Subscribe(file => LoadSelectedFile());
@@ -62,29 +59,29 @@ namespace NeoDebuggerUI.ViewModels
 
 		private bool LoadContract(string avmFilePath)
 		{
-			if (!_debugger.LoadContract(avmFilePath))
+			if (!DebuggerStore.instance.manager.LoadContract(avmFilePath))
 			{
 				return false;
 			}
 
-			_lastModificationDate = File.GetLastWriteTime(_debugger.AvmFilePath);
-			_debugger.Emulator.ClearAssignments();
+			_lastModificationDate = File.GetLastWriteTime(DebuggerStore.instance.manager.AvmFilePath);
+			DebuggerStore.instance.manager.Emulator.ClearAssignments();
 
-			if (_debugger.IsMapLoaded)
+			if (DebuggerStore.instance.manager.IsMapLoaded)
 			{
 				ProjectFiles.Clear();
 				_fileFolder = Path.GetDirectoryName(avmFilePath);
 				ProjectFiles.Add(Path.GetFileName(avmFilePath));
-				foreach (var path in _debugger.Map.FileNames)
+				foreach (var path in DebuggerStore.instance.manager.Map.FileNames)
 				{
-					_debugger.LoadAssignmentsFromContent(path);
+					DebuggerStore.instance.manager.LoadAssignmentsFromContent(path);
 					ProjectFiles.Add(path);
 				}
 
 				SelectedFile = avmFilePath;
 			}
 
-			//ReloadTextArea(_debugger.CurrentFilePath);
+			//ReloadTextArea(DebuggerStore.instance.manager.CurrentFilePath);
 
 			return true;
 		}
@@ -117,6 +114,12 @@ namespace NeoDebuggerUI.ViewModels
 			}
 		}
 
+		public static async void OpenRunDialog()
+		{
+			var modalWindow = new InvokeWindow();
+			var task = modalWindow.ShowDialog();
+			await Task.Run(()=> task.Wait());
+		}
 
 	}
 }
