@@ -13,11 +13,6 @@
 	  <vm:MainWindowViewModel/>
   </Window.DataContext>
 
-	<Window.Styles>
-		<Style Selector="StackPanel.DebuggerLine">
-			<Setter Property="Background" Value="Red"/>
-		</Style>
-	</Window.Styles>
 	<DockPanel LastChildFill="True">
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="File">
@@ -93,7 +88,7 @@
         <MenuItem Header="_Exit" />
       </MenuItem>
       <MenuItem Header="Blockchain">
-        <MenuItem Header="View" />
+        <MenuItem Header="View" Command="{Binding OpenGenericSampleDialog}" />
         <MenuItem Header="Load" />
         <MenuItem Header="Reset" />
       </MenuItem>

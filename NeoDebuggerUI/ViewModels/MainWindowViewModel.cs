@@ -121,5 +121,17 @@ namespace NeoDebuggerUI.ViewModels
 			await Task.Run(()=> task.Wait());
 		}
 
+		public static async void OpenGenericSampleDialog()
+		{
+			// TODO: this is a sample, rename it
+			var clickedOk = await new GenericConfirmationWindow()
+				.SetText("Do you want candy?")
+				.SetOkText("Sure, I love candy!")
+				.SetCancelText("Not today, I am on a diet :(")
+				.Open();
+
+			var wasOk = clickedOk;
+		}
+
 	}
 }
