@@ -9,17 +9,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Neo-Emulator\Neo-Emulator.csproj" />
     <ProjectReference Include="..\Neo-Debugger-Core\Neo-Debugger-Core.csproj" />
+    <ProjectReference Include="..\Neo.SmartContract.Framework\Neo.SmartContract.Framework.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Mono.Cecil" Version="0.10.3" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Neo.SmartContract.Framework.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Neo.SmartContract.Framework\bin\Release\netstandard2.0\Neo.SmartContract.Framework.dll">
-      <Link>Neo.SmartContract.Framework.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 </Project>
