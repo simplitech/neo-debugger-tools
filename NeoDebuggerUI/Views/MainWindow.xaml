@@ -95,7 +95,7 @@
         <MenuItem Header="_Exit" />
       </MenuItem>
       <MenuItem Header="Blockchain">
-        <MenuItem Header="View" />
+        <MenuItem Header="View" Command="{Binding OpenGenericSampleDialog}" />
         <MenuItem Header="Load" />
         <MenuItem Header="Reset" />
       </MenuItem>

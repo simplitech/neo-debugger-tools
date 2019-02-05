@@ -13,11 +13,6 @@
 	  <vm:InvokeWindowViewModel/>
   </Window.DataContext>
 
-	<Window.Styles>
-		<Style Selector="StackPanel.DebuggerLine">
-			<Setter Property="Background" Value="Red"/>
-		</Style>
-	</Window.Styles>
 	<DockPanel LastChildFill="True">
 		<Button Name="DebugBtn" DockPanel.Dock="Bottom" Margin="5" Width="200">Debug</Button>
 		<Grid Name="InputParametersGrid" DockPanel.Dock="Bottom" Margin="5, 5, 5, 0">
