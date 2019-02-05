@@ -86,7 +86,7 @@
         <MenuItem Header="Expand All" />
       </MenuItem>
       <MenuItem Header="Contract">
-        <MenuItem Header="Run (F5)" />
+        <MenuItem Header="Run (F5)" Command="{Binding OpenRunDialog}" />
         <MenuItem Header="Step (F10)" />
         <MenuItem Header="Reset" />
         <MenuItem Header="Rebuild" />
