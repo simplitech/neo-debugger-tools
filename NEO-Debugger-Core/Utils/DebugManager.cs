@@ -752,7 +752,7 @@ namespace Neo.Debugger.Core.Utils
 
                 _emulator.Reset(loaderScript, this.ABI, methodName);
             }
-            catch (Exception e)
+            catch (Exception)
             {                
                 return false;
             }
