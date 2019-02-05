@@ -9,7 +9,7 @@ namespace ICO_Unit_Tests
     [TestFixture]
     public class ContractTests
     {
-        private static Emulator emulator; 
+        private static Emulator emulator;
 
         [OneTimeSetUp]
         public void Setup()
@@ -40,5 +40,5 @@ namespace ICO_Unit_Tests
             var symbol = result.GetString();
             Assert.IsTrue(symbol.Equals("DEMO"));
         }
-    }   
+    }
 }

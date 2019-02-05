@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo-Convert-Task", "Neo-Con
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo-ICO-Template", "Neo-ICO-Template\Neo-ICO-Template.csproj", "{7AF5A21D-5A13-4161-B2B1-8056A75FC1AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo-ICO-UnitTests", "Neo-ICO-UnitTests\Neo-ICO-UnitTests.csproj", "{9C96D15E-934B-468D-817B-84D613408259}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo-Debugger-Core-UnitTests", "Neo-Debugger-Core-UnitTests\Neo-Debugger-Core-UnitTests.csproj", "{8E5DBFD3-FB58-45CE-8754-64184B766E5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,5 +59,13 @@ Global
 		{7AF5A21D-5A13-4161-B2B1-8056A75FC1AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AF5A21D-5A13-4161-B2B1-8056A75FC1AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AF5A21D-5A13-4161-B2B1-8056A75FC1AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C96D15E-934B-468D-817B-84D613408259}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C96D15E-934B-468D-817B-84D613408259}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C96D15E-934B-468D-817B-84D613408259}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C96D15E-934B-468D-817B-84D613408259}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E5DBFD3-FB58-45CE-8754-64184B766E5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E5DBFD3-FB58-45CE-8754-64184B766E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E5DBFD3-FB58-45CE-8754-64184B766E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E5DBFD3-FB58-45CE-8754-64184B766E5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

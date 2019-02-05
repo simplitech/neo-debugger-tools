@@ -1,8 +1,4 @@
-﻿
-using Neo.Debugger.Core.Utils;
-using NEO_Emulator.SmartContractTestSuite;
-using NUnit.Framework;
-using System;
+﻿using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
 using Neo.Emulation.Utils;
