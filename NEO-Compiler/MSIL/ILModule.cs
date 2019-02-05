@@ -147,7 +147,7 @@ namespace Neo.Compiler.MSIL
                                         }
                                     }
                                 }
-                                catch (Exception err)
+                                catch (Exception)
                                 {
 
                                 }
@@ -172,7 +172,7 @@ namespace Neo.Compiler.MSIL
                                                 }
                                             }
                                         }
-                                        catch (Exception err)
+                                        catch (Exception)
                                         {
 
                                         }
@@ -225,7 +225,7 @@ namespace Neo.Compiler.MSIL
                                 }
                             }
                         }
-                        catch (Exception err)
+                        catch (Exception)
                         {
 
                         }

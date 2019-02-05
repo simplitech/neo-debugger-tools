@@ -63,7 +63,7 @@ namespace Neo.Debugger.Forms
         private void MainForm_Load(object sender, EventArgs e)
         {
             //Use settings from the My Documents folder
-            _settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            _settings = new DebuggerSettings();
 
             //Init the UI controls
             InitUI();
@@ -445,7 +445,7 @@ namespace Neo.Debugger.Forms
 
             if(RunForm.SelectedTestSequence == null)
             {
-                return _debugger.SetDebugParameters(debugParams);
+                return _debugger.ConfigureDebugParameters(debugParams);
             }
             else
             {

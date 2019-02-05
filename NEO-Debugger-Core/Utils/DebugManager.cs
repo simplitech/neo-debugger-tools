@@ -10,6 +10,7 @@ using Neo.Debugger.Dissambler;
 using Neo.Debugger.Profiler;
 using Neo.Lux.Utils;
 using NEO_Emulator.SmartContractTestSuite;
+using NeoDebuggerCore.Utils;
 
 namespace Neo.Debugger.Core.Utils
 {
@@ -164,6 +165,16 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
+        public string CurrentFilePath
+        {
+            get { return _currentFilePath; }
+            set
+            {
+                _currentFilePath = value;
+            }
+        }
+        private string _currentFilePath;
+
         #endregion
 
         //Settings
@@ -176,6 +187,7 @@ namespace Neo.Debugger.Core.Utils
         private bool _resetFlag;
         private int _currentLine;
         private DebuggerState _state;
+        public static readonly string TempContractName = "TempContract";
 
         //Debugging Emulator and Content
         private Emulator _emulator { get; set; }
@@ -232,7 +244,7 @@ namespace Neo.Debugger.Core.Utils
 
         private string _blockchainFilePath;
 
-		public DebugManager() : this(new DebuggerSettings(Directory.GetCurrentDirectory()))
+		public DebugManager() : this(new DebuggerSettings())
 		{
 		}
 
@@ -556,15 +568,7 @@ namespace Neo.Debugger.Core.Utils
             return breakpointLineNumbers;
         }
 
-        public string CurrentFilePath
-        {
-            get { return _currentFilePath; }
-            set
-            {
-                _currentFilePath = value;
-            }
-        }
-        private string _currentFilePath;
+
 
         public class Breakpoint
         {
@@ -658,7 +662,7 @@ namespace Neo.Debugger.Core.Utils
 				var testCase = _tests.cases[testItem.TestName];
 				debugParams.ArgList = testCase.args;
 				debugParams.TriggerType = TriggerType.Application;
-				SetDebugParameters(debugParams);
+				ConfigureDebugParameters(debugParams);
 				Run();
 				var result = _emulator.GetOutput();
 				resultList.Add(result);
@@ -718,7 +722,7 @@ namespace Neo.Debugger.Core.Utils
             });
         }
 
-        public bool SetDebugParameters(DebugParameters debugParams)
+        public bool ConfigureDebugParameters(DebugParameters debugParams)
         {
             //Save all the params for settings later
             Settings.lastPrivateKey = debugParams.PrivateKey;
@@ -742,7 +746,6 @@ namespace Neo.Debugger.Core.Utils
                 var inputs = debugParams.ArgList;
                 byte[] loaderScript = debugParams.RawScript;
 
-
                 if (loaderScript == null)
                 {
                     loaderScript = _emulator.GenerateLoaderScriptFromInputs(inputs, this.ABI);
@@ -752,8 +755,9 @@ namespace Neo.Debugger.Core.Utils
 
                 _emulator.Reset(loaderScript, this.ABI, methodName);
             }
-            catch (Exception e)
-            {                
+            catch (Exception ex)
+            {
+                Log("Error during configuration. " + ex.Message);
                 return false;
             }
 
@@ -761,12 +765,9 @@ namespace Neo.Debugger.Core.Utils
             return true;
         }
 
-        public static readonly string TempContractName = "TempContract";
-
-
         public bool CompileContract(string sourceCode, SourceLanguage language, string outputFile = null)
         {
-            Compiler compiler = new Compiler(Settings);
+            var compiler = Compiler.GetInstance(Settings);
             compiler.SendToLog += Compiler_SendToLog;
 
             var extension = LanguageSupport.GetExtension(language);
@@ -795,9 +796,9 @@ namespace Neo.Debugger.Core.Utils
                 File.Delete(abiFile);
                 File.Delete(debugMapFile);
             }
-            catch
+            catch(Exception ex)
             {
-                // ignore
+                Log("Error during deletion. " + ex.Message);
             }
 
             bool success = compiler.CompileContract(sourceCode, fileName, language);
@@ -843,8 +844,9 @@ namespace Neo.Debugger.Core.Utils
                     var ofs = this.Map.ResolveEndOffset(entry.Key, path);
                     this.Emulator.AddAssigment(ofs, entry.Value.name, entry.Value.type);
                 }
-                catch
+                catch(Exception ex)
                 {
+                    Log("Error loading assignments. " + ex.Message);
                     continue;
                 }
             }
