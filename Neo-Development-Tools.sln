@@ -22,11 +22,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neo-ICO-UnitTests", "Neo-IC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neo-Debugger-Core-UnitTests", "Neo-Debugger-Core-UnitTests\Neo-Debugger-Core-UnitTests.csproj", "{8E5DBFD3-FB58-45CE-8754-64184B766E5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NEO-Debugger-Winform", "NEO-Debugger-Winform\NEO-Debugger-Winform.csproj", "{69CE0FB9-99CF-4A40-A0AB-E39F5050054E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo-Debugger-Winform", "NEO-Debugger-Winform\NEO-Debugger-Winform.csproj", "{69CE0FB9-99CF-4A40-A0AB-E39F5050054E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeoDebuggerUI", "NeoDebuggerUI\NeoDebuggerUI.csproj", "{6EB27225-8129-4260-AB97-7B01EBC6F506}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo-Gui-Development", "Neo-GUI-Developer\neo-gui-development.csproj", "{CFC243F0-F4E3-4754-8E21-8BA17E1C1788}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo-GUI-development", "Neo-GUI-Developer\neo-gui-development.csproj", "{CFC243F0-F4E3-4754-8E21-8BA17E1C1788}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
