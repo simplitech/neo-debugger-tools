@@ -28,7 +28,8 @@ namespace Neo.Debugger.Core.Utils
             return content.Split('\n').Where(x => !string.IsNullOrEmpty(x)).ToArray();
         }
 
-        public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language)
+		// #64
+	public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language)
         {
             if (!_settings.compilerPaths.ContainsKey(language))
             {

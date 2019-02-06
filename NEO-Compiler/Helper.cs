@@ -36,7 +36,7 @@ namespace Neo.Compiler
 			{
 				return HexString2Bytes(opdata);
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				return System.Text.Encoding.UTF8.GetBytes(opdata);
 			}
