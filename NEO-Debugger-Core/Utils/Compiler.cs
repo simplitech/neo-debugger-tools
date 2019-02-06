@@ -29,7 +29,7 @@ namespace Neo.Debugger.Core.Utils
         }
 
 		// #64
-		public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language)
+	public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language)
         {
             if (!_settings.compilerPaths.ContainsKey(language))
             {
