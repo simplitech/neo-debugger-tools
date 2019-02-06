@@ -27,6 +27,7 @@ namespace Neo.Debugger.Core.Models
 
         public DebuggerSettings(string settingsFolderPath)
         {
+
             this.path = settingsFolderPath + @"\Neo Contracts";
             this.fileName = path + @"\debugger.settings.json";
 
@@ -100,6 +101,7 @@ namespace Neo.Debugger.Core.Models
             var json = JSONWriter.WriteToString(root);
 
             Directory.CreateDirectory(this.path);
+            File.SetAttributes(this.path, FileAttributes.Normal);
 
             File.WriteAllText(fileName, json);
         }

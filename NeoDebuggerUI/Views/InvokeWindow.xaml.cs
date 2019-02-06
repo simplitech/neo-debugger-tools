@@ -35,27 +35,27 @@ namespace NeoDebuggerUI.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-        }  
+        }
 
         private void RenderTestCaseParams(DataNode tparams)
         {
             var grid = this.FindControl<Grid>("InputParametersGrid");
-            
-            var rowHeader = new RowDefinition {Height = new GridLength(20)};
+
+            var rowHeader = new RowDefinition { Height = new GridLength(20) };
             grid.RowDefinitions.Add(rowHeader);
 
-            var paramHeader = new TextBlock {Text = "Parameter", FontWeight = FontWeight.Bold, TextAlignment = TextAlignment.Center};
+            var paramHeader = new TextBlock { Text = "Parameter", FontWeight = FontWeight.Bold, TextAlignment = TextAlignment.Center };
             Grid.SetRow(paramHeader, 0);
             Grid.SetColumn(paramHeader, 0);
             grid.Children.Add(paramHeader);
 
-            var valueHeader = new TextBlock {Text = "Value", FontWeight = FontWeight.Bold, TextAlignment = TextAlignment.Center};
+            var valueHeader = new TextBlock { Text = "Value", FontWeight = FontWeight.Bold, TextAlignment = TextAlignment.Center };
             Grid.SetRow(valueHeader, 0);
             Grid.SetColumn(valueHeader, 1);
             grid.Children.Add(valueHeader);
 
-            var p1 = DebuggerUtils.ParseNode(tparams[0], 0);
-            var p2 = DebuggerUtils.ParseNode(tparams[1], 1);
+            var p1 = tparams != null ? DebuggerUtils.ParseNode(tparams[0], 0) : "";
+            var p2 = tparams != null ? DebuggerUtils.ParseNode(tparams[1], 1) : "";
 
             RenderLine(grid, 1, "operation", p1);
             RenderLine(grid, 2, "args", p2);

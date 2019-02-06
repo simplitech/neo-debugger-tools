@@ -1,11 +1,18 @@
-﻿using Avalonia;
+﻿using System.IO;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
+using AvaloniaEdit;
+using AvaloniaEdit.Highlighting;
+using NeoDebuggerUI.ViewModels;
 
 namespace NeoDebuggerUI.Views
 {
-	public class MainWindow : Window
-	{
+	public class MainWindow : ReactiveWindow<MainWindowViewModel>
+    {
+        private TextEditor _textEditor;
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -23,7 +30,14 @@ namespace NeoDebuggerUI.Views
 			this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
 		}
 
-		private void InitializeComponent()
+        private void LoadFile(string filename)
+        {
+            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+            _textEditor.Load(fs);
+        }
+
+
+        private void InitializeComponent()
 		{
 			AvaloniaXamlLoader.Load(this);
 		}

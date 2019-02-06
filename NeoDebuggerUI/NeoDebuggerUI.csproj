@@ -14,16 +14,13 @@
     <EmbeddedResource Include="Assets\*" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.6.1" />
-    <PackageReference Include="Avalonia.AvaloniaEdit" Version="0.6.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.6.1" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.6.1" />
+    <PackageReference Include="Avalonia" Version="0.7.0" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" Version="0.7.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.7.0" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.7.0" />
     <PackageReference Include="System.ComponentModel" Version="4.3.0" />
-    <PackageReference Include="System.Reactive" Version="3.1.1" />
-    <PackageReference Include="System.Reactive.Interfaces" Version="3.1.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NeoDebuggerCore\NeoDebuggerCore.csproj" />
+    <PackageReference Include="System.Reactive" Version="4.1.2" />
+    <PackageReference Include="System.Reactive.Interfaces" Version="4.1.2" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -35,5 +32,8 @@
     <None Update="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Neo-Debugger-Core\Neo-Debugger-Core.csproj" />
   </ItemGroup>
 </Project>

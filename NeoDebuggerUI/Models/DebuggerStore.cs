@@ -21,7 +21,7 @@ namespace NeoDebuggerUI.Models
 
         private DebuggerStore()
         {
-            var settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            var settings = new DebuggerSettings(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
             manager = new DebugManager(settings);
         }
 

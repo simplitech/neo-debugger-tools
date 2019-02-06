@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Reactive;
-using System.Threading.Tasks;
-using Avalonia.Controls;
+﻿using System.Linq;
 using Neo.Debugger.Core.Models;
-using Neo.Debugger.Core.Utils;
 using ReactiveUI;
-using ReactiveUI.Legacy;
 using System.Reactive.Linq;
-using Avalonia.Layout;
-using Avalonia.Media;
 using LunarLabs.Parser;
 using NeoDebuggerUI.Models;
 
@@ -29,10 +18,12 @@ namespace NeoDebuggerUI.ViewModels
 
         public InvokeWindowViewModel()
         {
-            _selectedTestCase = DebuggerStore.instance.Tests.cases.ElementAt(0).Key;
+            if(DebuggerStore.instance.Tests != null && DebuggerStore.instance.Tests.cases.Count > 0) {
+                _selectedTestCase = DebuggerStore.instance.Tests.cases.ElementAt(0).Key;
+            }
         }
 
-        public DataNode SelectedTestCaseParams => DebuggerStore.instance.Tests.cases[SelectedTestCase].args;
+        public DataNode SelectedTestCaseParams => SelectedTestCase != null ? DebuggerStore.instance.Tests.cases[SelectedTestCase].args : null;
 
         public DebugParameters DebugParams { get; set; } = new DebugParameters();
 

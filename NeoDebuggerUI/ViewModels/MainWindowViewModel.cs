@@ -1,29 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Neo.Debugger.Core.Models;
-using Neo.Debugger.Core.Utils;
 using ReactiveUI;
 using ReactiveUI.Legacy;
 using System.Reactive.Linq;
 using NeoDebuggerUI.Models;
 using NeoDebuggerUI.Views;
+using System.Reactive;
 
 namespace NeoDebuggerUI.ViewModels
 {
 	public class MainWindowViewModel : ViewModelBase
 	{
 		public ReactiveList<string> ProjectFiles { get; } = new ReactiveList<string>();
+        public delegate void SelectedFileChanged(string selectedFilename);
+        public event SelectedFileChanged EvtFileChanged;
 
-		private string _selectedFile;
+        private string _selectedFile;
 		public string SelectedFile
 		{
 			get => _selectedFile;
 			set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
 		}
+
 		private string _log;
 		public string Log
 		{
@@ -33,7 +34,6 @@ namespace NeoDebuggerUI.ViewModels
 
 		private string _fileFolder;
 		private DateTime _lastModificationDate;
-
 
 		public MainWindowViewModel()
 		{
