@@ -1,0 +1,163 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:NeoDebuggerUI.ViewModels;assembly=NeoDebuggerUI"
+        xmlns:AvalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        Icon="resm:NeoDebuggerUI.Assets.avalonia-logo.ico"
+        Title="NeoDebuggerUI"
+		    Background="LightGray"
+        Width="950"
+        Height="600">
+  <Window.DataContext>
+	  <vm:MainWindowViewModel/>
+  </Window.DataContext>
+
+	<DockPanel LastChildFill="True">
+    <Menu DockPanel.Dock="Top">
+      <MenuItem Header="File">
+        <MenuItem Header="New" >
+          <MenuItem Header="C#" />
+          <MenuItem Header="Python" />
+        </MenuItem>
+        <MenuItem Header="New from Template">
+          <MenuItem Header="C#">
+            <MenuItem Header="Agency Transaction"/>
+            <MenuItem Header="Domain"/>
+            <MenuItem Header="Hello World"/>
+            <MenuItem Header="ICO Template"/>
+            <MenuItem Header="Lock"/>
+            <MenuItem Header="Struct Example"/>
+          </MenuItem>
+          <MenuItem Header="Python">
+            <MenuItem Header="Hello World"/>
+            <MenuItem Header="NEP5"/>
+          </MenuItem>
+          </MenuItem>
+        <MenuItem Header="Open..." Command="{Binding Open}" />
+        <Separator />
+        <MenuItem Header="Exit" />
+      </MenuItem>
+      <MenuItem Header="Search">
+        <MenuItem Header="Quick Find... (Ctrl+F)" />
+        <MenuItem Header="Find... (Ctrl+Alt+F)" />
+        <MenuItem Header="Find And Replace..." />
+        <Separator />
+        <MenuItem Header="Go To Line... (Ctrl+G)" />
+      </MenuItem>
+      <MenuItem Header="View">
+        <MenuItem Header="Word Wrap">
+          <MenuItem.Icon>
+            <CheckBox BorderThickness="0"
+                      IsHitTestVisible="False"
+                      Command="{Binding WordWrap}">
+            </CheckBox>
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Contract">
+          <MenuItem Header="Run (F5)" />
+          <MenuItem Header="Step (F10)" />
+          <MenuItem Header="Reset" />
+          <MenuItem Header="Rebuild" />
+          <MenuItem Header="Storage (F6)" />
+          <Separator />
+          <MenuItem Header="_Exit" />
+        </MenuItem>
+        <MenuItem Header="Show Ident Guidelines">
+          <MenuItem.Icon>
+            <CheckBox BorderThickness="0"
+                      IsHitTestVisible="False"
+                      Command="{Binding IdentGuidelines}">
+            </CheckBox>
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Show Whitespace">
+          <MenuItem.Icon>
+            <CheckBox BorderThickness="0"
+                      IsHitTestVisible="False"
+                      Command="{Binding ShowWhitespace}">
+            </CheckBox>
+          </MenuItem.Icon>
+        </MenuItem>
+        <Separator />
+        <MenuItem Header="Zoom In (Ctrl+Plus)" />
+        <MenuItem Header="Zoom Out (Ctrl+Minus)" />
+        <MenuItem Header="Zoom 100% (Ctrl+0)" />
+        <Separator />
+        <MenuItem Header="Collapse All" />
+        <MenuItem Header="Expand All" />
+      </MenuItem>
+      <MenuItem Header="Contract">
+        <MenuItem Header="Run (F5)" Command="{Binding OpenRunDialog}" />
+        <MenuItem Header="Step (F10)" />
+        <MenuItem Header="Reset" />
+        <MenuItem Header="Rebuild" />
+        <MenuItem Header="Storage (F6)" />
+        <Separator />
+        <MenuItem Header="_Exit" />
+      </MenuItem>
+      <MenuItem Header="Blockchain">
+        <MenuItem Header="View" Command="{Binding OpenGenericSampleDialog}" />
+        <MenuItem Header="Load" />
+        <MenuItem Header="Reset" />
+      </MenuItem>
+      <MenuItem Header="Tools">
+        <MenuItem Header="Compile" />
+        <MenuItem Header="Key Tool" />
+        <MenuItem Header="Code Generator">
+          <MenuItem Header="Neo Lux"/>
+        </MenuItem>
+      </MenuItem>
+    </Menu>
+
+    <TextBlock
+      DockPanel.Dock="Top"
+      Margin="5"
+      Text="{Binding SelectedFile}"/>
+
+    <DockPanel
+      DockPanel.Dock="Bottom"
+      Height="145"
+      Margin="0, 5"
+      LastChildFill="True">
+      <DockPanel
+        DockPanel.Dock="Right"
+        Width="280"
+        LastChildFill="True">
+        <TextBlock
+          DockPanel.Dock="Top"
+          Text="VM Stack:"/>
+        <TextBlock
+          Background="White"
+          Text="Value" />
+      </DockPanel>
+      <DockPanel
+        Margin="0, 0, 5, 0"
+        LastChildFill="True">
+        <TextBlock
+          DockPanel.Dock="Top"
+          Margin="5, 0, 0, 0"
+          Text="Log:"/>
+        <TextBlock
+          VerticalAlignment="Stretch"
+          Background="White"
+          Text="{Binding Log}" />
+      </DockPanel>
+    </DockPanel>
+
+    <DockPanel
+      LastChildFill="True">
+      <ListBox
+        DockPanel.Dock="Left"
+        Width="180"
+        Margin="0, 0, 5, 0"
+        Name="FileNames"
+        Items="{Binding ProjectFiles}"
+        SelectedItem="{Binding SelectedFile}" />
+      <AvalonEdit:TextEditor
+        Name="Editor"
+        HorizontalScrollBarVisibility="Auto"
+        VerticalScrollBarVisibility="Auto"
+        TextBlock.FontSize="12" />
+    </DockPanel>
+  </DockPanel>
+
+</Window>

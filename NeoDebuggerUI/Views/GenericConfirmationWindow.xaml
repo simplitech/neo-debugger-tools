@@ -1,0 +1,37 @@
+﻿
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:NeoDebuggerUI.ViewModels;assembly=NeoDebuggerUI"
+        xmlns:AvalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        Icon="resm:NeoDebuggerUI.Assets.avalonia-logo.ico"
+        Title="NeoDebuggerUI"
+		Background="LightGray"
+        Width="500"
+        Height="150">
+  <Window.DataContext>
+	  <vm:GenericConfirmationWindowViewModel/>
+  </Window.DataContext>
+
+	<DockPanel LastChildFill="True">
+		<DockPanel Margin="0, 0, 0, 10" DockPanel.Dock="Bottom" Width="300">
+			<Button 
+				Command="{Binding Cancel}"
+				IsVisible="{Binding ShowCancel}" 
+				Content="{Binding CancelText}" 
+				DockPanel.Dock="Left" 
+				Margin="0, 0, 10, 0" 
+				Width="145"/>
+			<Button 
+				Command="{Binding Ok}" 
+				Content="{Binding OkText}" 
+				DockPanel.Dock="Left" 
+				Width="145"/>
+		</DockPanel>
+		
+		<TextBlock 
+			Text="{Binding Text}" 
+			HorizontalAlignment="Center" 
+			VerticalAlignment="Center"/>
+    </DockPanel>
+</Window>

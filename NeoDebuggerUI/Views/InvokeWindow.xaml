@@ -1,0 +1,26 @@
+﻿
+
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:NeoDebuggerUI.ViewModels;assembly=NeoDebuggerUI"
+        xmlns:AvalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+        Icon="resm:NeoDebuggerUI.Assets.avalonia-logo.ico"
+        Title="NeoDebuggerUI"
+		Background="LightGray"
+        Width="500"
+        Height="600">
+  <Window.DataContext>
+	  <vm:InvokeWindowViewModel/>
+  </Window.DataContext>
+
+	<DockPanel LastChildFill="True">
+		<Button Name="DebugBtn" DockPanel.Dock="Bottom" Margin="5" Width="200">Debug</Button>
+		<Grid Name="InputParametersGrid" DockPanel.Dock="Bottom" Margin="5, 5, 5, 0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+		</Grid>
+		<DockPanel></DockPanel>
+    </DockPanel>
+</Window>

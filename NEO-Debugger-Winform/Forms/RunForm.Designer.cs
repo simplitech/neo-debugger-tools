@@ -48,6 +48,8 @@
             this.privateKeyInput = new System.Windows.Forms.TextBox();
             this.assetComboBox = new System.Windows.Forms.ComboBox();
             this.optionsPage = new System.Windows.Forms.TabPage();
+            this.label8 = new System.Windows.Forms.Label();
+            this.RawScriptText = new System.Windows.Forms.TextBox();
             this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.timestampBox = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
@@ -55,13 +57,14 @@
             this.witnessComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.triggerComboBox = new System.Windows.Forms.ComboBox();
-            this.RawScriptText = new System.Windows.Forms.TextBox();
-            this.label8 = new System.Windows.Forms.Label();
+            this.testSequencesTab = new System.Windows.Forms.TabPage();
+            this.testSequenceList = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.inputGrid)).BeginInit();
             this.runTabs.SuspendLayout();
             this.methodTab.SuspendLayout();
             this.transactionPage.SuspendLayout();
             this.optionsPage.SuspendLayout();
+            this.testSequencesTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -189,6 +192,7 @@
             this.runTabs.Controls.Add(this.methodTab);
             this.runTabs.Controls.Add(this.transactionPage);
             this.runTabs.Controls.Add(this.optionsPage);
+            this.runTabs.Controls.Add(this.testSequencesTab);
             this.runTabs.Location = new System.Drawing.Point(12, 12);
             this.runTabs.Name = "runTabs";
             this.runTabs.SelectedIndex = 0;
@@ -281,6 +285,23 @@
             this.optionsPage.Text = "Options";
             this.optionsPage.UseVisualStyleBackColor = true;
             // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(6, 132);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(63, 13);
+            this.label8.TabIndex = 8;
+            this.label8.Text = "RAW Script";
+            // 
+            // RawScriptText
+            // 
+            this.RawScriptText.Location = new System.Drawing.Point(99, 132);
+            this.RawScriptText.Multiline = true;
+            this.RawScriptText.Name = "RawScriptText";
+            this.RawScriptText.Size = new System.Drawing.Size(327, 153);
+            this.RawScriptText.TabIndex = 7;
+            // 
             // dateTimePicker1
             // 
             this.dateTimePicker1.Location = new System.Drawing.Point(226, 92);
@@ -349,22 +370,25 @@
             this.triggerComboBox.Size = new System.Drawing.Size(121, 21);
             this.triggerComboBox.TabIndex = 0;
             // 
-            // RawScriptText
+            // testSequencesTab
             // 
-            this.RawScriptText.Location = new System.Drawing.Point(99, 132);
-            this.RawScriptText.Multiline = true;
-            this.RawScriptText.Name = "RawScriptText";
-            this.RawScriptText.Size = new System.Drawing.Size(327, 153);
-            this.RawScriptText.TabIndex = 7;
+            this.testSequencesTab.Controls.Add(this.testSequenceList);
+            this.testSequencesTab.Location = new System.Drawing.Point(4, 22);
+            this.testSequencesTab.Name = "testSequencesTab";
+            this.testSequencesTab.Padding = new System.Windows.Forms.Padding(3);
+            this.testSequencesTab.Size = new System.Drawing.Size(448, 316);
+            this.testSequencesTab.TabIndex = 3;
+            this.testSequencesTab.Text = "Test Sequences";
+            this.testSequencesTab.UseVisualStyleBackColor = true;
             // 
-            // label8
+            // testSequenceList
             // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(6, 132);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(63, 13);
-            this.label8.TabIndex = 8;
-            this.label8.Text = "RAW Script";
+            this.testSequenceList.FormattingEnabled = true;
+            this.testSequenceList.Location = new System.Drawing.Point(-4, 0);
+            this.testSequenceList.Name = "testSequenceList";
+            this.testSequenceList.Size = new System.Drawing.Size(453, 316);
+            this.testSequenceList.TabIndex = 0;
+            this.testSequenceList.SelectedIndexChanged += new System.EventHandler(this.testSequenceList_SelectedIndexChanged);
             // 
             // RunForm
             // 
@@ -388,6 +412,7 @@
             this.transactionPage.PerformLayout();
             this.optionsPage.ResumeLayout(false);
             this.optionsPage.PerformLayout();
+            this.testSequencesTab.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -423,5 +448,7 @@
         private System.Windows.Forms.DateTimePicker dateTimePicker1;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TextBox RawScriptText;
-    }
+		private System.Windows.Forms.TabPage testSequencesTab;
+		private System.Windows.Forms.ListBox testSequenceList;
+	}
 }

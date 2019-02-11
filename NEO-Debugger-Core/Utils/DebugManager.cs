@@ -9,6 +9,8 @@ using System.Linq;
 using Neo.Debugger.Dissambler;
 using Neo.Debugger.Profiler;
 using Neo.Lux.Utils;
+using NEO_Emulator.SmartContractTestSuite;
+using NeoDebuggerCore.Utils;
 
 namespace Neo.Debugger.Core.Utils
 {
@@ -21,7 +23,7 @@ namespace Neo.Debugger.Core.Utils
         public delegate void DebugManagerLogEventHandler(object sender, DebugManagerLogEventArgs e);
 
         //Public props
-        public TestSuite Tests { get { return _tests; } }
+        public SmartContractTestSuite Tests { get { return _tests; } }
         public Emulator Emulator
         {
             get
@@ -163,6 +165,16 @@ namespace Neo.Debugger.Core.Utils
             }
         }
 
+        public string CurrentFilePath
+        {
+            get { return _currentFilePath; }
+            set
+            {
+                _currentFilePath = value;
+            }
+        }
+        private string _currentFilePath;
+
         #endregion
 
         //Settings
@@ -175,6 +187,7 @@ namespace Neo.Debugger.Core.Utils
         private bool _resetFlag;
         private int _currentLine;
         private DebuggerState _state;
+        public static readonly string TempContractName = "TempContract";
 
         //Debugging Emulator and Content
         private Emulator _emulator { get; set; }
@@ -182,8 +195,9 @@ namespace Neo.Debugger.Core.Utils
         private ABI _ABI { get; set; }
         private NeoMapFile _map { get; set; }
         private bool _isCompiled { get; set; }
+		private Dictionary<byte[], AVMDisassemble> _disassembles = new Dictionary<byte[], AVMDisassemble>(new ByteArrayComparer());
 
-        public AVMDisassemble avmDisassemble { get; private set; }
+		public AVMDisassemble avmDisassemble { get; private set; }
 
         //Profiler context
         public ProfilerContext profiler { get; private set; }
@@ -200,7 +214,7 @@ namespace Neo.Debugger.Core.Utils
         }
 
         //Tests
-        private TestSuite _tests { get; set; }
+        private SmartContractTestSuite _tests { get; set; }
 
         //File paths
         private string _avmFilePath { get; set; }
@@ -229,6 +243,10 @@ namespace Neo.Debugger.Core.Utils
         }
 
         private string _blockchainFilePath;
+
+		public DebugManager() : this(new DebuggerSettings())
+		{
+		}
 
         public DebugManager(DebuggerSettings settings)
         {
@@ -455,11 +473,10 @@ namespace Neo.Debugger.Core.Utils
 
         public bool LoadTests()
         {
-            _tests = new TestSuite(_avmFilePath);
+            _tests = new SmartContractTestSuite(_avmFilePath);
             return true;
         }
 
-        private Dictionary<byte[], AVMDisassemble> _disassembles = new Dictionary<byte[], AVMDisassemble>(new ByteArrayComparer());
 
         public int ResolveLine(int ofs, bool useMap, out string filePath)
         {
@@ -551,15 +568,7 @@ namespace Neo.Debugger.Core.Utils
             return breakpointLineNumbers;
         }
 
-        public string CurrentFilePath
-        {
-            get { return _currentFilePath; }
-            set
-            {
-                _currentFilePath = value;
-            }
-        }
-        private string _currentFilePath;
+
 
         public class Breakpoint
         {
@@ -635,6 +644,32 @@ namespace Neo.Debugger.Core.Utils
             UpdateState();
         }
 
+		public List<object> RunSequence(string sequenceName)
+		{
+			var resultList = new List<object>();
+			var testSequence = _tests.sequences[sequenceName];
+			var debugParams = new DebugParameters();
+			foreach (var testItem in testSequence.Items)
+			{
+                //TODO: Refactoring required 
+				debugParams.PrivateKey = testItem.TestPrivateKey;
+                var keyPair = DebuggerUtils.GetKeyFromString(debugParams.PrivateKey);
+                if (keyPair != null)
+                {
+                    Runtime.invokerKeys = keyPair;
+                }
+                debugParams.WitnessMode = CheckWitnessMode.Default;
+				var testCase = _tests.cases[testItem.TestName];
+				debugParams.ArgList = testCase.args;
+				debugParams.TriggerType = TriggerType.Application;
+				ConfigureDebugParameters(debugParams);
+				Run();
+				var result = _emulator.GetOutput();
+				resultList.Add(result);
+			}
+			return resultList;
+		}
+
         public void Step()
         {
             if (_resetFlag)
@@ -687,7 +722,7 @@ namespace Neo.Debugger.Core.Utils
             });
         }
 
-        public bool SetDebugParameters(DebugParameters debugParams)
+        public bool ConfigureDebugParameters(DebugParameters debugParams)
         {
             //Save all the params for settings later
             Settings.lastPrivateKey = debugParams.PrivateKey;
@@ -711,7 +746,6 @@ namespace Neo.Debugger.Core.Utils
                 var inputs = debugParams.ArgList;
                 byte[] loaderScript = debugParams.RawScript;
 
-
                 if (loaderScript == null)
                 {
                     loaderScript = _emulator.GenerateLoaderScriptFromInputs(inputs, this.ABI);
@@ -721,8 +755,9 @@ namespace Neo.Debugger.Core.Utils
 
                 _emulator.Reset(loaderScript, this.ABI, methodName);
             }
-            catch (Exception e)
-            {                
+            catch (Exception ex)
+            {
+                Log("Error during configuration. " + ex.Message);
                 return false;
             }
 
@@ -730,12 +765,9 @@ namespace Neo.Debugger.Core.Utils
             return true;
         }
 
-        public static readonly string TempContractName = "TempContract";
-
-
         public bool CompileContract(string sourceCode, SourceLanguage language, string outputFile = null)
         {
-            Compiler compiler = new Compiler(Settings);
+            var compiler = Compiler.GetInstance(Settings);
             compiler.SendToLog += Compiler_SendToLog;
 
             var extension = LanguageSupport.GetExtension(language);
@@ -764,9 +796,9 @@ namespace Neo.Debugger.Core.Utils
                 File.Delete(abiFile);
                 File.Delete(debugMapFile);
             }
-            catch
+            catch(Exception ex)
             {
-                // ignore
+                Log("Error during deletion. " + ex.Message);
             }
 
             bool success = compiler.CompileContract(sourceCode, fileName, language);
@@ -812,8 +844,9 @@ namespace Neo.Debugger.Core.Utils
                     var ofs = this.Map.ResolveEndOffset(entry.Key, path);
                     this.Emulator.AddAssigment(ofs, entry.Value.name, entry.Value.type);
                 }
-                catch
+                catch(Exception ex)
                 {
+                    Log("Error loading assignments. " + ex.Message);
                     continue;
                 }
             }

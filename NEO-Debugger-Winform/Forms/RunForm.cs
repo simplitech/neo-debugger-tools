@@ -11,13 +11,14 @@ using System.Numerics;
 using System.Windows.Forms;
 using Neo.Lux.Cryptography;
 using LunarLabs.Parser.JSON;
+using NEO_Emulator.SmartContractTestSuite;
 
 namespace Neo.Debugger.Forms
 {
     public partial class RunForm : Form
     {
         private ABI _abi;
-        private TestSuite _testSuite;
+        private SmartContractTestSuite _testSuite;
         private string currentContractName = "";
         private bool editMode = false;
         private int editRow;
@@ -26,11 +27,12 @@ namespace Neo.Debugger.Forms
         public AVMFunction currentMethod { get; private set; }
 
         public DebugParameters DebugParameters { get; private set; }
+        public static String SelectedTestSequence { get; private set; }
 
         private string _defaultPrivateKey;
         private Dictionary<string, string> _defaultParams;
 
-        public RunForm(ABI abi, TestSuite tests, string contractName, string defaultPrivateKey, Dictionary<string,string> defaultParams, string defaultFunction)
+        public RunForm(ABI abi, SmartContractTestSuite tests, string contractName, string defaultPrivateKey, Dictionary<string, string> defaultParams, string defaultFunction)
         {
             InitializeComponent();
             _testSuite = tests;
@@ -65,14 +67,19 @@ namespace Neo.Debugger.Forms
             {
                 defaultFunction = _abi.entryPoint.name;
             }
-            
+
             int mainItem = paramsList.FindString(defaultFunction);
             if (mainItem >= 0) paramsList.SetSelected(mainItem, true);
-            
+
             testCasesList.Items.Clear();
             foreach (var entry in _testSuite.cases.Keys)
             {
                 testCasesList.Items.Add(entry);
+            }
+
+            foreach (var entry in _testSuite.sequences.Keys)
+            {
+                testSequenceList.Items.Add(entry);
             }
         }
 
@@ -593,10 +600,21 @@ namespace Neo.Debugger.Forms
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (InitInvoke())
+            if (runTabs.SelectedIndex != 3)
             {
-                this.DialogResult = DialogResult.OK;
+                SelectedTestSequence = null;
+                if (InitInvoke())
+                {
+                    this.DialogResult = DialogResult.OK;
+                }
+            }else
+            {
+                if(SelectedTestSequence != null)
+                {
+                    this.DialogResult = DialogResult.OK;
+                }
             }
+            
         }
 
         private void button3_Click_1(object sender, EventArgs e)
@@ -657,6 +675,11 @@ namespace Neo.Debugger.Forms
         private void assetComboBox_SelectedIndexChanged_1(object sender, EventArgs e)
         {
             assetAmount.Enabled = assetComboBox.SelectedIndex > 0;
+        }
+
+        private void testSequenceList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SelectedTestSequence = (string)testSequenceList.SelectedItem;
         }
     }
 }

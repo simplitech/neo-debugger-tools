@@ -11,62 +11,69 @@ namespace Neo.Debugger.Core.Models
 {
     public class DebuggerSettings
     {
-        public string lastOpenedFile;
-        public string lastPrivateKey;
+        public string lastOpenedFile = "";
+        public string lastPrivateKey = "";
 
-        public string lastFunction;
+        public string lastFunction = "";
 
         public Dictionary<SourceLanguage, string> compilerPaths = new Dictionary<SourceLanguage, string>();
 
         public Dictionary<string, string> lastParams = new Dictionary<string, string>();
 
-        private string fileName;
+        private string fileName = "";
 
         public readonly string path;
 
 
-        public DebuggerSettings(string settingsFolderPath)
+        public DebuggerSettings()
         {
+            var settingsFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             this.path = settingsFolderPath + @"\Neo Contracts";
             this.fileName = path + @"\debugger.settings.json";
 
             if (File.Exists(fileName))
             {
-                var json = File.ReadAllText(fileName);
-                var root = JSONReader.ReadFromString(json);
-                root = root["settings"];
-
-                this.lastOpenedFile = root.GetString("lastfile");
-                this.lastPrivateKey = root.GetString("lastkey", Blockchain.InitialPrivateWIF);
-
-                var paramsNode = root.GetNode("lastparams");
-                this.lastParams.Clear();
-
-                if (paramsNode != null)
+                try
                 {
-                    foreach (var child in paramsNode.Children)
-                    {
-                        var key = child.GetString("key");
-                        var value = child.GetString("value");
-                        this.lastParams[key] = value;
-                    }
-                }
+                    var json = File.ReadAllText(fileName);
+                    var root = JSONReader.ReadFromString(json);
+                    root = root["settings"];
 
-                var compilersNode = root.GetNode("compilers");
-                if (compilersNode != null)
-                {
-                    foreach (var child in compilersNode.Children)
-                    {
-                        var key = child.GetString("language");
-                        var value = child.GetString("path");
+                    this.lastOpenedFile = root.GetString("lastfile");
+                    this.lastPrivateKey = root.GetString("lastkey", Blockchain.InitialPrivateWIF);
 
-                        SourceLanguage language;
-                        
-                        if (Enum.TryParse<SourceLanguage>(key, out language))
+                    var paramsNode = root.GetNode("lastparams");
+                    this.lastParams.Clear();
+
+                    if (paramsNode != null)
+                    {
+                        foreach (var child in paramsNode.Children)
                         {
-                            this.compilerPaths[language] = value;
-                        }                        
+                            var key = child.GetString("key");
+                            var value = child.GetString("value");
+                            this.lastParams[key] = value;
+                        }
                     }
+
+                    var compilersNode = root.GetNode("compilers");
+                    if (compilersNode != null)
+                    {
+                        foreach (var child in compilersNode.Children)
+                        {
+                            var key = child.GetString("language");
+                            var value = child.GetString("path");
+
+                            SourceLanguage language;
+
+                            if (Enum.TryParse<SourceLanguage>(key, out language))
+                            {
+                                this.compilerPaths[language] = value;
+                            }
+                        }
+                    }
+                }catch(Exception)
+                {
+                    Console.WriteLine("Invalid settings file");
                 }
             }
         }
@@ -100,6 +107,7 @@ namespace Neo.Debugger.Core.Models
             var json = JSONWriter.WriteToString(root);
 
             Directory.CreateDirectory(this.path);
+            File.SetAttributes(this.path, FileAttributes.Normal);
 
             File.WriteAllText(fileName, json);
         }
