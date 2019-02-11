@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Neo_Debugger_UI_UnitTests
 {
 	[TestFixture]
-	public class ViewModelTests
+	public class DebuggerCoreUnitTests
 	{
 
 		private string _compilerFolder = Path.Combine(Path.Combine(
@@ -44,7 +44,7 @@ namespace Neo_Debugger_UI_UnitTests
 		{
 			var path = TestContext.CurrentContext.TestDirectory;
 			Directory.SetCurrentDirectory(path);
-			var compiler = Compiler.GetInstance(new DebuggerSettings());
+			var compiler = NeonCompiler.GetInstance(new DebuggerSettings());
             var fullFilePath = Path.Combine(path, "SampleContract.cs");
             var sourceCode = File.ReadAllText(fullFilePath);
 			Assert.NotNull(sourceCode);
@@ -57,7 +57,7 @@ namespace Neo_Debugger_UI_UnitTests
 		[Ignore("It won't pass in all OS")]
         public void TestGetCompilerInstance()
         {
-            var compilerInstance = Compiler.GetInstance(new DebuggerSettings());
+            var compilerInstance = NeonCompiler.GetInstance(new DebuggerSettings());
             //Assert.IsInstanceOf(typeof(UnixCompiler), compilerInstance);
         }
 

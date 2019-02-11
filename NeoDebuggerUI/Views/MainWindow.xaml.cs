@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
@@ -27,8 +30,29 @@ namespace NeoDebuggerUI.Views
 			_textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C#");
 			_textEditor.TextArea.IndentationStrategy = new AvaloniaEdit.Indentation.CSharp.CSharpIndentationStrategy();
 
-			this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
-		}
+            MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
+            newCSharp.Click += async (o, e) => { await NewCSharpFile(); };
+
+            this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
+            this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
+
+        }
+
+
+        public async Task NewCSharpFile()
+        {
+            var dialog = new SaveFileDialog();
+            var filters = new List<FileDialogFilter>();
+            var filteredExtensions = new List<string>(new string[] { "cs" });
+            var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "C# File" };
+            filters.Add(filter);
+            dialog.Filters = filters;
+            var result = await dialog.ShowAsync(this);
+            if (result != null)
+            {
+                this.ViewModel.ResetWithNewFile(result);
+            }
+        }
 
         private void LoadFile(string filename)
         {

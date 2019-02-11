@@ -7,10 +7,11 @@
 
   <ItemGroup>
     <Compile Remove="SampleContract.cs" />
+    <Compile Remove="ContractTemplate.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="SampleContract.cs">
+    <None Include="ContractTemplate.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -15,7 +15,7 @@
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="File">
         <MenuItem Header="New" >
-          <MenuItem Header="C#" />
+          <MenuItem Header="C#" Name="MenuItemNewCSharp"/>
           <MenuItem Header="Python" />
         </MenuItem>
         <MenuItem Header="New from Template">
@@ -89,7 +89,7 @@
         <MenuItem Header="Run (F5)" Command="{Binding OpenRunDialog}" />
         <MenuItem Header="Step (F10)" />
         <MenuItem Header="Reset" />
-        <MenuItem Header="Rebuild" />
+        <MenuItem Header="Rebuild" Command="{Binding CompileCurrentFile}"/>
         <MenuItem Header="Storage (F6)" />
         <Separator />
         <MenuItem Header="_Exit" />
