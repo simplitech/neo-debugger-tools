@@ -3,7 +3,7 @@ using NeoDebuggerCore.Utils;
 
 namespace Neo.Debugger.Core.Utils
 {
-    public class WindowsCompiler : Compiler
+    public class WindowsCompiler : NeonCompiler
     {
         public WindowsCompiler(DebuggerSettings settings) : base(settings)
         {

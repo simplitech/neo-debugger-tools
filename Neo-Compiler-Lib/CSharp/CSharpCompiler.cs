@@ -90,11 +90,11 @@ namespace Neo.Compiler
 
             List<MetadataReference> references = neededAssemblies.Select(x => MetadataReference.CreateFromFile(Path.Combine(libFolder, x))).ToList<MetadataReference>();
 
-            var exePath = Directory.GetCurrentDirectory();
+            var exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             references.Add(MetadataReference.CreateFromFile(Path.Combine(exePath, "Neo.SmartContract.Framework.dll")));
 
             var contractName = Path.GetFileNameWithoutExtension(fileName);
-            var assemblyName = Path.Combine(exePath, contractName+".dll");
+            var assemblyName = Path.Combine(Path.GetDirectoryName(fileName), contractName+".dll");
 
             var compileOptions = new CSharpCompilationOptions(
                            OutputKind.DynamicallyLinkedLibrary,

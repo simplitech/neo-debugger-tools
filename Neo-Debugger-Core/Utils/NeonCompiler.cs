@@ -2,28 +2,30 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using Neo.Compiler;
 using Neo.Debugger.Core.Data;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
+using Neo.DebuggerCompiler;
 
 namespace NeoDebuggerCore.Utils
 {
-    public abstract class Compiler
+    public abstract class NeonCompiler : ILogger
     {
         internal DebuggerSettings _settings;
         public event CompilerLogEventHandler SendToLog;
         public delegate void CompilerLogEventHandler(object sender, CompilerLogEventArgs e);
 		public abstract string PythonCompilerExecutableName();
 		
-        public Compiler(DebuggerSettings settings)
+        public NeonCompiler(DebuggerSettings settings)
         {
             _settings = settings;
         }
 
-        public static Compiler GetInstance(DebuggerSettings settings)
+        public static NeonCompiler GetInstance(DebuggerSettings settings)
         {
             var platform = Environment.OSVersion.Platform;
-            Compiler compiler;
+            NeonCompiler compiler;
             if(platform == PlatformID.Win32NT)
             {
                 compiler = new WindowsCompiler(settings);
@@ -42,6 +44,27 @@ namespace NeoDebuggerCore.Utils
             return content.Split('\n').Where(x => !string.IsNullOrEmpty(x)).ToArray();
         }
 
+
+        //C# only
+        public bool CompileContractUsingEmbeddedNeon(string sourceCode, string outputFilePath)
+        {
+            if (string.IsNullOrEmpty(outputFilePath))
+                throw new ArgumentNullException("outputFilePath");
+
+            File.WriteAllText(outputFilePath, sourceCode);
+
+            if (CSharpCompiler.Execute(outputFilePath, this))
+            {
+                SendToLog?.Invoke(this, new CompilerLogEventArgs() { Message = "SUCC" });
+            }
+            else
+            {
+                SendToLog?.Invoke(this, new CompilerLogEventArgs() { Message = "Compilation failed" });
+            }
+
+            return true;
+        }
+
         // #64
         public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language, string compilerPath = null)
         {
@@ -52,8 +75,12 @@ namespace NeoDebuggerCore.Utils
 
             File.WriteAllText(outputFilePath, sourceCode);
 
-            var proc = new Process();
+            if (language == SourceLanguage.CSharp)
+            {
+                return CompileContractUsingEmbeddedNeon(sourceCode, outputFilePath);
+            }
 
+            var proc = new Process();
             var info = new ProcessStartInfo();
 
             if (compilerPath == null)
@@ -67,16 +94,6 @@ namespace NeoDebuggerCore.Utils
 
             switch (language)
             {
-                case SourceLanguage.CSharp:
-                    {
-                        var compilePath = Path.Combine(info.WorkingDirectory, NeonDotNetExecutableName());
-                        if (!File.Exists(compilePath))
-                            throw new FileNotFoundException("Compiler not found.\nExpected path: " + compilePath, compilePath);
-
-						info.FileName = DotNetExecutableName();
-                        info.Arguments = compilePath + " \"" + outputFilePath + "\"";
-                        break;
-                    }
 
                 case SourceLanguage.Python:
                     {

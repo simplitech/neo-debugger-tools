@@ -13,4 +13,10 @@
     <PackageReference Include="LunarParser" Version="1.1.5" />
     <PackageReference Include="LunarLabs.Server" Version="1.3.13" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Output\contracts\DefaultContract.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Output\contracts\DefaultContract.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+  </ItemGroup>
 </Project>

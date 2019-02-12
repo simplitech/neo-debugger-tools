@@ -9,14 +9,19 @@ using System.Reactive.Linq;
 using NeoDebuggerUI.Models;
 using NeoDebuggerUI.Views;
 using System.Reactive;
+using NeoDebuggerCore.Utils;
 
 namespace NeoDebuggerUI.ViewModels
 {
 	public class MainWindowViewModel : ViewModelBase
 	{
-		public ReactiveList<string> ProjectFiles { get; } = new ReactiveList<string>();
+        public ReactiveList<string> ProjectFiles { get; } = new ReactiveList<string>();
         public delegate void SelectedFileChanged(string selectedFilename);
         public event SelectedFileChanged EvtFileChanged;
+
+        public delegate void FileToCompileChanged();
+        public event FileToCompileChanged EvtFileToCompileChanged;
+
 
         private string _selectedFile;
 		public string SelectedFile
@@ -41,8 +46,9 @@ namespace NeoDebuggerUI.ViewModels
 			Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
 			DebuggerStore.instance.manager.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
 
-			var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile).ObserveOn(RxApp.MainThreadScheduler);
+            var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile);
 			fileChanged.Subscribe(file => LoadSelectedFile());
+
 		}
 
 		private Unit LoadSelectedFile()
@@ -51,7 +57,12 @@ namespace NeoDebuggerUI.ViewModels
 			return Unit.Default;
 		}
 
-		private bool LoadContract(string avmFilePath)
+        public void SaveCurrentFileWithContent(string content)
+        {
+            File.WriteAllText(this.SelectedFile, content);
+        }
+
+        private bool LoadContract(string avmFilePath)
 		{
 			if (!DebuggerStore.instance.manager.LoadContract(avmFilePath))
 			{
@@ -78,7 +89,41 @@ namespace NeoDebuggerUI.ViewModels
 			return true;
 		}
 
-		public void SendLogToPanel(string s)
+        internal void ResetWithNewFile(string result)
+        {
+            if (!result.EndsWith(".cs", StringComparison.Ordinal))
+            {
+                SendLogToPanel("File not supported. Please use .cs extension.");
+                return;
+            }
+
+            if (!File.Exists(result))
+            {
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
+                var fullFilePath = Path.Combine(path, "ContractTemplate.cs");
+                var sourceCode = File.ReadAllText(fullFilePath);
+                File.WriteAllText(result, sourceCode);
+            }
+
+            this.ProjectFiles.Clear();
+            this.ProjectFiles.Add(result);
+            this.SelectedFile = ProjectFiles[0];
+            CompileCurrentFile();
+        }
+
+        //Current compiler does not support multiple files
+        public void CompileCurrentFile()
+        {
+            EvtFileToCompileChanged?.Invoke();
+            var sourceCode = File.ReadAllText(this.SelectedFile);
+            var compiled = DebuggerStore.instance.manager.CompileContract(sourceCode, Neo.Debugger.Core.Data.SourceLanguage.CSharp ,this.SelectedFile);
+            if(compiled)
+            {
+                DebuggerStore.instance.manager.LoadContract(this.SelectedFile.Replace(".cs", ".avm"));
+            }
+        }
+
+        public void SendLogToPanel(string s)
 		{
 			Log += s + "\n";
 		}
@@ -88,7 +133,7 @@ namespace NeoDebuggerUI.ViewModels
 			Log = "";
 		}
 
-		public async Task Open()
+        public async Task Open()
 		{
 			var dialog = new OpenFileDialog();
 			var filters = new List<FileDialogFilter>();
@@ -100,19 +145,20 @@ namespace NeoDebuggerUI.ViewModels
 
 			var result = await dialog.ShowAsync();
 
-			if (result != null)
+			if (result != null && result.Length > 0)
 			{
 				LoadContract(result[0]);
 			}
 		}
 
-		public static async void OpenRunDialog()
+		public async Task OpenRunDialog()
 		{
+            CompileCurrentFile();
 			var modalWindow = new InvokeWindow();
 			var task = modalWindow.ShowDialog();
 			await Task.Run(()=> task.Wait());
 		}
 
-		
-	}
+
+    }
 }

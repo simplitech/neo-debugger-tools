@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reactive.Linq;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
@@ -23,17 +24,14 @@ namespace NeoDebuggerUI.Models
         {
             var settings = new DebuggerSettings();
             manager = new DebugManager(settings);
+            manager.LoadTests();
+            manager.LoadEmulator("chain.avm");
         }
 
         public SmartContractTestSuite Tests
         {
             get
             {
-                if (manager.Tests == null)
-                {
-                    manager.LoadTests();   
-                }
-
                 return manager.Tests;
             }
         }

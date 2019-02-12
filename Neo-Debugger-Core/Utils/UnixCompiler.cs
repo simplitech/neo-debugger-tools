@@ -3,7 +3,7 @@ using Neo.Debugger.Core.Models;
 
 namespace NeoDebuggerCore.Utils
 {
-    public class UnixCompiler : Compiler
+    public class UnixCompiler : NeonCompiler
     {
         public UnixCompiler(DebuggerSettings settings) : base(settings)
         {

@@ -67,7 +67,7 @@ namespace Neo.Compiler.AVM
                 option.useSysCallInteropHash = false;
                 NeoModule am = conv.Convert(mod, option);
 
-                Directory.SetCurrentDirectory(curPath);
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(filename));
 
                 bytes = am.Build();
                 log.Log("convert succ");

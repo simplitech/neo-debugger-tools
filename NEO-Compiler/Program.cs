@@ -1,5 +1,6 @@
 ﻿using Neo.Compiler.AVM;
 using Neo.Compiler.MSIL;
+using Neo.DebuggerCompiler;
 using System;
 using System.IO;
 using System.Reflection;
@@ -18,75 +19,7 @@ namespace Neo.Compiler
         //控制台输出约定了特别的语法
         public static void Main(string[] args)
         {
-
-            //set console
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            var log = new DefLogger();
-            log.Log("Neo.Compiler.MSIL console app v" + Assembly.GetEntryAssembly().GetName().Version + " [DEBUGGER SUPPORT]");
-            if (args.Length == 0)
-            {
-                log.Log("need one param for DLL filename.");
-                return;
-            }
-
-
-            string filename = args[0];
-            log.Log("Trying to compile " + filename);
-
-            var extension = Path.GetExtension(filename);
-            string filepdb = filename.Replace(extension, ".pdb");
-
-            // fix necessary when debugging the compiler via VS
-            var path = Path.GetDirectoryName(filename);
-            if (!string.IsNullOrEmpty(path))
-            {
-                try
-                {
-                    Directory.SetCurrentDirectory(path);
-                }
-                catch
-                {
-                    log.Log("Could not find path: " + path);
-                    Environment.Exit(-1);
-                }
-            }
-
-            if (!File.Exists(filename))
-            {
-                log.Log("Could not find file: " + filename);
-                Environment.Exit(-1);
-            }
-
-            switch (extension)
-            {
-                case ".dll":
-                    {
-                        if (AVMCompiler.Execute(filename, filepdb, log))
-                        {
-                            log.Log("SUCC");
-                        }
-
-                        break;
-                    }
-
-                case ".cs":
-                    {
-                        if (CSharpCompiler.Execute(filename, log))
-                        {
-                            log.Log("SUCC");
-                        }
-
-                        break;
-                    }
-
-                default:
-                    {
-                        log.Log("Invalid extension: " + extension);
-                        Environment.Exit(-1);
-                        break;
-                    }
-            }
-            
+            Neon.Run(args);
         }
     }
 }

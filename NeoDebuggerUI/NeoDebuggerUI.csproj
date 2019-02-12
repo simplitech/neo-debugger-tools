@@ -5,6 +5,9 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Resources\ContractTemplate.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="**\*.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
@@ -24,6 +27,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\Neo-Compiler.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ContractTemplate.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Update="App.xaml">
@@ -31,6 +43,9 @@
     </None>
     <None Update="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </None>
+    <None Update="Neo.SmartContract.Framework.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

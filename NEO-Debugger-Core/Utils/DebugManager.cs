@@ -473,8 +473,16 @@ namespace Neo.Debugger.Core.Utils
 
         public bool LoadTests()
         {
-            _tests = new SmartContractTestSuite(_avmFilePath);
-            return true;
+            try
+            {
+                _tests = new SmartContractTestSuite(_avmFilePath);
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Log("Error loading JSON tests. " + ex.Message);
+                return false;
+            }
         }
 
 
@@ -767,7 +775,7 @@ namespace Neo.Debugger.Core.Utils
 
         public bool CompileContract(string sourceCode, SourceLanguage language, string outputFile = null)
         {
-            var compiler = Compiler.GetInstance(Settings);
+            var compiler = NeonCompiler.GetInstance(Settings);
             compiler.SendToLog += Compiler_SendToLog;
 
             var extension = LanguageSupport.GetExtension(language);
@@ -776,14 +784,14 @@ namespace Neo.Debugger.Core.Utils
 
             string fileName;
 
+            Directory.CreateDirectory(Settings.path);
             if (outputFile == null)
             {
-                Directory.CreateDirectory(Settings.path);
                 fileName = Path.Combine(Settings.path, sourceFile);
             }
             else
             {
-                fileName = outputFile.Replace(".avm", extension);
+                fileName = Path.Combine(Settings.path, outputFile.Replace(".avm", extension));
             }
 
             var avmPath = fileName.Replace(extension, ".avm");

@@ -7,19 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Neo-Emulator\Neo-Emulator.csproj" />
-    <ProjectReference Include="..\Neo-Debugger-Core\Neo-Debugger-Core.csproj" />
-    <ProjectReference Include="..\Neo.SmartContract.Framework\Neo.SmartContract.Framework.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Mono.Cecil" Version="0.10.3" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove=".DS_Store" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Neo.SmartContract.Framework.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="AVM\AVMCompiler.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Neo-Compiler-Lib\Neo-Compiler-Lib.csproj" />
   </ItemGroup>
 </Project>
