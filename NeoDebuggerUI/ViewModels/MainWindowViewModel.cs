@@ -111,6 +111,7 @@ namespace NeoDebuggerUI.ViewModels
             CompileCurrentFile();
         }
 
+
         //Current compiler does not support multiple files
         public void CompileCurrentFile()
         {
@@ -137,8 +138,8 @@ namespace NeoDebuggerUI.ViewModels
 		{
 			var dialog = new OpenFileDialog();
 			var filters = new List<FileDialogFilter>();
-			var filteredExtensions = new List<string>(new string[] { "avm" });
-			var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "NEO AVM files" };
+			var filteredExtensions = new List<string>(new string[] { "avm", "cs" });
+			var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "C# or NEO AVM files" };
 			filters.Add(filter);
 			dialog.Filters = filters;
 			dialog.AllowMultiple = false;
@@ -147,8 +148,19 @@ namespace NeoDebuggerUI.ViewModels
 
 			if (result != null && result.Length > 0)
 			{
-				LoadContract(result[0]);
-			}
+                var selectedFile = result[0];
+                if (selectedFile.EndsWith(".avm", StringComparison.Ordinal))
+                {
+                    LoadContract(result[0]);
+                }
+                else if(selectedFile.EndsWith(".cs", StringComparison.Ordinal))
+                {
+                    ProjectFiles.Clear();
+                    ProjectFiles.Add(selectedFile);
+                    SelectedFile = selectedFile;
+                }
+
+            }
 		}
 
 		public async Task OpenRunDialog()
@@ -158,7 +170,6 @@ namespace NeoDebuggerUI.ViewModels
 			var task = modalWindow.ShowDialog();
 			await Task.Run(()=> task.Wait());
 		}
-
-
-    }
+        
+	}
 }

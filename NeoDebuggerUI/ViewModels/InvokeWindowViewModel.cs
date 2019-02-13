@@ -7,11 +7,21 @@ using NeoDebuggerUI.Models;
 using System;
 using System.Threading.Tasks;
 using Neo.VM;
+using System.Collections.Generic;
 
 namespace NeoDebuggerUI.ViewModels
 {
     public class InvokeWindowViewModel : ViewModelBase
     {
+        public List<string> TestCases { get; } = new List<string>();
+        public List<string> FunctionList { get; } = new List<string>();
+
+        public DataNode SelectedTestCaseParams => SelectedTestCase != null ? DebuggerStore.instance.Tests.cases[SelectedTestCase].args : null;
+        public DebugParameters DebugParams { get; set; } = new DebugParameters();
+
+        public delegate void SelectedTestChanged(string selectedTestCase);
+        public event SelectedTestChanged EvtSelectedTestCaseChanged;
+
         private string _selectedTestCase;
         public string SelectedTestCase
         {
@@ -19,14 +29,38 @@ namespace NeoDebuggerUI.ViewModels
             set => this.RaiseAndSetIfChanged(ref _selectedTestCase, value);
         }
 
-        public DataNode SelectedTestCaseParams => SelectedTestCase != null ? DebuggerStore.instance.Tests.cases[SelectedTestCase].args : null;
-        public DebugParameters DebugParams { get; set; } = new DebugParameters();
+        private string _selectedFunction;
+        public string SelectedFunction
+        {
+            get => _selectedFunction;
+            set => this.RaiseAndSetIfChanged(ref _selectedFunction, value);
+        }
 
+        public void NotifySelectedTestChangeEvt()
+        {
+            EvtSelectedTestCaseChanged?.Invoke(_selectedTestCase);
+        }
+        
         public InvokeWindowViewModel()
         {
             if(DebuggerStore.instance.Tests != null && DebuggerStore.instance.Tests.cases.Count > 0) {
                 _selectedTestCase = DebuggerStore.instance.Tests.cases.ElementAt(0).Key;
             }
+
+            foreach (var test in DebuggerStore.instance.Tests.cases.Keys)
+            {
+                TestCases.Add(test);
+            }
+
+            foreach (var function in DebuggerStore.instance.manager.ABI.functions.Values)
+            {
+                FunctionList.Add(function.name);
+            }
+
+            _selectedFunction = DebuggerStore.instance.manager.ABI.entryPoint.name;
+
+            var selectedTestChanged = this.WhenAnyValue(x => x.SelectedTestCase);
+            selectedTestChanged.Subscribe(test => NotifySelectedTestChangeEvt());
         }
 
         public void Run()

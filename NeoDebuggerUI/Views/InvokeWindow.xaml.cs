@@ -30,6 +30,8 @@ namespace NeoDebuggerUI.Views
 
             RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
             RegisterInteraction();
+            RegisterEventListeners();
+            
         }
 
         private void InitializeComponent()
@@ -40,6 +42,8 @@ namespace NeoDebuggerUI.Views
         private void RenderTestCaseParams(DataNode tparams)
         {
             var grid = this.FindControl<Grid>("InputParametersGrid");
+            grid.Children.Clear();
+            grid.RowDefinitions.Clear();
 
             var rowHeader = new RowDefinition { Height = new GridLength(20) };
             grid.RowDefinitions.Add(rowHeader);
@@ -112,6 +116,11 @@ namespace NeoDebuggerUI.Views
                 DebugPressed(op, args);
                 Close();
             };
+        }
+
+        public void RegisterEventListeners()
+        {
+            this.ViewModel.EvtSelectedTestCaseChanged += (fileName) => RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
         }
 
         public void DebugPressed(string field1, string field2)

@@ -15,12 +15,27 @@
 
 	<DockPanel LastChildFill="True">
 		<Button Name="DebugBtn" DockPanel.Dock="Bottom" Margin="5" Width="200">Debug</Button>
-		<Grid Name="InputParametersGrid" DockPanel.Dock="Bottom" Margin="5, 5, 5, 0">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="Auto"/>
-				<ColumnDefinition Width="*" />
-			</Grid.ColumnDefinitions>
-		</Grid>
-		<DockPanel></DockPanel>
+        <Grid Name="InputParametersGrid" DockPanel.Dock="Bottom" Margin="5, 5, 5, 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+        </Grid>
+        <DockPanel
+          LastChildFill="True">
+            <ListBox
+              DockPanel.Dock="Right"
+              Width="180"
+              Margin="0, 0, 5, 0"
+              Name="TestCases"
+              Items="{Binding TestCases}"
+              SelectedItem="{Binding SelectedTestCase}" />
+            <ListBox
+              Width="180"
+              Name="Functions"
+              Items="{Binding FunctionList}"
+              SelectedItem="{Binding SelectedFunction}" />
+        </DockPanel>
+        <DockPanel></DockPanel>
     </DockPanel>
 </Window>
