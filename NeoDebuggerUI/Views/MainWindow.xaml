@@ -108,10 +108,21 @@
       </MenuItem>
     </Menu>
 
-    <TextBlock
+    <DockPanel
       DockPanel.Dock="Top"
-      Margin="5"
-      Text="{Binding SelectedFile}"/>
+      LastChildFill="True">
+      <TextBlock
+        DockPanel.Dock="Right"
+        Margin="5"
+        Text="{Binding ConsumedGas}"/>
+      <TextBlock
+        DockPanel.Dock="Right"
+        Margin="5"
+        Text="GAS used:"/>
+      <TextBlock
+        Margin="5"
+        Text="{Binding SelectedFile}"/>
+    </DockPanel>
 
     <DockPanel
       DockPanel.Dock="Bottom"

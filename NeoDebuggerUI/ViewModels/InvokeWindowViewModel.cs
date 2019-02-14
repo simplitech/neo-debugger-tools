@@ -69,9 +69,9 @@ namespace NeoDebuggerUI.ViewModels
                 errorMessage = ex.Message;
             }
 
-            if(result != null)
+            if (result != null)
             {
-                OpenGenericSampleDialog(result.GetString(), "OK", "", false);
+                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
             }
             else
             {
