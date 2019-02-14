@@ -13,8 +13,8 @@ namespace NeoDebuggerUI.ViewModels
 {
     public class InvokeWindowViewModel : ViewModelBase
     {
-        public List<string> TestCases { get; } = new List<string>();
-        public List<string> FunctionList { get; } = new List<string>();
+        public IEnumerable<string> TestCases { get => DebuggerStore.instance.Tests.cases.Keys; }
+        public IEnumerable<string> FunctionList { get => DebuggerStore.instance.manager.ABI.functions.Select(x => x.Value.name); }
 
         public DataNode SelectedTestCaseParams => SelectedTestCase != null ? DebuggerStore.instance.Tests.cases[SelectedTestCase].args : null;
         public DebugParameters DebugParams { get; set; } = new DebugParameters();
@@ -46,17 +46,7 @@ namespace NeoDebuggerUI.ViewModels
             if(DebuggerStore.instance.Tests != null && DebuggerStore.instance.Tests.cases.Count > 0) {
                 _selectedTestCase = DebuggerStore.instance.Tests.cases.ElementAt(0).Key;
             }
-
-            foreach (var test in DebuggerStore.instance.Tests.cases.Keys)
-            {
-                TestCases.Add(test);
-            }
-
-            foreach (var function in DebuggerStore.instance.manager.ABI.functions.Values)
-            {
-                FunctionList.Add(function.name);
-            }
-
+            
             _selectedFunction = DebuggerStore.instance.manager.ABI.entryPoint.name;
 
             var selectedTestChanged = this.WhenAnyValue(x => x.SelectedTestCase);

@@ -24,17 +24,17 @@
         <DockPanel
           LastChildFill="True">
             <ListBox
-              DockPanel.Dock="Right"
+              DockPanel.Dock="Left"
               Width="180"
               Margin="0, 0, 5, 0"
-              Name="TestCases"
-              Items="{Binding TestCases}"
-              SelectedItem="{Binding SelectedTestCase}" />
-            <ListBox
-              Width="180"
               Name="Functions"
               Items="{Binding FunctionList}"
               SelectedItem="{Binding SelectedFunction}" />
+            <ListBox
+              Width="315"
+              Name="TestCases"
+              Items="{Binding TestCases}"
+              SelectedItem="{Binding SelectedTestCase}" />
         </DockPanel>
         <DockPanel></DockPanel>
     </DockPanel>
