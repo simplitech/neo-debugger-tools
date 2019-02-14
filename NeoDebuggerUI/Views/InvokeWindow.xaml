@@ -31,11 +31,9 @@
               Items="{Binding FunctionList}"
               SelectedItem="{Binding SelectedFunction}" />
             <ListBox
-              Width="315"
               Name="TestCases"
               Items="{Binding TestCases}"
               SelectedItem="{Binding SelectedTestCase}" />
         </DockPanel>
-        <DockPanel></DockPanel>
     </DockPanel>
 </Window>
