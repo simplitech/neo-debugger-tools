@@ -6,15 +6,15 @@
         xmlns:AvalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
         Icon="resm:NeoDebuggerUI.Assets.avalonia-logo.ico"
         Title="NeoDebuggerUI"
-		Background="LightGray"
+        Background="LightGray"
         Width="500"
         Height="600">
   <Window.DataContext>
-	  <vm:InvokeWindowViewModel/>
+      <vm:InvokeWindowViewModel/>
   </Window.DataContext>
 
-	<DockPanel LastChildFill="True">
-		<Button Name="DebugBtn" DockPanel.Dock="Bottom" Margin="5" Width="200">Debug</Button>
+    <DockPanel LastChildFill="True">
+        <Button Name="DebugBtn" DockPanel.Dock="Bottom" Margin="5" Width="200">Debug</Button>
         <Grid Name="InputParametersGrid" DockPanel.Dock="Bottom" Margin="5, 5, 5, 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
