@@ -12,32 +12,31 @@ using NeoDebuggerUI.ViewModels;
 
 namespace NeoDebuggerUI.Views
 {
-	public class MainWindow : ReactiveWindow<MainWindowViewModel>
+    public class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         private TextEditor _textEditor;
 
-		public MainWindow()
-		{
-			InitializeComponent();
+        public MainWindow()
+        {
+            InitializeComponent();
 #if DEBUG
             this.AttachDevTools();
 #endif
 
-			_textEditor = this.FindControl<TextEditor>("Editor");
-			_textEditor.Background = Brushes.WhiteSmoke;
-			_textEditor.BorderBrush = Brushes.Gray;
-			_textEditor.ShowLineNumbers = true;
-			_textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C#");
-			_textEditor.TextArea.IndentationStrategy = new AvaloniaEdit.Indentation.CSharp.CSharpIndentationStrategy();
+            _textEditor = this.FindControl<TextEditor>("Editor");
+            _textEditor.Background = Brushes.WhiteSmoke;
+            _textEditor.BorderBrush = Brushes.Gray;
+            _textEditor.ShowLineNumbers = true;
+            _textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C#");
+            _textEditor.TextArea.IndentationStrategy = new AvaloniaEdit.Indentation.CSharp.CSharpIndentationStrategy();
 
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
             newCSharp.Click += async (o, e) => { await NewCSharpFile(); };
 
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
-
+            this.Activated += (o, e) => { ReloadCurrentFile(); };
         }
-
 
         public async Task NewCSharpFile()
         {
@@ -62,8 +61,17 @@ namespace NeoDebuggerUI.Views
 
 
         private void InitializeComponent()
-		{
-			AvaloniaXamlLoader.Load(this);
-		}
-	}
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+
+        private async void ReloadCurrentFile()
+        {
+            if (!string.IsNullOrEmpty(ViewModel.SelectedFile) && File.Exists(ViewModel.SelectedFile))
+            {
+                await Task.Run(() => LoadFile(ViewModel.SelectedFile));
+            }
+        }
+
+    }
 }

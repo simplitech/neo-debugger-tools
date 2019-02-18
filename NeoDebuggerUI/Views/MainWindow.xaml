@@ -4,14 +4,14 @@
         xmlns:AvalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
         Icon="resm:NeoDebuggerUI.Assets.avalonia-logo.ico"
         Title="NeoDebuggerUI"
-		    Background="LightGray"
+            Background="LightGray"
         Width="950"
         Height="600">
   <Window.DataContext>
-	  <vm:MainWindowViewModel/>
+      <vm:MainWindowViewModel/>
   </Window.DataContext>
 
-	<DockPanel LastChildFill="True">
+    <DockPanel LastChildFill="True">
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="File">
         <MenuItem Header="New" >

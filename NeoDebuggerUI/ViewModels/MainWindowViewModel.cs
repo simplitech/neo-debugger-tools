@@ -13,8 +13,8 @@ using NeoDebuggerCore.Utils;
 
 namespace NeoDebuggerUI.ViewModels
 {
-	public class MainWindowViewModel : ViewModelBase
-	{
+    public class MainWindowViewModel : ViewModelBase
+    {
         public ReactiveList<string> ProjectFiles { get; } = new ReactiveList<string>();
         public delegate void SelectedFileChanged(string selectedFilename);
         public event SelectedFileChanged EvtFileChanged;
@@ -24,38 +24,38 @@ namespace NeoDebuggerUI.ViewModels
 
 
         private string _selectedFile;
-		public string SelectedFile
-		{
-			get => _selectedFile;
-			set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
-		}
+        public string SelectedFile
+        {
+            get => _selectedFile;
+            set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
+        }
 
-		private string _log;
-		public string Log
-		{
-			get => _log;
-			set => this.RaiseAndSetIfChanged(ref _log, value);
-		}
+        private string _log;
+        public string Log
+        {
+            get => _log;
+            set => this.RaiseAndSetIfChanged(ref _log, value);
+        }
 
-		private string _fileFolder;
-		private DateTime _lastModificationDate;
+        private string _fileFolder;
+        private DateTime _lastModificationDate;
 
-		public MainWindowViewModel()
-		{
-			Log = "Debugger started\n";
-			Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
-			DebuggerStore.instance.manager.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
+        public MainWindowViewModel()
+        {
+            Log = "Debugger started\n";
+            Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
+            DebuggerStore.instance.manager.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
 
             var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile);
-			fileChanged.Subscribe(file => LoadSelectedFile());
+            fileChanged.Subscribe(file => LoadSelectedFile());
 
-		}
+        }
 
-		private Unit LoadSelectedFile()
-		{
-			EvtFileChanged?.Invoke(_selectedFile);
-			return Unit.Default;
-		}
+        private Unit LoadSelectedFile()
+        {
+            EvtFileChanged?.Invoke(_selectedFile);
+            return Unit.Default;
+        }
 
         public void SaveCurrentFileWithContent(string content)
         {
@@ -63,31 +63,31 @@ namespace NeoDebuggerUI.ViewModels
         }
 
         private bool LoadContract(string avmFilePath)
-		{
-			if (!DebuggerStore.instance.manager.LoadContract(avmFilePath))
-			{
-				return false;
-			}
+        {
+            if (!DebuggerStore.instance.manager.LoadContract(avmFilePath))
+            {
+                return false;
+            }
 
-			_lastModificationDate = File.GetLastWriteTime(DebuggerStore.instance.manager.AvmFilePath);
-			DebuggerStore.instance.manager.Emulator.ClearAssignments();
+            _lastModificationDate = File.GetLastWriteTime(DebuggerStore.instance.manager.AvmFilePath);
+            DebuggerStore.instance.manager.Emulator.ClearAssignments();
 
-			if (DebuggerStore.instance.manager.IsMapLoaded)
-			{
-				ProjectFiles.Clear();
-				_fileFolder = Path.GetDirectoryName(avmFilePath);
-				ProjectFiles.Add(Path.GetFileName(avmFilePath));
-				foreach (var path in DebuggerStore.instance.manager.Map.FileNames)
-				{
-					DebuggerStore.instance.manager.LoadAssignmentsFromContent(path);
-					ProjectFiles.Add(path);
-				}
+            if (DebuggerStore.instance.manager.IsMapLoaded)
+            {
+                ProjectFiles.Clear();
+                _fileFolder = Path.GetDirectoryName(avmFilePath);
+                ProjectFiles.Add(Path.GetFileName(avmFilePath));
+                foreach (var path in DebuggerStore.instance.manager.Map.FileNames)
+                {
+                    DebuggerStore.instance.manager.LoadAssignmentsFromContent(path);
+                    ProjectFiles.Add(path);
+                }
 
-				SelectedFile = avmFilePath;
-			}
+                SelectedFile = avmFilePath;
+            }
 
-			return true;
-		}
+            return true;
+        }
 
         internal void ResetWithNewFile(string result)
         {
@@ -111,6 +111,7 @@ namespace NeoDebuggerUI.ViewModels
             CompileCurrentFile();
         }
 
+
         //Current compiler does not support multiple files
         public void CompileCurrentFile()
         {
@@ -124,41 +125,51 @@ namespace NeoDebuggerUI.ViewModels
         }
 
         public void SendLogToPanel(string s)
-		{
-			Log += s + "\n";
-		}
+        {
+            Log += s + "\n";
+        }
 
-		public void ClearLog()
-		{
-			Log = "";
-		}
+        public void ClearLog()
+        {
+            Log = "";
+        }
 
         public async Task Open()
-		{
-			var dialog = new OpenFileDialog();
-			var filters = new List<FileDialogFilter>();
-			var filteredExtensions = new List<string>(new string[] { "avm" });
-			var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "NEO AVM files" };
-			filters.Add(filter);
-			dialog.Filters = filters;
-			dialog.AllowMultiple = false;
+        {
+            var dialog = new OpenFileDialog();
+            var filters = new List<FileDialogFilter>();
+            var filteredExtensions = new List<string>(new string[] { "avm", "cs" });
+            var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "C# or NEO AVM files" };
+            filters.Add(filter);
+            dialog.Filters = filters;
+            dialog.AllowMultiple = false;
 
-			var result = await dialog.ShowAsync();
+            var result = await dialog.ShowAsync();
 
-			if (result != null && result.Length > 0)
-			{
-				LoadContract(result[0]);
-			}
-		}
+            if (result != null && result.Length > 0)
+            {
+                var selectedFile = result[0];
+                if (selectedFile.EndsWith(".avm", StringComparison.Ordinal))
+                {
+                    LoadContract(result[0]);
+                }
+                else if(selectedFile.EndsWith(".cs", StringComparison.Ordinal))
+                {
+                    ProjectFiles.Clear();
+                    ProjectFiles.Add(selectedFile);
+                    SelectedFile = selectedFile;
+                }
 
-		public async Task OpenRunDialog()
-		{
+            }
+        }
+
+        public async Task OpenRunDialog()
+        {
             CompileCurrentFile();
-			var modalWindow = new InvokeWindow();
-			var task = modalWindow.ShowDialog();
-			await Task.Run(()=> task.Wait());
-		}
-
-
+            var modalWindow = new InvokeWindow();
+            var task = modalWindow.ShowDialog();
+            await Task.Run(()=> task.Wait());
+        }
+        
     }
 }
