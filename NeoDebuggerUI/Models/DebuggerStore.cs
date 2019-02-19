@@ -35,5 +35,13 @@ namespace NeoDebuggerUI.Models
                 return manager.Tests;
             }
         }
+
+        public string UsedGasCost
+        {
+            get
+            {
+                return string.Format("{0:N4}", manager.UsedGasCost);
+            }
+        }
     }
 }

@@ -13,15 +13,14 @@ using NeoDebuggerCore.Utils;
 
 namespace NeoDebuggerUI.ViewModels
 {
-	public class MainWindowViewModel : ViewModelBase
-	{
+    public class MainWindowViewModel : ViewModelBase
+    {
         public ReactiveList<string> ProjectFiles { get; } = new ReactiveList<string>();
         public delegate void SelectedFileChanged(string selectedFilename);
         public event SelectedFileChanged EvtFileChanged;
 
         public delegate void FileToCompileChanged();
         public event FileToCompileChanged EvtFileToCompileChanged;
-
 
         private string _selectedFile;
 		public string SelectedFile
@@ -37,7 +36,14 @@ namespace NeoDebuggerUI.ViewModels
 			set => this.RaiseAndSetIfChanged(ref _log, value);
 		}
 
-		private string _fileFolder;
+        private string _consumedGas;
+        public string ConsumedGas
+        {
+            get => _consumedGas;
+            set => this.RaiseAndSetIfChanged(ref _consumedGas, value);
+        }
+
+        private string _fileFolder;
 		private DateTime _lastModificationDate;
 
 		public MainWindowViewModel()
@@ -48,14 +54,13 @@ namespace NeoDebuggerUI.ViewModels
 
             var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile);
 			fileChanged.Subscribe(file => LoadSelectedFile());
-
 		}
 
-		private Unit LoadSelectedFile()
-		{
-			EvtFileChanged?.Invoke(_selectedFile);
-			return Unit.Default;
-		}
+        private Unit LoadSelectedFile()
+        {
+            EvtFileChanged?.Invoke(_selectedFile);
+            return Unit.Default;
+        }
 
         public void SaveCurrentFileWithContent(string content)
         {
@@ -63,31 +68,31 @@ namespace NeoDebuggerUI.ViewModels
         }
 
         private bool LoadContract(string avmFilePath)
-		{
-			if (!DebuggerStore.instance.manager.LoadContract(avmFilePath))
-			{
-				return false;
-			}
+        {
+            if (!DebuggerStore.instance.manager.LoadContract(avmFilePath))
+            {
+                return false;
+            }
 
-			_lastModificationDate = File.GetLastWriteTime(DebuggerStore.instance.manager.AvmFilePath);
-			DebuggerStore.instance.manager.Emulator.ClearAssignments();
+            _lastModificationDate = File.GetLastWriteTime(DebuggerStore.instance.manager.AvmFilePath);
+            DebuggerStore.instance.manager.Emulator.ClearAssignments();
 
-			if (DebuggerStore.instance.manager.IsMapLoaded)
-			{
-				ProjectFiles.Clear();
-				_fileFolder = Path.GetDirectoryName(avmFilePath);
-				ProjectFiles.Add(Path.GetFileName(avmFilePath));
-				foreach (var path in DebuggerStore.instance.manager.Map.FileNames)
-				{
-					DebuggerStore.instance.manager.LoadAssignmentsFromContent(path);
-					ProjectFiles.Add(path);
-				}
+            if (DebuggerStore.instance.manager.IsMapLoaded)
+            {
+                ProjectFiles.Clear();
+                _fileFolder = Path.GetDirectoryName(avmFilePath);
+                ProjectFiles.Add(Path.GetFileName(avmFilePath));
+                foreach (var path in DebuggerStore.instance.manager.Map.FileNames)
+                {
+                    DebuggerStore.instance.manager.LoadAssignmentsFromContent(path);
+                    ProjectFiles.Add(path);
+                }
 
-				SelectedFile = avmFilePath;
-			}
+                SelectedFile = avmFilePath;
+            }
 
-			return true;
-		}
+            return true;
+        }
 
         internal void ResetWithNewFile(string result)
         {
@@ -111,6 +116,7 @@ namespace NeoDebuggerUI.ViewModels
             CompileCurrentFile();
         }
 
+
         //Current compiler does not support multiple files
         public void CompileCurrentFile()
         {
@@ -124,14 +130,14 @@ namespace NeoDebuggerUI.ViewModels
         }
 
         public void SendLogToPanel(string s)
-		{
-			Log += s + "\n";
-		}
+        {
+            Log += s + "\n";
+        }
 
-		public void ClearLog()
-		{
-			Log = "";
-		}
+        public void ClearLog()
+        {
+            Log = "";
+        }
 
         public async Task Open()
 		{
@@ -157,8 +163,8 @@ namespace NeoDebuggerUI.ViewModels
 			var modalWindow = new InvokeWindow();
 			var task = modalWindow.ShowDialog();
 			await Task.Run(()=> task.Wait());
-		}
 
-
+            ConsumedGas = DebuggerStore.instance.UsedGasCost;
+        }
     }
 }

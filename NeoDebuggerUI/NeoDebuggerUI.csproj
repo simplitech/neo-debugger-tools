@@ -41,6 +41,9 @@
     <None Update="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
+    <None Update="Views\GenericConfirmationWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
     <None Update="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
