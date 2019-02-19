@@ -22,34 +22,39 @@ namespace NeoDebuggerUI.ViewModels
         public delegate void FileToCompileChanged();
         public event FileToCompileChanged EvtFileToCompileChanged;
 
-
         private string _selectedFile;
-        public string SelectedFile
-        {
-            get => _selectedFile;
-            set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
-        }
+		public string SelectedFile
+		{
+			get => _selectedFile;
+			set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
+		}
 
-        private string _log;
-        public string Log
+		private string _log;
+		public string Log
+		{
+			get => _log;
+			set => this.RaiseAndSetIfChanged(ref _log, value);
+		}
+
+        private string _consumedGas;
+        public string ConsumedGas
         {
-            get => _log;
-            set => this.RaiseAndSetIfChanged(ref _log, value);
+            get => _consumedGas;
+            set => this.RaiseAndSetIfChanged(ref _consumedGas, value);
         }
 
         private string _fileFolder;
-        private DateTime _lastModificationDate;
+		private DateTime _lastModificationDate;
 
-        public MainWindowViewModel()
-        {
-            Log = "Debugger started\n";
-            Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
-            DebuggerStore.instance.manager.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
+		public MainWindowViewModel()
+		{
+			Log = "Debugger started\n";
+			Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
+			DebuggerStore.instance.manager.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
 
             var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile);
-            fileChanged.Subscribe(file => LoadSelectedFile());
-
-        }
+			fileChanged.Subscribe(file => LoadSelectedFile());
+		}
 
         private Unit LoadSelectedFile()
         {
@@ -135,41 +140,31 @@ namespace NeoDebuggerUI.ViewModels
         }
 
         public async Task Open()
-        {
-            var dialog = new OpenFileDialog();
-            var filters = new List<FileDialogFilter>();
-            var filteredExtensions = new List<string>(new string[] { "avm", "cs" });
-            var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "C# or NEO AVM files" };
-            filters.Add(filter);
-            dialog.Filters = filters;
-            dialog.AllowMultiple = false;
+		{
+			var dialog = new OpenFileDialog();
+			var filters = new List<FileDialogFilter>();
+			var filteredExtensions = new List<string>(new string[] { "avm" });
+			var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "NEO AVM files" };
+			filters.Add(filter);
+			dialog.Filters = filters;
+			dialog.AllowMultiple = false;
 
-            var result = await dialog.ShowAsync();
+			var result = await dialog.ShowAsync();
 
-            if (result != null && result.Length > 0)
-            {
-                var selectedFile = result[0];
-                if (selectedFile.EndsWith(".avm", StringComparison.Ordinal))
-                {
-                    LoadContract(result[0]);
-                }
-                else if(selectedFile.EndsWith(".cs", StringComparison.Ordinal))
-                {
-                    ProjectFiles.Clear();
-                    ProjectFiles.Add(selectedFile);
-                    SelectedFile = selectedFile;
-                }
+			if (result != null && result.Length > 0)
+			{
+				LoadContract(result[0]);
+			}
+		}
 
-            }
-        }
-
-        public async Task OpenRunDialog()
-        {
+		public async Task OpenRunDialog()
+		{
             CompileCurrentFile();
-            var modalWindow = new InvokeWindow();
-            var task = modalWindow.ShowDialog();
-            await Task.Run(()=> task.Wait());
+			var modalWindow = new InvokeWindow();
+			var task = modalWindow.ShowDialog();
+			await Task.Run(()=> task.Wait());
+
+            ConsumedGas = DebuggerStore.instance.UsedGasCost;
         }
-        
     }
 }
