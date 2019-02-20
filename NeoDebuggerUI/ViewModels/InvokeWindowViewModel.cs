@@ -22,6 +22,9 @@ namespace NeoDebuggerUI.ViewModels
         public delegate void SelectedTestChanged(string selectedTestCase);
         public event SelectedTestChanged EvtSelectedTestCaseChanged;
 
+        public string[] Trigger { get => Enum.GetNames(typeof(Neo.Emulation.TriggerType)); }
+        public string[] Witness { get => Enum.GetNames(typeof(Neo.Emulation.CheckWitnessMode)); }
+        
         private string _selectedTestCase;
         public string SelectedTestCase
         {
@@ -36,11 +39,25 @@ namespace NeoDebuggerUI.ViewModels
             set => this.RaiseAndSetIfChanged(ref _selectedFunction, value);
         }
 
+        private string _selectedTrigger;
+        public string SelectedTrigger
+        {
+            get => _selectedTrigger;
+            set => this.RaiseAndSetIfChanged(ref _selectedTrigger, value);
+        }
+
+        private string _selectedWitness;
+        public string SelectedWitness
+        {
+            get => _selectedWitness;
+            set => this.RaiseAndSetIfChanged(ref _selectedWitness, value);
+        }
+
         public void NotifySelectedTestChangeEvt()
         {
             EvtSelectedTestCaseChanged?.Invoke(_selectedTestCase);
         }
-        
+
         public InvokeWindowViewModel()
         {
             if(DebuggerStore.instance.Tests != null && DebuggerStore.instance.Tests.cases.Count > 0) {
@@ -48,7 +65,9 @@ namespace NeoDebuggerUI.ViewModels
             }
             
             _selectedFunction = DebuggerStore.instance.manager.ABI.entryPoint.name;
-
+            _selectedTrigger = DebuggerStore.instance.manager.Emulator.currentTrigger.ToString();
+            _selectedWitness = DebuggerStore.instance.manager.Emulator.checkWitnessMode.ToString();
+            
             var selectedTestChanged = this.WhenAnyValue(x => x.SelectedTestCase);
             selectedTestChanged.Subscribe(test => NotifySelectedTestChangeEvt());
         }
