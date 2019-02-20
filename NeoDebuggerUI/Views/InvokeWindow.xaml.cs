@@ -113,6 +113,7 @@ namespace NeoDebuggerUI.Views
             {
                 var op = ExtractValueFromGrid(1, 1);
                 var args = ExtractValueFromGrid(2, 1);
+                SetOptions();
                 DebugPressed(op, args);
                 Close();
             };
@@ -129,5 +130,27 @@ namespace NeoDebuggerUI.Views
             ViewModel.Run();
         }
 
+        public void SetOptions()
+        {
+            //Get the witness mode
+            CheckWitnessMode witnessMode;
+            var selectedWitness = ViewModel.SelectedWitness;
+
+            if (!Enum.TryParse<CheckWitnessMode>(selectedWitness, out witnessMode))
+            {
+                return;
+            }
+            ViewModel.DebugParams.WitnessMode = witnessMode;
+
+            //Get the trigger type
+            TriggerType type;
+            var selectedTrigger = ViewModel.SelectedTrigger;
+            
+            if (!Enum.TryParse<TriggerType>(selectedTrigger, out type))
+            {
+                return;
+            }
+            ViewModel.DebugParams.TriggerType = type;
+        }
     }
 }
