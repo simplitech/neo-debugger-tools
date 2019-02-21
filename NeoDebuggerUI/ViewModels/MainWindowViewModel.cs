@@ -167,7 +167,7 @@ namespace NeoDebuggerUI.ViewModels
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
 		}
 
-        public void ResetBlockchain()
+        public async void ResetBlockchain()
         {
             if(!DebuggerStore.instance.manager.BlockchainLoaded)
             {
@@ -175,15 +175,14 @@ namespace NeoDebuggerUI.ViewModels
                 return;
             }
 
-            //TODO: if there are more than one block in the blockchain
-            /*
             if (DebuggerStore.instance.manager.Blockchain.currentHeight > 1)
             {
-                OpenGenericSampleDialog("The current loaded Blockchain already has some transactions.\n" +
-                    "This action can not be reversed, are you sure you want to reset it?", "Yes", "No", true);
-                return;
+                if(!(await GetGenericSampleDialogResult("The current loaded Blockchain already has some transactions.\n" +
+                    "This action can not be reversed, are you sure you want to reset it?", "Yes", "No", true)))
+                {
+                    return;
+                }
             }
-            */
 
             DebuggerStore.instance.manager.Blockchain.Reset();
             DebuggerStore.instance.manager.Blockchain.Save();
