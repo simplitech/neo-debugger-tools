@@ -17,6 +17,8 @@ using Neo.Debugger.Core.Utils;
 using Neo.Emulation;
 using Neo.Lux.Utils;
 using NeoDebuggerUI.Models;
+using Neo.Emulation.API;
+using System.Numerics;
 
 namespace NeoDebuggerUI.Views
 {
@@ -114,6 +116,11 @@ namespace NeoDebuggerUI.Views
             {
                 var op = ExtractValueFromGrid(1, 1);
                 var args = ExtractValueFromGrid(2, 1);
+
+                if(!SetTransactionInfo())
+                {
+                    return;
+                }
                 SetOptions();
                 DebugPressed(op, args);
                 Close();
@@ -130,7 +137,7 @@ namespace NeoDebuggerUI.Views
             ViewModel.DebugParams.ArgList = DebuggerUtils.GetArgsListAsNode(string.Concat(field1, ",", field2));
             ViewModel.Run();
         }
-
+        
         public void SetOptions()
         {
             //Get the witness mode
@@ -160,6 +167,37 @@ namespace NeoDebuggerUI.Views
             var HasRawScript = rawScriptText.Text?.Length > 0;
 
             ViewModel.DebugParams.RawScript = HasRawScript ? rawScriptText.Text.HexToBytes() : null;
+        }
+
+        public bool SetTransactionInfo()
+        {
+            var assetBox = this.FindControl<DropDown>("AssetBox");
+            if (assetBox.SelectedIndex > 0)
+            {
+                foreach (var entry in Asset.Entries)
+                {
+                    if (entry.name == assetBox.SelectedItem.ToString())
+                    {
+                        BigInteger amount;
+                        BigInteger.TryParse(ViewModel.AssetAmount, out amount);
+                        if (amount > 0)
+                        {
+                            amount *= Asset.Decimals; // fix decimals
+
+                            //Add the transaction info
+                            ViewModel.DebugParams.Transaction.Add(entry.id, amount);
+                        }
+                        else
+                        {
+                            ViewModel.OpenGenericSampleDialog(entry.name + " amount must be greater than zero", "OK", "", false);
+                            return false;
+                        }
+
+                        break;
+                    }
+                }
+            }
+            return true;
         }
     }
 }
