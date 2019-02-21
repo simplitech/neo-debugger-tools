@@ -46,33 +46,27 @@
               LastChildFill="False"
               DockPanel.Dock="Left"
               Margin="5">
-              <TextBlock Height="30"
-                Margin="0,5,0,0"
+              <TextBlock Height="35"
                 DockPanel.Dock="Top"
                 Text="Trigger"/>
-              <TextBlock Height="30"
-                Margin="0,5,0,0"
+              <TextBlock Height="35"
                 DockPanel.Dock="Top"
                 Text="Check Witness"/>
-              <TextBlock Height="30"
-                Margin="0,5,0,0"
+              <TextBlock Height="35"
                 DockPanel.Dock="Top"
                 Text="Timestamp"/>
               <TextBlock
-                Margin="0,5,0,0"
                 DockPanel.Dock="Top"
                 Text="Raw Script"/>
             </DockPanel>
             <DropDown Height="30"
               Margin="0,0,0,5"
-              Name="TriggerBox"
               DockPanel.Dock="Top"
               Items="{Binding Trigger}"
               SelectedItem="{Binding SelectedTrigger}">
             </DropDown>
             <DropDown Height="30"
               Margin="0,0,0,5"
-              Name="WitnessBox"
               DockPanel.Dock="Top"
               Items="{Binding Witness}"
               SelectedItem="{Binding SelectedWitness}">
@@ -82,10 +76,10 @@
               Margin="0,0,0,5">
               <TextBox Width="100"
                 DockPanel.Dock="Left"
-                Name="TimeStamp"/>
+                Text="{Binding Timestamp}"/>
               <DatePicker Height="30"
-                SelectedDateFormat="Long"
-                Name="DatePicker"/>
+                SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                SelectedDateFormat="Long"/>
             </DockPanel>
             <TextBox
               Name="RawScriptText"/>

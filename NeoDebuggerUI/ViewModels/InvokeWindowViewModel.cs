@@ -24,7 +24,22 @@ namespace NeoDebuggerUI.ViewModels
 
         public string[] Trigger { get => Enum.GetNames(typeof(Neo.Emulation.TriggerType)); }
         public string[] Witness { get => Enum.GetNames(typeof(Neo.Emulation.CheckWitnessMode)); }
-        
+        private bool lockDate;
+
+        private DateTime _selectedDate;
+        public DateTime SelectedDate
+        {
+            get => _selectedDate;
+            set => this.RaiseAndSetIfChanged(ref _selectedDate, value);
+        }
+
+        private uint _timestamp;
+        public uint Timestamp
+        {
+            get => _timestamp;
+            set => this.RaiseAndSetIfChanged(ref _timestamp, value);
+        }
+
         private string _selectedTestCase;
         public string SelectedTestCase
         {
@@ -58,6 +73,22 @@ namespace NeoDebuggerUI.ViewModels
             EvtSelectedTestCaseChanged?.Invoke(_selectedTestCase);
         }
 
+        public void UpdateSelectedDate()
+        {
+            if(lockDate)
+            {
+                return;
+            }
+            SelectedDate = DateTimeOffset.FromUnixTimeSeconds((long)Timestamp).DateTime;
+        }
+
+        public void UpdateTimestamp()
+        {
+            lockDate = true;
+            Timestamp = (uint)((DateTimeOffset)SelectedDate).ToUnixTimeSeconds();
+            lockDate = false;
+        }
+
         public InvokeWindowViewModel()
         {
             if(DebuggerStore.instance.Tests != null && DebuggerStore.instance.Tests.cases.Count > 0) {
@@ -67,9 +98,16 @@ namespace NeoDebuggerUI.ViewModels
             _selectedFunction = DebuggerStore.instance.manager.ABI.entryPoint.name;
             _selectedTrigger = DebuggerStore.instance.manager.Emulator.currentTrigger.ToString();
             _selectedWitness = DebuggerStore.instance.manager.Emulator.checkWitnessMode.ToString();
-            
+            _selectedDate = DateTime.UtcNow;
+
             var selectedTestChanged = this.WhenAnyValue(x => x.SelectedTestCase);
             selectedTestChanged.Subscribe(test => NotifySelectedTestChangeEvt());
+
+            var selectedDateChanged = this.WhenAnyValue(x => x.SelectedDate);
+            selectedDateChanged.Subscribe(time => UpdateTimestamp());
+
+            var timestampChanged = this.WhenAnyValue(x => x.Timestamp);
+            timestampChanged.Subscribe(date => UpdateSelectedDate());
         }
 
         public void Run()
