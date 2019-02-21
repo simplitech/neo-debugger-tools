@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using Neo.VM;
 using System.Collections.Generic;
+using Neo.Emulation.API;
 
 namespace NeoDebuggerUI.ViewModels
 {
@@ -15,6 +16,7 @@ namespace NeoDebuggerUI.ViewModels
     {
         public IEnumerable<string> TestCases { get => DebuggerStore.instance.Tests.cases.Keys; }
         public IEnumerable<string> FunctionList { get => DebuggerStore.instance.manager.ABI.functions.Select(x => x.Value.name); }
+        public List<string> AssetItems { get; } = new List<string>();
 
         public DataNode SelectedTestCaseParams => SelectedTestCase != null ? DebuggerStore.instance.Tests.cases[SelectedTestCase].args : null;
         public DebugParameters DebugParams { get; set; } = new DebugParameters();
@@ -53,7 +55,7 @@ namespace NeoDebuggerUI.ViewModels
             get => _selectedFunction;
             set => this.RaiseAndSetIfChanged(ref _selectedFunction, value);
         }
-
+        
         private string _selectedTrigger;
         public string SelectedTrigger
         {
@@ -66,6 +68,20 @@ namespace NeoDebuggerUI.ViewModels
         {
             get => _selectedWitness;
             set => this.RaiseAndSetIfChanged(ref _selectedWitness, value);
+        }
+
+        private string _selectedAsset;
+        public string SelectedAsset
+        {
+            get => _selectedAsset;
+            set => this.RaiseAndSetIfChanged(ref _selectedAsset, value);
+        }
+
+        private string _assetAmount;
+        public string AssetAmount
+        {
+            get => _assetAmount;
+            set => this.RaiseAndSetIfChanged(ref _assetAmount, value);
         }
 
         public void NotifySelectedTestChangeEvt()
@@ -99,6 +115,14 @@ namespace NeoDebuggerUI.ViewModels
             _selectedTrigger = DebuggerStore.instance.manager.Emulator.currentTrigger.ToString();
             _selectedWitness = DebuggerStore.instance.manager.Emulator.checkWitnessMode.ToString();
             _selectedDate = DateTime.UtcNow;
+
+            AssetItems.Add("None");
+            foreach (var entry in Asset.Entries)
+            {
+                AssetItems.Add(entry.name);
+            }
+            _selectedAsset = AssetItems.ElementAt(0);
+            _assetAmount = "0";
 
             var selectedTestChanged = this.WhenAnyValue(x => x.SelectedTestCase);
             selectedTestChanged.Subscribe(test => NotifySelectedTestChangeEvt());
