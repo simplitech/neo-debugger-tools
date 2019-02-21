@@ -15,6 +15,7 @@ using Avalonia.Layout;
 using LunarLabs.Parser;
 using Neo.Debugger.Core.Utils;
 using Neo.Emulation;
+using Neo.Lux.Utils;
 using NeoDebuggerUI.Models;
 
 namespace NeoDebuggerUI.Views
@@ -151,6 +152,14 @@ namespace NeoDebuggerUI.Views
                 return;
             }
             ViewModel.DebugParams.TriggerType = type;
+            //Get the timestamp
+            ViewModel.DebugParams.Timestamp = ViewModel.Timestamp;
+
+            //Get raw script
+            var rawScriptText = this.FindControl<TextBox>("RawScriptText");
+            var HasRawScript = rawScriptText.Text?.Length > 0;
+
+            ViewModel.DebugParams.RawScript = HasRawScript ? rawScriptText.Text.HexToBytes() : null;
         }
     }
 }
