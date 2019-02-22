@@ -165,7 +165,7 @@ namespace NeoDebuggerUI.ViewModels
 			await Task.Run(()=> task.Wait());
 
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
-		}
+        }
 
         public async void ResetBlockchain()
         {
