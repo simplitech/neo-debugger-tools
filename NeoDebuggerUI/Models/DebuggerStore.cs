@@ -43,5 +43,11 @@ namespace NeoDebuggerUI.Models
                 return string.Format("{0:N4}", manager.UsedGasCost);
             }
         }
+
+        public string GetKeyAddressFromString(string privateKey)
+        {
+            var key = DebuggerUtils.GetKeyFromString(privateKey);
+            return key?.address;
+        }
     }
 }
