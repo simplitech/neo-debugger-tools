@@ -15,6 +15,7 @@ using Avalonia.Layout;
 using LunarLabs.Parser;
 using Neo.Debugger.Core.Utils;
 using Neo.Emulation;
+using Neo.Lux.Utils;
 using NeoDebuggerUI.Models;
 
 namespace NeoDebuggerUI.Views
@@ -113,6 +114,7 @@ namespace NeoDebuggerUI.Views
             {
                 var op = ExtractValueFromGrid(1, 1);
                 var args = ExtractValueFromGrid(2, 1);
+                SetOptions();
                 DebugPressed(op, args);
                 Close();
             };
@@ -129,5 +131,35 @@ namespace NeoDebuggerUI.Views
             ViewModel.Run();
         }
 
+        public void SetOptions()
+        {
+            //Get the witness mode
+            CheckWitnessMode witnessMode;
+            var selectedWitness = ViewModel.SelectedWitness;
+
+            if (!Enum.TryParse<CheckWitnessMode>(selectedWitness, out witnessMode))
+            {
+                return;
+            }
+            ViewModel.DebugParams.WitnessMode = witnessMode;
+
+            //Get the trigger type
+            TriggerType type;
+            var selectedTrigger = ViewModel.SelectedTrigger;
+            
+            if (!Enum.TryParse<TriggerType>(selectedTrigger, out type))
+            {
+                return;
+            }
+            ViewModel.DebugParams.TriggerType = type;
+            //Get the timestamp
+            ViewModel.DebugParams.Timestamp = ViewModel.Timestamp;
+
+            //Get raw script
+            var rawScriptText = this.FindControl<TextBox>("RawScriptText");
+            var HasRawScript = rawScriptText.Text?.Length > 0;
+
+            ViewModel.DebugParams.RawScript = HasRawScript ? rawScriptText.Text.HexToBytes() : null;
+        }
     }
 }

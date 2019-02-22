@@ -14,26 +14,78 @@
   </Window.DataContext>
 
     <DockPanel LastChildFill="True">
-        <Button Name="DebugBtn" DockPanel.Dock="Bottom" Margin="5" Width="200">Debug</Button>
-        <Grid Name="InputParametersGrid" DockPanel.Dock="Bottom" Margin="5, 5, 5, 0">
-            <Grid.ColumnDefinitions>
+      <Button Name="DebugBtn" DockPanel.Dock="Bottom" Margin="5" Width="200">Debug</Button>
+      <TabControl>
+        <TabItem Header="Methods">
+          <DockPanel LastChildFill="True">
+            <Grid Name="InputParametersGrid" DockPanel.Dock="Bottom" Margin="5, 5, 5, 0">
+              <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-        </Grid>
-        <DockPanel
-          LastChildFill="True">
-            <ListBox
+              </Grid.ColumnDefinitions>
+            </Grid>
+            <DockPanel
+              LastChildFill="True">
+              <ListBox
+                DockPanel.Dock="Left"
+                Width="180"
+                Margin="0, 0, 5, 0"
+                Name="Functions"
+                Items="{Binding FunctionList}"
+                SelectedItem="{Binding SelectedFunction}" />
+              <ListBox
+                Name="TestCases"
+                Items="{Binding TestCases}"
+                SelectedItem="{Binding SelectedTestCase}" />
+            </DockPanel>
+          </DockPanel>
+        </TabItem>
+        <TabItem Header="Options">
+          <DockPanel LastChildFill="True">
+            <DockPanel
+              LastChildFill="False"
               DockPanel.Dock="Left"
-              Width="180"
-              Margin="0, 0, 5, 0"
-              Name="Functions"
-              Items="{Binding FunctionList}"
-              SelectedItem="{Binding SelectedFunction}" />
-            <ListBox
-              Name="TestCases"
-              Items="{Binding TestCases}"
-              SelectedItem="{Binding SelectedTestCase}" />
-        </DockPanel>
+              Margin="5">
+              <TextBlock Height="35"
+                DockPanel.Dock="Top"
+                Text="Trigger"/>
+              <TextBlock Height="35"
+                DockPanel.Dock="Top"
+                Text="Check Witness"/>
+              <TextBlock Height="35"
+                DockPanel.Dock="Top"
+                Text="Timestamp"/>
+              <TextBlock
+                DockPanel.Dock="Top"
+                Text="Raw Script"/>
+            </DockPanel>
+            <DropDown Height="30"
+              Margin="0,0,0,5"
+              DockPanel.Dock="Top"
+              Items="{Binding Trigger}"
+              SelectedItem="{Binding SelectedTrigger}">
+            </DropDown>
+            <DropDown Height="30"
+              Margin="0,0,0,5"
+              DockPanel.Dock="Top"
+              Items="{Binding Witness}"
+              SelectedItem="{Binding SelectedWitness}">
+            </DropDown>
+            <DockPanel LastChildFill="True"
+              DockPanel.Dock="Top"
+              Margin="0,0,0,5">
+              <TextBox Width="100"
+                DockPanel.Dock="Left"
+                Text="{Binding Timestamp}"/>
+              <DatePicker Height="30"
+                SelectedDate="{Binding SelectedDate, Mode=TwoWay}"
+                SelectedDateFormat="Long"/>
+            </DockPanel>
+            <TextBox
+              Name="RawScriptText"/>
+          </DockPanel>
+        </TabItem>
+      </TabControl>
+    
     </DockPanel>
 </Window>
