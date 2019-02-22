@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Neo.VM;
 using System.Collections.Generic;
 using Avalonia.Controls;
+using System.Collections.ObjectModel;
 using Neo.Emulation.API;
 
 
@@ -86,6 +87,27 @@ namespace NeoDebuggerUI.ViewModels
             set => this.RaiseAndSetIfChanged(ref _assetAmount, value);
         }
 
+        private ObservableCollection<string> _privateKeys;
+        public ObservableCollection<string> PrivateKeys
+        {
+            get => _privateKeys;
+            set => this.RaiseAndSetIfChanged(ref _privateKeys, value);
+        }
+
+        private string _selectedPrivateKey;
+        public string SelectedPrivateKey
+        {
+            get => _selectedPrivateKey;
+            set => this.RaiseAndSetIfChanged(ref _selectedPrivateKey, value);
+        }
+
+        private string _inputPrivateKey = "";
+        public string InputPrivateKey
+        {
+            get => _inputPrivateKey;
+            set => this.RaiseAndSetIfChanged(ref _inputPrivateKey, value);
+        }
+
         public void NotifySelectedTestChangeEvt()
         {
             EvtSelectedTestCaseChanged?.Invoke(_selectedTestCase);
@@ -126,6 +148,8 @@ namespace NeoDebuggerUI.ViewModels
             _selectedAsset = AssetItems.ElementAt(0);
             _assetAmount = "0";
 
+            LoadPrivateKeys();
+
             var selectedTestChanged = this.WhenAnyValue(x => x.SelectedTestCase);
             selectedTestChanged.Subscribe(test => NotifySelectedTestChangeEvt());
 
@@ -159,6 +183,46 @@ namespace NeoDebuggerUI.ViewModels
             else
             {
                 OpenGenericSampleDialog(errorMessage, "Error", "", false, new Window());
+            }
+        }
+
+        public void LoadPrivateKeys()
+        {
+            _privateKeys = new ObservableCollection<string>() { "None" };
+            _selectedPrivateKey = PrivateKeys.ElementAt(0);
+        }
+
+        public void AddPrivateKey()
+        {
+            if (PrivateKeys.Contains(InputPrivateKey))
+            {
+                SelectedPrivateKey = InputPrivateKey;
+                InputPrivateKey = "";
+                OpenGenericSampleDialog("This private key is already loaded", "OK", "", false);
+                return;
+            }
+
+            var keyAddress = DebuggerStore.instance.GetKeyAddressFromString(InputPrivateKey);
+            if (keyAddress != null)
+            {
+                PrivateKeys.Add(InputPrivateKey);
+                SelectedPrivateKey = InputPrivateKey;
+                InputPrivateKey = "";
+            }
+            else
+            {
+                OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false);
+            }
+        }
+
+        public void RemovePrivateKey()
+        {
+            if(SelectedPrivateKey != PrivateKeys.ElementAt(0))
+            {
+                var i = PrivateKeys.IndexOf(SelectedPrivateKey);
+
+                SelectedPrivateKey = PrivateKeys.ElementAt(i - 1);
+                PrivateKeys.RemoveAt(i);
             }
         }
     }

@@ -41,25 +41,33 @@
           </DockPanel>
         </TabItem>
         <TabItem Header="Transaction">
-          <DockPanel>
-            <TextBlock
-              DockPanel.Dock="Top"
-              Text="Asset Transfer"/>
-            <DockPanel DockPanel.Dock="Top">
+          <DockPanel Margin="5">
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
               <TextBox
-                DockPanel.Dock="Left"
                 Width="200"
                 Text="{Binding AssetAmount}"/>
               <DropDown
-                DockPanel.Dock="Left"
                 Width="100"
                 Name="AssetBox"
                 Items="{Binding AssetItems}"
                 SelectedItem="{Binding SelectedAsset}">
               </DropDown>
-              <TextBlock/>
+            </StackPanel>
+            <TextBlock
+              DockPanel.Dock="Bottom"
+              Text="Asset Transfer"/>
+            <TextBlock
+              DockPanel.Dock="Top"
+              Text="Invoker Adress"/>
+            <DockPanel DockPanel.Dock="Bottom">
+              <Button Name="RemovePrivateKey" DockPanel.Dock="Right">-</Button>
+              <Button Name="AddPrivateKey" DockPanel.Dock="Right">+</Button>
+              <TextBox Text="{Binding InputPrivateKey}"/>
             </DockPanel>
-            <TextBlock/>
+            <ListBox
+              Name="PrivateKeys"
+              Items="{Binding PrivateKeys}"
+              SelectedItem="{Binding SelectedPrivateKey}" />
           </DockPanel>
         </TabItem>
         <TabItem Header="Options">
