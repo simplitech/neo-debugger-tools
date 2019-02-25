@@ -99,6 +99,13 @@ namespace NeoDebuggerUI.ViewModels
             set => this.RaiseAndSetIfChanged(ref _selectedPrivateKey, value);
         }
 
+        private string _privateKeyAddress;
+        public string PrivateKeyAddress
+        {
+            get => _privateKeyAddress;
+            set => this.RaiseAndSetIfChanged(ref _privateKeyAddress, value);
+        }
+
         private string _inputPrivateKey = "";
         public string InputPrivateKey
         {
@@ -125,6 +132,16 @@ namespace NeoDebuggerUI.ViewModels
             lockDate = true;
             Timestamp = (uint)((DateTimeOffset)SelectedDate).ToUnixTimeSeconds();
             lockDate = false;
+        }
+
+        public void UpdatePrivateKeyAddress()
+        {
+            if(SelectedPrivateKey == "None")
+            {
+                PrivateKeyAddress = "(No key loaded)";
+                return;
+            }
+            PrivateKeyAddress = DebuggerStore.instance.GetKeyAddressFromString(SelectedPrivateKey);
         }
 
         public InvokeWindowViewModel()
@@ -156,11 +173,13 @@ namespace NeoDebuggerUI.ViewModels
 
             var timestampChanged = this.WhenAnyValue(x => x.Timestamp);
             timestampChanged.Subscribe(date => UpdateSelectedDate());
+
+            var selectedPrivateKeyChanged = this.WhenAnyValue(x => x.SelectedPrivateKey);
+            selectedPrivateKeyChanged.Subscribe(time => UpdatePrivateKeyAddress());
         }
 
         public void Run()
         {
-            DebugParams.TriggerType = Neo.Emulation.TriggerType.Application;
             DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
             DebuggerStore.instance.manager.Run();
             StackItem result = null;
@@ -182,12 +201,33 @@ namespace NeoDebuggerUI.ViewModels
             {
                 OpenGenericSampleDialog(errorMessage, "Error", "", false);
             }
+            DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
         }
 
         public void LoadPrivateKeys()
         {
-            _privateKeys = new ObservableCollection<string>() { "None" };
-            _selectedPrivateKey = PrivateKeys.ElementAt(0);
+            if (DebuggerStore.instance.PrivateKeysList?.Count > 0)
+            {
+                _privateKeys = new ObservableCollection<string>(DebuggerStore.instance.PrivateKeysList);
+            }
+            else
+            {
+                _privateKeys = new ObservableCollection<string>() { "None" };
+            }
+
+            var lastPrivateKey = DebuggerStore.instance.manager.Settings.lastPrivateKey;
+            if (!string.IsNullOrEmpty(lastPrivateKey) )
+            {
+                if (!PrivateKeys.Contains(lastPrivateKey))
+                {
+                    PrivateKeys.Add(lastPrivateKey);
+                }
+                _selectedPrivateKey = lastPrivateKey;
+            }
+            else
+            {
+                _selectedPrivateKey = PrivateKeys.ElementAt(0);
+            }
         }
 
         public void AddPrivateKey()
