@@ -40,6 +40,28 @@
             </DockPanel>
           </DockPanel>
         </TabItem>
+        <TabItem Header="Transaction">
+          <DockPanel>
+            <TextBlock
+              DockPanel.Dock="Top"
+              Text="Asset Transfer"/>
+            <DockPanel DockPanel.Dock="Top">
+              <TextBox
+                DockPanel.Dock="Left"
+                Width="200"
+                Text="{Binding AssetAmount}"/>
+              <DropDown
+                DockPanel.Dock="Left"
+                Width="100"
+                Name="AssetBox"
+                Items="{Binding AssetItems}"
+                SelectedItem="{Binding SelectedAsset}">
+              </DropDown>
+              <TextBlock/>
+            </DockPanel>
+            <TextBlock/>
+          </DockPanel>
+        </TabItem>
         <TabItem Header="Options">
           <DockPanel LastChildFill="True">
             <DockPanel
