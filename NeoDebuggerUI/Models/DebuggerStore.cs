@@ -49,5 +49,7 @@ namespace NeoDebuggerUI.Models
             var key = DebuggerUtils.GetKeyFromString(privateKey);
             return key?.address;
         }
+
+        public List<string> PrivateKeysList { get; set; }
     }
 }
