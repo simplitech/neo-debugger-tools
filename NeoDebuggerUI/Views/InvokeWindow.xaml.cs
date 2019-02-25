@@ -130,6 +130,8 @@ namespace NeoDebuggerUI.Views
         public void RegisterEventListeners()
         {
             this.ViewModel.EvtSelectedTestCaseChanged += (fileName) => RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
+            this.FindControl<Button>("AddPrivateKey").Click += (_, __) => ViewModel.AddPrivateKey();
+            this.FindControl<Button>("RemovePrivateKey").Click += (_, __) => ViewModel.RemovePrivateKey();
         }
 
         public void DebugPressed(string field1, string field2)
@@ -197,6 +199,16 @@ namespace NeoDebuggerUI.Views
                     }
                 }
             }
+
+            //Get the private key used
+            var privateKey = ViewModel.SelectedPrivateKey;
+
+            if (privateKey == "None")
+            {
+                privateKey = "";
+            }
+            ViewModel.DebugParams.PrivateKey = privateKey;
+
             return true;
         }
     }
