@@ -177,7 +177,7 @@ namespace NeoDebuggerUI.ViewModels
 
             if (DebuggerStore.instance.manager.Blockchain.currentHeight > 1)
             {
-                if(!(await GetGenericSampleDialogResult("The current loaded Blockchain already has some transactions.\n" +
+                if(!(await OpenGenericSampleDialog("The current loaded Blockchain already has some transactions.\n" +
                     "This action can not be reversed, are you sure you want to reset it?", "Yes", "No", true)))
                 {
                     return;

@@ -9,14 +9,7 @@ namespace NeoDebuggerUI.ViewModels
 {
 	public class ViewModelBase : ReactiveObject
 	{
-        public async void OpenGenericSampleDialog(String text, String okText, String cancelText, bool showCancel)
-        {
-            var clickedOk = await GetGenericSampleDialogResult(text, okText, cancelText, showCancel);
-
-            var wasOk = clickedOk;
-        }
-
-        public async Task<bool> GetGenericSampleDialogResult(String text, String okText, String cancelText, bool showCancel)
+        public async Task<bool> OpenGenericSampleDialog(String text, String okText, String cancelText, bool showCancel)
         {
             var clickedOk = await new GenericConfirmationWindow()
                 .SetText(text)
