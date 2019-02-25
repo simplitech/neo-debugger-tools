@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using NeoDebuggerUI.Views;
 using ReactiveUI;
 
@@ -8,7 +9,7 @@ namespace NeoDebuggerUI.ViewModels
 {
 	public class ViewModelBase : ReactiveObject
 	{
-        public async void OpenGenericSampleDialog(String text, String okText, String cancelText, bool showCancel)
+        public async Task<bool> OpenGenericSampleDialog(String text, String okText, String cancelText, bool showCancel)
         {
             var clickedOk = await new GenericConfirmationWindow()
                 .SetText(text)
@@ -18,6 +19,7 @@ namespace NeoDebuggerUI.ViewModels
                 .Open();
 
             var wasOk = clickedOk;
+            return wasOk;
         }
 
     }
