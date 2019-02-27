@@ -23,8 +23,6 @@ namespace NeoDebuggerUI.ViewModels
         public delegate void SelectedTestChanged(string selectedTestCase);
         public event SelectedTestChanged EvtSelectedTestCaseChanged;
 
-        public Window MainWindow = new Window();
-
         private string _selectedTestCase;
         public string SelectedTestCase
         {
@@ -74,11 +72,11 @@ namespace NeoDebuggerUI.ViewModels
 
             if (result != null)
             {
-                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false, MainWindow);
+                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false, new Window());
             }
             else
             {
-                OpenGenericSampleDialog(errorMessage, "Error", "", false, MainWindow);
+                OpenGenericSampleDialog(errorMessage, "Error", "", false, new Window());
             }
         }
     }

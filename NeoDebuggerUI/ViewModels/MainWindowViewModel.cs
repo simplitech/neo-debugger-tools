@@ -22,9 +22,6 @@ namespace NeoDebuggerUI.ViewModels
         public delegate void FileToCompileChanged();
         public event FileToCompileChanged EvtFileToCompileChanged;
 
-        //Mega anti pattern
-        public Window MainWindow { get; set; }
-
         private string _selectedFile;
 		public string SelectedFile
 		{
@@ -152,7 +149,7 @@ namespace NeoDebuggerUI.ViewModels
 			dialog.Filters = filters;
 			dialog.AllowMultiple = false;
 
-			var result = await dialog.ShowAsync(this.MainWindow);
+			var result = await dialog.ShowAsync(new Window());
 
 			if (result != null && result.Length > 0)
 			{
@@ -164,7 +161,7 @@ namespace NeoDebuggerUI.ViewModels
 		{
             CompileCurrentFile();
 			var modalWindow = new InvokeWindow();
-			var task = modalWindow.ShowDialog(this.MainWindow);
+			var task = modalWindow.ShowDialog(new Window());
 			await Task.Run(()=> task.Wait());
 
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
