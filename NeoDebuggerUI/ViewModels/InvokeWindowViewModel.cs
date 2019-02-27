@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using Neo.VM;
 using System.Collections.Generic;
+using Avalonia.Controls;
 
 namespace NeoDebuggerUI.ViewModels
 {
@@ -21,6 +22,8 @@ namespace NeoDebuggerUI.ViewModels
 
         public delegate void SelectedTestChanged(string selectedTestCase);
         public event SelectedTestChanged EvtSelectedTestCaseChanged;
+
+        public Window MainWindow = new Window();
 
         private string _selectedTestCase;
         public string SelectedTestCase
@@ -71,11 +74,11 @@ namespace NeoDebuggerUI.ViewModels
 
             if (result != null)
             {
-                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
+                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false, MainWindow);
             }
             else
             {
-                OpenGenericSampleDialog(errorMessage, "Error", "", false);
+                OpenGenericSampleDialog(errorMessage, "Error", "", false, MainWindow);
             }
         }
     }

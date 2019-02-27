@@ -23,6 +23,7 @@ namespace NeoDebuggerUI.Views
             this.AttachDevTools();
 #endif
 
+            this.ViewModel.MainWindow = this;
             _textEditor = this.FindControl<TextEditor>("Editor");
             _textEditor.Background = Brushes.WhiteSmoke;
             _textEditor.BorderBrush = Brushes.Gray;
@@ -36,6 +37,9 @@ namespace NeoDebuggerUI.Views
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
             this.Activated += (o, e) => { ReloadCurrentFile(); };
+
+
+            RenderOptions.SetBitmapInterpolationMode(this, Avalonia.Visuals.Media.Imaging.BitmapInterpolationMode.LowQuality);     
         }
 
         public async Task NewCSharpFile()

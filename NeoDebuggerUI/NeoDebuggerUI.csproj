@@ -17,13 +17,14 @@
     <EmbeddedResource Include="Assets\*" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.7.0" />
+    <PackageReference Include="Avalonia" Version="0.7.1-cibuild0001534-beta" />
     <PackageReference Include="Avalonia.AvaloniaEdit" Version="0.7.0" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.7.0" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.7.0" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.7.1-cibuild0001534-beta" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.7.1-cibuild0001534-beta" />
     <PackageReference Include="System.ComponentModel" Version="4.3.0" />
     <PackageReference Include="System.Reactive" Version="4.1.2" />
     <PackageReference Include="System.Reactive.Interfaces" Version="4.1.2" />
+    <PackageReference Include="Avalonia.Native" Version="0.7.1-cibuild0001534-beta" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
