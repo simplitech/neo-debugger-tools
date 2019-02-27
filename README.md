@@ -1,6 +1,6 @@
 <p align="center">
-  <img 
-    src="http://res.cloudinary.com/vidsy/image/upload/v1503160820/CoZ_Icon_DARKBLUE_200x178px_oq0gxm.png" 
+  <img
+    src="http://res.cloudinary.com/vidsy/image/upload/v1503160820/CoZ_Icon_DARKBLUE_200x178px_oq0gxm.png"
     width="125px"
   >
 </p>
@@ -23,6 +23,9 @@
 A suite of development tools for NEO smart contracts.  
 Includes a cli disassembler and a GUI debugger. A helper library that helps loading `.avm` files and create and load `.neomap` files is also included, and can be used to create other dev tools.
 
+#### Migration in progress
+We are adding cross platform support to this project. You need to add Avalonia NuGet repository in order to use this project: https://github.com/AvaloniaUI/Avalonia/wiki/Using-nightly-build-feed
+
 (click picture to view video)
 
 [![IntroductionVideo](images/debugger.png)](https://youtu.be/KnPHIaEsgtA "Introduction video")
@@ -34,10 +37,10 @@ Includes a cli disassembler and a GUI debugger. A helper library that helps load
 3. The debugger IDE can also run or step through either the assembly code or the original source (if the `.debug.json` file is present in same directory as the `.avm`)
 4. The debugger will also emulate the smart contracts' API that interacts with the Blockchain (like Storage, Transactions, Blocks)
 
-### Setup 
+### Setup
 1. Get this code and open the solution in Visual Studio.
 2. Compile the solution and find the compiled NEON.exe path (should be in $(SolutionPath)\NEO-Compiler\bin\Debug).
-3. Replace the path of your old NEON compiler to the new compiler path. 
+3. Replace the path of your old NEON compiler to the new compiler path.
 4. When you compile a smart contract, it will accordingly use the debugger compiler and produce (next to the`.avm`) the map file which you need to step through the code.
 
 ### Current Features
@@ -76,7 +79,7 @@ Currently the only way to generate a `.neomap` file is to compile the smart cont
 
 A single smart contract can have different results and behaviours, depending on the inputs passed to it.
 
-So, when debugging a contract, it is necessary to be able to know what methods are supported and specify the inputs for them. 
+So, when debugging a contract, it is necessary to be able to know what methods are supported and specify the inputs for them.
 
 Currently this is done via a `.abi.json` file that resides in the same folder as the debugger executable (should generated automatically by the compiler, but can also be hand-written if necessary).
 
@@ -166,7 +169,7 @@ Here's a example of how to specify test cases.
 
 ### Storage Emulation
 
-The debugger supports emulation of the Storage API, meaning Storage.Put and Storage.Get work fine when debugging. 
+The debugger supports emulation of the Storage API, meaning Storage.Put and Storage.Get work fine when debugging.
 
 The actual data is stored in a file with extension `.store`, in same folder as the `.avm`. If required to reset the smart contract storage, it's fine to delete this file.
 
@@ -181,7 +184,7 @@ The current version does support sending virtual NEO and GAS to the smart contra
 ## Supported Programming Languages
 
 NEO smart contracts can be coded in many different languages, and in theory, this compiler already supports any language as long as a `.neomap` file exists in the same directory as the `.avm` file.
-However, in order to be able to debug an compiled `.avm` file, the compiler used must be able to emit those map files during compilation. 
+However, in order to be able to debug an compiled `.avm` file, the compiler used must be able to emit those map files during compilation.
 The table below lists the current supported languages / compilers.
 
 | Language      | Compiler                          		| Comments                                      								|
@@ -240,7 +243,7 @@ The `.neomap` file format is `json` and consists of a `compiler` section that in
 
 ### Developer Shell
 
-A developer shell is also included and can be used to emulate and debug NEO smart contracts from the terminal. 
+A developer shell is also included and can be used to emulate and debug NEO smart contracts from the terminal.
 
 The smart contract inputs should also be passed as a JSON string, same as in the debugger GUI.
 
@@ -250,7 +253,7 @@ If using Linux or OSX, [Mono](http://www.mono-project.com/) is required.
 
 ## Unit testing
 
-The NEO emulator library makes it easy to create your own unit tests for smart contracts. 
+The NEO emulator library makes it easy to create your own unit tests for smart contracts.
 
 ### Install
 
@@ -270,7 +273,7 @@ using NUnit.Framework;
 [TestFixture]
 public class ContractTests
 {
-	private static NeoEmulator emulator; 
+	private static NeoEmulator emulator;
 
 	// load the .avm file before tests run
 	[OneTimeSetUp]
@@ -308,7 +311,7 @@ public class ContractTests
 
 ## Demo Project
 
-In the folder ICO Template you can find an example of a complex `.json` input file. 
+In the folder ICO Template you can find an example of a complex `.json` input file.
 
 Included is also a small project to demonstrate unit tests of the demo project.
 
