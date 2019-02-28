@@ -5,7 +5,7 @@ using Neo.Debugger.Core.Utils;
 using NeoDebuggerCore.Utils;
 using NUnit.Framework;
 
-namespace Neo_Debugger_UI_UnitTests
+namespace Neo
 {
 	[TestFixture]
 	public class DebuggerCoreUnitTests
@@ -15,7 +15,9 @@ namespace Neo_Debugger_UI_UnitTests
 													  Directory.GetParent(TestContext.CurrentContext.TestDirectory).Parent.Parent.Parent.FullName,
 													  "Output"), "neo-compiler");
 
-		[Test]
+        private NeonCompiler compiler = NeonCompiler.GetInstance(new DebuggerSettings());
+
+        [Test]
 		public void TestParameterParsing()
 		{
 			var argList = DebuggerUtils.GetArgsListAsNode("\"symbol\"");
@@ -40,11 +42,10 @@ namespace Neo_Debugger_UI_UnitTests
 		}
 
 		[Test]
-		public void TestSimpleExecution()
+		public void TestCSharpCompiler()
 		{
 			var path = TestContext.CurrentContext.TestDirectory;
 			Directory.SetCurrentDirectory(path);
-			var compiler = NeonCompiler.GetInstance(new DebuggerSettings());
             var fullFilePath = Path.Combine(path, "SampleContract.cs");
             var sourceCode = File.ReadAllText(fullFilePath);
 			Assert.NotNull(sourceCode);
@@ -53,7 +54,19 @@ namespace Neo_Debugger_UI_UnitTests
 			Assert.IsTrue(compiled);
 		}
 
-		[Test]
+        [Test]
+        public void TestPythonCompiler()
+        {
+            var path = TestContext.CurrentContext.TestDirectory;
+            Directory.SetCurrentDirectory(path);
+            var fullFilePath = Path.Combine(path, "NEP5.py");
+            var sourceCode = File.ReadAllText(fullFilePath);
+            Assert.NotNull(sourceCode);
+            var compiled = compiler.CompileContract(sourceCode, fullFilePath, Neo.Debugger.Core.Data.SourceLanguage.Python);
+            Assert.IsTrue(compiled);
+        }
+
+        [Test]
 		[Ignore("It won't pass in all OS")]
         public void TestGetCompilerInstance()
         {

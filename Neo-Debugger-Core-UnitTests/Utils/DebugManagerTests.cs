@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Neo.Emulation.Utils;
-
+using NeoDebuggerCore.Utils;
 
 namespace Neo.Debugger.Core.Utils.Tests
 {
@@ -30,5 +30,5 @@ namespace Neo.Debugger.Core.Utils.Tests
 			//Assert.AreEqual("BNDES Token", name);
 			//Assert.AreEqual("BNDT", symbol);
 		}
-	}
+    }
 }
