@@ -59,14 +59,14 @@ namespace NeoDebuggerCore.Utils
             return true;
         }
 
-        public bool CompilePythonContract(string sourceCode, string outputFilePath)
+        public bool CompilePythonContract(string sourceCode, string outputFilePath, string compilerPath = null)
         {
             if (string.IsNullOrEmpty(outputFilePath))
                 throw new ArgumentNullException(nameof(outputFilePath));
 
             File.WriteAllText(outputFilePath, sourceCode);
 
-            if (PythonCompilerProxy.Execute(outputFilePath, PythonCompilerExecutableName(), (m) => { SendToLog?.Invoke(this, new CompilerLogEventArgs() { Message = m }); }))
+            if (PythonCompilerProxy.Execute(outputFilePath, PythonCompilerExecutableName(), (m) => { SendToLog?.Invoke(this, new CompilerLogEventArgs() { Message = m }); }, compilerPath))
             {
                 SendToLog?.Invoke(this, new CompilerLogEventArgs() { Message = "SUCC" });
             }
@@ -91,7 +91,7 @@ namespace NeoDebuggerCore.Utils
             }
             else if (language == SourceLanguage.Python)
             {
-                return CompilePythonContract(sourceCode, outputFilePath);
+                return CompilePythonContract(sourceCode, outputFilePath, compilerPath);
             }
             else 
             {

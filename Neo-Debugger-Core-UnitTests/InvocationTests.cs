@@ -62,7 +62,7 @@ namespace Neo
             var fullFilePath = Path.Combine(path, "NEP5.py");
             var sourceCode = File.ReadAllText(fullFilePath);
             Assert.NotNull(sourceCode);
-            var compiled = compiler.CompileContract(sourceCode, fullFilePath, Neo.Debugger.Core.Data.SourceLanguage.Python);
+            var compiled = compiler.CompileContract(sourceCode, fullFilePath, Neo.Debugger.Core.Data.SourceLanguage.Python, "/Users/ricardmprado/Workspace/neo-boa/");
             Assert.IsTrue(compiled);
         }
 
