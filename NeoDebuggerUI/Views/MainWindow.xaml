@@ -16,7 +16,7 @@
       <MenuItem Header="File">
         <MenuItem Header="New" >
           <MenuItem Header="C#" Name="MenuItemNewCSharp"/>
-          <MenuItem Header="Python" />
+          <MenuItem Header="Python"  Name="MenuItemNewPython"/>
         </MenuItem>
         <MenuItem Header="New from Template">
           <MenuItem Header="C#">
@@ -28,8 +28,7 @@
             <MenuItem Header="Struct Example"/>
           </MenuItem>
           <MenuItem Header="Python">
-            <MenuItem Header="Hello World"/>
-            <MenuItem Header="NEP5"/>
+            <MenuItem Header="NEP5"  Name="MenuItemNewNEP5"/>
           </MenuItem>
           </MenuItem>
         <MenuItem Header="Open..." Command="{Binding Open}" />

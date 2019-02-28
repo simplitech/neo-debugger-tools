@@ -33,6 +33,13 @@ namespace NeoDebuggerUI.Views
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
             newCSharp.Click += async (o, e) => { await NewCSharpFile(); };
 
+            MenuItem newPython = this.FindControl<MenuItem>("MenuItemNewPython");
+            newPython.Click += async (o, e) => { await NewPythonFile(); };
+
+            MenuItem newNEP5 = this.FindControl<MenuItem>("MenuItemNewNEP5");
+            newNEP5.Click += async (o, e) => { await NewPythonFile(); };
+
+
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
             this.Activated += (o, e) => { ReloadCurrentFile(); };
@@ -45,6 +52,21 @@ namespace NeoDebuggerUI.Views
             var filters = new List<FileDialogFilter>();
             var filteredExtensions = new List<string>(new string[] { "cs" });
             var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "C# File" };
+            filters.Add(filter);
+            dialog.Filters = filters;
+            var result = await dialog.ShowAsync(this);
+            if (result != null)
+            {
+                this.ViewModel.ResetWithNewFile(result);
+            }
+        }
+
+        public async Task NewPythonFile()
+        {
+            var dialog = new SaveFileDialog();
+            var filters = new List<FileDialogFilter>();
+            var filteredExtensions = new List<string>(new string[] { "py" });
+            var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "Python File" };
             filters.Add(filter);
             dialog.Filters = filters;
             var result = await dialog.ShowAsync(this);
