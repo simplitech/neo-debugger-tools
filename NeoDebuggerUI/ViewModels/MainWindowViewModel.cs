@@ -149,7 +149,7 @@ namespace NeoDebuggerUI.ViewModels
 			dialog.Filters = filters;
 			dialog.AllowMultiple = false;
 
-			var result = await dialog.ShowAsync();
+			var result = await dialog.ShowAsync(new Window());
 
 			if (result != null && result.Length > 0)
 			{
@@ -161,7 +161,7 @@ namespace NeoDebuggerUI.ViewModels
 		{
             CompileCurrentFile();
 			var modalWindow = new InvokeWindow();
-			var task = modalWindow.ShowDialog();
+			var task = modalWindow.ShowDialog(new Window());
 			await Task.Run(()=> task.Wait());
 
             ConsumedGas = DebuggerStore.instance.UsedGasCost;

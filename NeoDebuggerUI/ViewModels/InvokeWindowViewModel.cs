@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using Neo.VM;
 using System.Collections.Generic;
+using Avalonia.Controls;
 
 namespace NeoDebuggerUI.ViewModels
 {
@@ -71,11 +72,11 @@ namespace NeoDebuggerUI.ViewModels
 
             if (result != null)
             {
-                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
+                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false, new Window());
             }
             else
             {
-                OpenGenericSampleDialog(errorMessage, "Error", "", false);
+                OpenGenericSampleDialog(errorMessage, "Error", "", false, new Window());
             }
         }
     }

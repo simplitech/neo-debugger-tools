@@ -36,6 +36,7 @@ namespace NeoDebuggerUI.Views
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
             this.Activated += (o, e) => { ReloadCurrentFile(); };
+              
         }
 
         public async Task NewCSharpFile()
