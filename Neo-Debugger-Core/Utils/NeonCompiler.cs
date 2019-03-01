@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using Neo.Compiler;
 using Neo.Debugger.Core.Data;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
-using Neo.DebuggerCompiler;
 using Neo_Boa_Proxy_Lib;
 
 namespace NeoDebuggerCore.Utils
@@ -16,7 +13,7 @@ namespace NeoDebuggerCore.Utils
         internal DebuggerSettings _settings;
         public event CompilerLogEventHandler SendToLog;
         public delegate void CompilerLogEventHandler(object sender, CompilerLogEventArgs e);
-		public abstract string PythonCompilerExecutableName();
+		public abstract string Python3();
 		
         public NeonCompiler(DebuggerSettings settings)
         {
@@ -59,14 +56,16 @@ namespace NeoDebuggerCore.Utils
             return true;
         }
 
-        public bool CompilePythonContract(string sourceCode, string outputFilePath, string compilerPath = null)
+        public bool CompilePythonContract(string sourceCode, string outputFilePath)
         {
             if (string.IsNullOrEmpty(outputFilePath))
                 throw new ArgumentNullException(nameof(outputFilePath));
 
             File.WriteAllText(outputFilePath, sourceCode);
 
-            if (PythonCompilerProxy.Execute(outputFilePath, PythonCompilerExecutableName(), (m) => { SendToLog?.Invoke(this, new CompilerLogEventArgs() { Message = m }); }, compilerPath))
+            if (PythonCompilerProxy.Execute(outputFilePath, 
+                                            Python3(), 
+                                            (m) => { SendToLog?.Invoke(this, new CompilerLogEventArgs() { Message = m }); }))
             {
                 SendToLog?.Invoke(this, new CompilerLogEventArgs() { Message = "SUCC" });
             }
@@ -78,7 +77,7 @@ namespace NeoDebuggerCore.Utils
             return true;
         }
 
-        public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language, string compilerPath = null)
+        public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language)
         {
             if (string.IsNullOrEmpty(outputFilePath))
                 throw new ArgumentNullException(nameof(outputFilePath));
@@ -91,7 +90,7 @@ namespace NeoDebuggerCore.Utils
             }
             else if (language == SourceLanguage.Python)
             {
-                return CompilePythonContract(sourceCode, outputFilePath, compilerPath);
+                return CompilePythonContract(sourceCode, outputFilePath);
             }
             else 
             {
@@ -108,12 +107,12 @@ namespace NeoDebuggerCore.Utils
             });
         }
 
-		private string NeonDotNetExecutableName()
+		private string NeonDotNet()
 		{
 			return "Neo-Compiler.dll";
 		}
 
-		private string DotNetExecutableName()
+		private string DotNet()
 		{
 			return "dotnet";
 		}
