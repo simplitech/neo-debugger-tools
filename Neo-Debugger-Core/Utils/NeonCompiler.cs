@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using Neo.Compiler;
 using Neo.Debugger.Core.Data;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
-using Neo.DebuggerCompiler;
+using Neo_Boa_Proxy_Lib;
 
 namespace NeoDebuggerCore.Utils
 {
@@ -15,7 +13,7 @@ namespace NeoDebuggerCore.Utils
         internal DebuggerSettings _settings;
         public event CompilerLogEventHandler SendToLog;
         public delegate void CompilerLogEventHandler(object sender, CompilerLogEventArgs e);
-		public abstract string PythonCompilerExecutableName();
+		public abstract string Python3();
 		
         public NeonCompiler(DebuggerSettings settings)
         {
@@ -39,17 +37,10 @@ namespace NeoDebuggerCore.Utils
         }
 
 
-        private string[] FetchLog(string content)
-        {
-            return content.Split('\n').Where(x => !string.IsNullOrEmpty(x)).ToArray();
-        }
-
-
-        //C# only
-        public bool CompileContractUsingEmbeddedNeon(string sourceCode, string outputFilePath)
+        public bool CompileCSharpContract(string sourceCode, string outputFilePath)
         {
             if (string.IsNullOrEmpty(outputFilePath))
-                throw new ArgumentNullException("outputFilePath");
+                throw new ArgumentNullException(nameof(outputFilePath));
 
             File.WriteAllText(outputFilePath, sourceCode);
 
@@ -65,136 +56,47 @@ namespace NeoDebuggerCore.Utils
             return true;
         }
 
-        // #64
-        public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language, string compilerPath = null)
+        public bool CompilePythonContract(string sourceCode, string outputFilePath)
         {
-            bool success = false;
-
             if (string.IsNullOrEmpty(outputFilePath))
-                throw new ArgumentNullException("outputFilePath");
+                throw new ArgumentNullException(nameof(outputFilePath));
+
+            File.WriteAllText(outputFilePath, sourceCode);
+
+            if (PythonCompilerProxy.Execute(outputFilePath, 
+                                            Python3(), 
+                                            (m) => { SendToLog?.Invoke(this, new CompilerLogEventArgs() { Message = m }); }))
+            {
+                SendToLog?.Invoke(this, new CompilerLogEventArgs() { Message = "SUCC" });
+            }
+            else
+            {
+                SendToLog?.Invoke(this, new CompilerLogEventArgs() { Message = "Compilation failed" });
+            }
+
+            return true;
+        }
+
+        public bool CompileContract(string sourceCode, string outputFilePath, SourceLanguage language)
+        {
+            if (string.IsNullOrEmpty(outputFilePath))
+                throw new ArgumentNullException(nameof(outputFilePath));
 
             File.WriteAllText(outputFilePath, sourceCode);
 
             if (language == SourceLanguage.CSharp)
             {
-                return CompileContractUsingEmbeddedNeon(sourceCode, outputFilePath);
+                return CompileCSharpContract(sourceCode, outputFilePath);
             }
-
-            var proc = new Process();
-            var info = new ProcessStartInfo();
-
-            if (compilerPath == null)
+            else if (language == SourceLanguage.Python)
             {
-                info.WorkingDirectory = _settings.compilerPaths[language];
+                return CompilePythonContract(sourceCode, outputFilePath);
             }
-            else
+            else 
             {
-                info.WorkingDirectory = compilerPath;
+                throw new NotSupportedException(); 
             }
 
-            switch (language)
-            {
-
-                case SourceLanguage.Python:
-                    {
-                        outputFilePath = outputFilePath.Replace("\\", "/");
-                        var loadCode = $"from boa.compiler import Compiler;Compiler.load_and_save('{outputFilePath}')";
-                        info.FileName = PythonCompilerExecutableName();
-                        info.Arguments = $"-c \"{loadCode}\"";
-                        break;
-                    }
-
-                default:
-                    {
-                        Log("Unsupported language...");
-                        return false;
-                    }
-            }
-
-            info.UseShellExecute = false;
-            info.RedirectStandardInput = false;
-            info.RedirectStandardOutput = true;
-            info.RedirectStandardError = true;
-            info.CreateNoWindow = true;
-            proc.EnableRaisingEvents = true;
-
-            proc.StartInfo = info;
-
-            try
-            {
-                Log("Starting compilation...");
-
-                proc.Start();
-                proc.WaitForExit();
-
-                var log = FetchLog(proc.StandardOutput.ReadToEnd());
-                string last = null;
-                foreach (var temp in log)
-                {
-                    var line = temp.Replace("\r", "");
-                    if (string.IsNullOrEmpty(line))
-                    {
-                        continue;
-                    }
-                    Log(line);
-                    last = line;
-                }
-
-                switch (language)
-                {
-                    case SourceLanguage.CSharp:
-                        {
-                            if (last == "SUCC")
-                            {
-                                success = true;
-                            }
-                            break;
-                        }
-
-                    case SourceLanguage.Python:
-                        {
-                            if (log.Length == 0)
-                            {
-                                success = true;
-                            }
-                            break;
-                        }
-                }
-
-                log = FetchLog(proc.StandardError.ReadToEnd());
-                foreach (var line in log)
-                {
-                    Log(line);
-                }
-
-                switch (language)
-                {
-                    case SourceLanguage.Python:
-                        {
-                            if (log.Length > 0)
-                            {
-                                success = false;
-                            }
-                            break;
-                        }
-                }
-
-                if (proc.ExitCode != 0 || !success)
-                {
-                    Log("Error during compilation.");
-                }
-                else
-                {
-                    success = true;
-                    Log("Compilation successful.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log(ex.Message);
-            }
-
-            return success;
         }
 
         public void Log(string message)
@@ -205,12 +107,12 @@ namespace NeoDebuggerCore.Utils
             });
         }
 
-		private string NeonDotNetExecutableName()
+		private string NeonDotNet()
 		{
 			return "Neo-Compiler.dll";
 		}
 
-		private string DotNetExecutableName()
+		private string DotNet()
 		{
 			return "dotnet";
 		}

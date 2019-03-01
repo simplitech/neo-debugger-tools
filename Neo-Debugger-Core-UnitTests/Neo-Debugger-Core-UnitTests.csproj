@@ -6,6 +6,13 @@
     <RootNamespace>Neo_Debugger_Core_UnitTests</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
+    <StartAction>Project</StartAction>
+    <ExternalConsole>true</ExternalConsole>
+    <EnvironmentVariables>
+      <Variable name="NEOBOA" value="/Users/ricardmprado/Workspace/neo-boa/" />
+    </EnvironmentVariables>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="SampleContract.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -23,6 +30,9 @@
     </None>
     <None Update="testFile.test.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="NEP5.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

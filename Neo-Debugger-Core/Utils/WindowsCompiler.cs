@@ -9,7 +9,7 @@ namespace Neo.Debugger.Core.Utils
         {
         }
 
-        public override string PythonCompilerExecutableName()
+        public override string Python3()
         {
             return "python.exe";
         }

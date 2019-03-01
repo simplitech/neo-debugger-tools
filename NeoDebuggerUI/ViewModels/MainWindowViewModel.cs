@@ -10,6 +10,7 @@ using NeoDebuggerUI.Models;
 using NeoDebuggerUI.Views;
 using System.Reactive;
 using NeoDebuggerCore.Utils;
+using Neo.Debugger.Core.Utils;
 
 namespace NeoDebuggerUI.ViewModels
 {
@@ -96,18 +97,15 @@ namespace NeoDebuggerUI.ViewModels
 
         internal void ResetWithNewFile(string result)
         {
-            if (!result.EndsWith(".cs", StringComparison.Ordinal))
+            if (!result.EndsWith(".cs", StringComparison.Ordinal) && !result.EndsWith(".py", StringComparison.Ordinal))
             {
-                SendLogToPanel("File not supported. Please use .cs extension.");
+                SendLogToPanel("File not supported. Please use .cs or .py extension.");
                 return;
             }
 
             if (!File.Exists(result))
             {
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
-                var fullFilePath = Path.Combine(path, "ContractTemplate.cs");
-                var sourceCode = File.ReadAllText(fullFilePath);
-                File.WriteAllText(result, sourceCode);
+                LoadTemplate(result);
             }
 
             this.ProjectFiles.Clear();
@@ -116,16 +114,33 @@ namespace NeoDebuggerUI.ViewModels
             CompileCurrentFile();
         }
 
+        private void LoadTemplate(string result)
+        {
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
+            string fullFilePath = null;
+            if (result.EndsWith("cs", StringComparison.Ordinal))
+            {
+                fullFilePath = Path.Combine(path, "ContractTemplate.cs");
+            }
+            else if (result.EndsWith("py", StringComparison.Ordinal))
+            {
+                fullFilePath = Path.Combine(path, "NEP5.py");
+            }
+
+            var sourceCode = File.ReadAllText(fullFilePath);
+            File.WriteAllText(result, sourceCode);
+        }
+
 
         //Current compiler does not support multiple files
         public void CompileCurrentFile()
         {
             EvtFileToCompileChanged?.Invoke();
             var sourceCode = File.ReadAllText(this.SelectedFile);
-            var compiled = DebuggerStore.instance.manager.CompileContract(sourceCode, Neo.Debugger.Core.Data.SourceLanguage.CSharp ,this.SelectedFile);
+            var compiled = DebuggerStore.instance.manager.CompileContract(sourceCode, LanguageSupport.DetectLanguage(this.SelectedFile), this.SelectedFile);
             if(compiled)
             {
-                DebuggerStore.instance.manager.LoadContract(this.SelectedFile.Replace(".cs", ".avm"));
+                DebuggerStore.instance.manager.LoadContract(this.SelectedFile.Substring(0, this.SelectedFile.Length - 3) + ".avm");
             }
         }
 

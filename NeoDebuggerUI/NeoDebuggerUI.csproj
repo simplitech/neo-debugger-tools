@@ -51,6 +51,9 @@
     <None Update="Neo.SmartContract.Framework.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\NEP5.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Neo-Debugger-Core\Neo-Debugger-Core.csproj" />
