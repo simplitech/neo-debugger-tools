@@ -191,7 +191,7 @@ namespace NeoDebuggerUI.Views
                         }
                         else
                         {
-                            ViewModel.OpenGenericSampleDialog(entry.name + " amount must be greater than zero", "OK", "", false);
+                            ViewModel.OpenGenericSampleDialog(entry.name + " amount must be greater than zero", "OK", "", false, new Window());
                             return false;
                         }
 

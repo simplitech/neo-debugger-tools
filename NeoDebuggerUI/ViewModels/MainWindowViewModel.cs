@@ -146,7 +146,7 @@ namespace NeoDebuggerUI.ViewModels
 
         public void SendLogToPanel(string s)
         {
-            Log += s + "\n";
+            Log = s + "\n" + Log;
         }
 
         public void ClearLog()

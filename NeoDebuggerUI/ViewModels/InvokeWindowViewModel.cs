@@ -143,7 +143,9 @@ namespace NeoDebuggerUI.ViewModels
                 PrivateKeyAddress = "(No key loaded)";
                 return;
             }
-            PrivateKeyAddress = DebuggerStore.instance.GetKeyAddressFromString(SelectedPrivateKey);
+            var keyPair = DebuggerStore.instance.GetKeyFromString(SelectedPrivateKey);
+            PrivateKeyAddress = keyPair.address;
+            Runtime.invokerKeys = keyPair;
         }
 
         public InvokeWindowViewModel()
@@ -238,7 +240,7 @@ namespace NeoDebuggerUI.ViewModels
             {
                 SelectedPrivateKey = InputPrivateKey;
                 InputPrivateKey = "";
-                OpenGenericSampleDialog("This private key is already loaded", "OK", "", false);
+                OpenGenericSampleDialog("This private key is already loaded", "OK", "", false, new Window());
                 return;
             }
 
@@ -251,7 +253,7 @@ namespace NeoDebuggerUI.ViewModels
             }
             else
             {
-                OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false);
+                OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false, new Window());
             }
         }
 
