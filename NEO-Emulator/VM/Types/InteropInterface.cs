@@ -1,6 +1,7 @@
 ﻿using System;
+using Neo.VM;
 
-namespace Neo.VM.Types
+namespace Neo_Emulator.VM.Types
 {
     public class InteropInterface : StackItem
     {

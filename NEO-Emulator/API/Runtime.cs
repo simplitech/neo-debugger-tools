@@ -17,27 +17,30 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Runtime.GetTrigger")]
         public static bool GetTrigger(ExecutionEngine engine)
         {
+            var context = engine.CurrentContext;
             var emulator = engine.GetEmulator();
             TriggerType result = emulator.currentTrigger;
 
-            engine.EvaluationStack.Push((int)result);
+            context.EvaluationStack.Push((int)result);
             return true;
         }
 
         [Syscall("Neo.Runtime.GetTime")]
         public static bool GetTime(ExecutionEngine engine)
         {
+            var context = engine.CurrentContext;
             var emulator = engine.GetEmulator();
             uint result = emulator.timestamp;
 
-            engine.EvaluationStack.Push(result);
+            context.EvaluationStack.Push(result);
             return true;
         }
 
         [Syscall("Neo.Runtime.CheckWitness", 0.2)]
         public static bool CheckWitness(ExecutionEngine engine)
         {
-            byte[] hashOrPubkey = engine.EvaluationStack.Pop().GetByteArray();
+            var context = engine.CurrentContext;
+            byte[] hashOrPubkey = context.EvaluationStack.Pop().GetByteArray();
 
             bool result;
 
@@ -94,7 +97,7 @@ namespace Neo.Emulation.API
 
             DoLog($"Checking Witness [{matchType}]: {FormattingUtils.OutputData(hashOrPubkey, false)} => {result}");
 
-            engine.EvaluationStack.Push(new VM.Types.Boolean(result));
+            context.EvaluationStack.Push(new VM.Types.Boolean(result));
             return true;
         }
 
@@ -102,7 +105,8 @@ namespace Neo.Emulation.API
         public static bool Notify(ExecutionEngine engine)
         {
             //params object[] state
-            var something = engine.EvaluationStack.Pop();
+            var context = engine.CurrentContext;
+            var something = context.EvaluationStack.Pop();
 
             if (something is ICollection)
             {
@@ -135,7 +139,8 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Runtime.Log")]
         public static bool Log(ExecutionEngine engine)
         {
-            var msg = engine.EvaluationStack.Pop();
+            var context = engine.CurrentContext;
+            var msg = context.EvaluationStack.Pop();
             DoLog(FormattingUtils.StackItemAsString(msg));
             return true;
         }

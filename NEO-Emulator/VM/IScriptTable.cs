@@ -1,4 +1,4 @@
-﻿namespace Neo.VM
+﻿namespace Neo_Emulator.VM
 {
     public interface IScriptTable
     {
