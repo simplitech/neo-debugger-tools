@@ -15,7 +15,7 @@
 
     <DockPanel LastChildFill="True">
       <Button Name="DebugBtn" DockPanel.Dock="Bottom" Margin="5" Width="200">Debug</Button>
-      <TabControl>
+      <TabControl Name="TabPages">
         <TabItem Header="Methods">
           <DockPanel LastChildFill="True">
             <Grid Name="InputParametersGrid" DockPanel.Dock="Bottom" Margin="5, 5, 5, 0">
@@ -122,6 +122,14 @@
             </DockPanel>
             <TextBox
               Name="RawScriptText"/>
+          </DockPanel>
+        </TabItem>
+        <TabItem Name="TestSequencesTab"
+                 Header="Test Sequences">
+          <DockPanel LastChildFill="True">
+            <ListBox
+              Items="{Binding TestSequences}"
+              SelectedItem="{Binding SelectedTestSequence}" />
           </DockPanel>
         </TabItem>
       </TabControl>
