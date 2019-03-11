@@ -4,8 +4,9 @@ using Neo.Lux.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using OpCode = Neo.VM.OpCode;
 
-namespace Neo.VM
+namespace Neo_Emulator.VM
 {
     public class ExecutionContext : IDisposable
     {
@@ -27,7 +28,7 @@ namespace Neo.VM
             }
         }
 
-        public Lux.VM.OpCode NextInstruction => (Lux.VM.OpCode)Script[OpReader.BaseStream.Position];
+        public OpCode NextInstruction => (OpCode)Script[OpReader.BaseStream.Position];
 
         private UInt160 _script_hash = null;
         public UInt160 ScriptHash

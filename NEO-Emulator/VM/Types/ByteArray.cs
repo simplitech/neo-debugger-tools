@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using Neo.VM;
 
-namespace Neo.VM.Types
+namespace Neo_Emulator.VM.Types
 {
     public class ByteArray : StackItem
     {

@@ -110,10 +110,11 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Storage.GetContext")]
         public static bool GetCurrentContext(ExecutionEngine engine)
         {
+            var engineContext = engine.CurrentContext;
             var storage = engine.GetStorage();
 
-            var context = new Neo.VM.Types.InteropInterface(storage);
-            engine.EvaluationStack.Push(context);
+            var context = new Neo.VM.Types.InteropInterface<Storage>(storage);
+            engineContext.EvaluationStack.Push(context);
 
             //returns StorageContext 
             return true;
@@ -128,8 +129,9 @@ namespace Neo.Emulation.API
 
             //returns byte[]
 
-            var obj = engine.EvaluationStack.Pop();
-            var item = engine.EvaluationStack.Pop();
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop();
+            var item = context.EvaluationStack.Pop();
             
             var key = item.GetByteArray();
 
@@ -137,7 +139,7 @@ namespace Neo.Emulation.API
             var data = storage.Read(key);
 
             var result = new VM.Types.ByteArray(data);
-            engine.EvaluationStack.Push(result);
+            context.EvaluationStack.Push(result);
 
             return true;
         }
@@ -158,9 +160,10 @@ namespace Neo.Emulation.API
             //StorageContext context, string key, string value
             // return void
 
-            var obj = engine.EvaluationStack.Pop();
-            var keyItem = engine.EvaluationStack.Pop();
-            var dataItem = engine.EvaluationStack.Pop();
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop();
+            var keyItem = context.EvaluationStack.Pop();
+            var dataItem = context.EvaluationStack.Pop();
 
             var key = keyItem.GetByteArray();
             var data = dataItem.GetByteArray();
@@ -178,8 +181,9 @@ namespace Neo.Emulation.API
             //OR
             //StorageContext context, string key
 
-            var context = engine.EvaluationStack.Pop();
-            var keyItem = engine.EvaluationStack.Pop();
+            var engineContext = engine.CurrentContext;
+            var context = engineContext.EvaluationStack.Pop();
+            var keyItem = engineContext.EvaluationStack.Pop();
 
             var key = keyItem.GetByteArray();
 

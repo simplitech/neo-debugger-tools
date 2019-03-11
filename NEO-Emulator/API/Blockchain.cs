@@ -267,8 +267,9 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Blockchain.GetHeight")]
         public static bool GetHeight(ExecutionEngine engine)
         {
+            var context = engine.CurrentContext;
             var blockchain = engine.GetBlockchain();
-            engine.EvaluationStack.Push(blockchain.currentHeight);
+            context.EvaluationStack.Push(blockchain.currentHeight);
 
             return true;
         }
@@ -276,7 +277,8 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Blockchain.GetHeader", 0.1)]
         public static bool GetHeader(ExecutionEngine engine)
         {
-            var obj = engine.EvaluationStack.Pop();
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop();
 
             Block block = null;
 
@@ -312,7 +314,7 @@ namespace Neo.Emulation.API
             {
             }
 
-            engine.EvaluationStack.Push(new VM.Types.InteropInterface(block));
+            context.EvaluationStack.Push(new VM.Types.InteropInterface<Block>(block));
             return true;
             // returns Header
         }

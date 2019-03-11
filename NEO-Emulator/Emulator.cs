@@ -8,6 +8,7 @@ using Neo.Emulation.API;
 using LunarLabs.Parser;
 using Neo.Lux.Core;
 using Account = Neo.Emulation.API.Account;
+using ScriptBuilder = Neo.Lux.Utils.ScriptBuilder;
 using Neo.Emulation.Utils;
 
 namespace Neo.Emulation
@@ -97,7 +98,7 @@ namespace Neo.Emulation
         {
             public byte[] byteCode;
             public int offset;
-            public Lux.VM.OpCode opcode;
+            public OpCode opcode;
             public decimal gasCost;
             public string sysCall;
         }
@@ -116,6 +117,7 @@ namespace Neo.Emulation
 
         public Account currentAccount { get; private set; }
         public API.Transaction currentTransaction { get; private set; }
+        public Crypto crypto { get; private set; }
 
         public string currentMethod { get; private set; }
 
@@ -169,11 +171,16 @@ namespace Neo.Emulation
                 currentTransaction = new API.Transaction(this.blockchain.currentBlock);
             }
 
+            if(crypto == null)
+            {
+                crypto = new Crypto();
+            }
+
             usedGas = 0;
             usedOpcodeCount = 0;
 
             currentTransaction.emulator = this;
-            engine = new ExecutionEngine(currentTransaction, table, interop);
+            engine = new ExecutionEngine(currentTransaction, null, table, interop);
             engine.LoadScript(ContractByteCode);
             engine.LoadScript(inputScript);
 
@@ -187,9 +194,10 @@ namespace Neo.Emulation
                 }
             }*/
 
+            var context = engine.CurrentContext; // Needs to test
             foreach (var pos in _breakpoints)
             {
-                engine.AddBreakPoint((uint)pos);
+                engine.AddBreakPoint(ContractByteCode,(uint)pos);
             }
 
             //engine.Reset();
@@ -253,24 +261,24 @@ namespace Neo.Emulation
 
         public bool GetRunningState()
         {
-            return !engine.State.HasFlag(VMState.HALT) && !engine.State.HasFlag(VMState.FAULT) && !engine.State.HasFlag(VMState.BREAK);
+            return !engine.State.HasFlag(VMState.HALT) && !engine.State.HasFlag(VMState.FAULT) && !(engine.State.HasFlag(VMState.BREAK) && _breakpoints.Contains(lastOffset));
         }
 
         private bool ExecuteSingleStep()
         {
             if (this.lastState.state == DebuggerState.State.Reset)
             {
-                engine.State = VMState.NONE;
+                //engine.State = VMState.NONE;
 
                 var initialContext = engine.CurrentContext;
                 while (engine.CurrentContext == initialContext)
                 {
                     engine.StepInto();
 
-                    if (engine.State != VMState.NONE)
-                    {
-                        return false;
-                    }
+                    //if (engine.State != VMState.NONE)
+                    //{
+                    //    return false;
+                    //}
                 }
 
                 if (this._ABI != null && _ABI.entryPoint != null)
@@ -280,7 +288,8 @@ namespace Neo.Emulation
                     {
                         try
                         {
-                            var val = engine.EvaluationStack.Peek(index);
+                            var context = engine.CurrentContext;
+                            var val = context.EvaluationStack.Peek(index);
 
                             var varType = entry.type;
 
@@ -319,7 +328,8 @@ namespace Neo.Emulation
                         var ass = _assigments[currentOffset];
                         try
                         {
-                            var val = engine.EvaluationStack.Peek();
+                            var context = engine.CurrentContext;
+                            var val = context.EvaluationStack.Peek();
                             _variables[ass.name] =  new Variable() { value = val, type = ass.type, name = ass.name };
                         }
                         catch
@@ -347,54 +357,56 @@ namespace Neo.Emulation
                 return lastState;
             }
 
+            var opcode = engine.CurrentContext.NextInstruction; // lastOpcode
             ExecuteSingleStep();
+            // is not getting the real last opcode
 
             try
             {
                 lastOffset = engine.CurrentContext.InstructionPointer;
 
-                var opcode = engine.lastOpcode;
+                //var opcode = engine.lastOpcode;
                 decimal opCost;
 
-                if (opcode <= Lux.VM.OpCode.PUSH16)
+                if (opcode <= OpCode.PUSH16)
                 {
                     opCost = 0;
                 }
                 else
                     switch (opcode)
                     {
-                        case Lux.VM.OpCode.SYSCALL:
-                            {
-                                var callInfo = interop.FindCall(engine.lastSysCall);
-                                opCost = (callInfo != null) ? callInfo.gasCost : 0;
+                        case OpCode.SYSCALL:
+                            //{
+                            //    var callInfo = interop.FindCall(engine.lastSysCall);
+                            //    opCost = (callInfo != null) ? callInfo.gasCost : 0;
 
-                                if (engine.lastSysCall.EndsWith("Storage.Put"))
-                                {
-                                    opCost *= (API.Storage.lastStorageLength / 1024.0m);
-                                    if (opCost < 1) opCost = 1;
-                                }
-                                break;
-                            }
+                            //    if (engine.lastSysCall.EndsWith("Storage.Put"))
+                            //    {
+                            //        opCost *= (API.Storage.lastStorageLength / 1024.0m);
+                            //        if (opCost < 1) opCost = 1;
+                            //    }
+                            //    break;
+                            //}
 
-                        case Lux.VM.OpCode.CHECKMULTISIG:
-                        case Lux.VM.OpCode.CHECKSIG: opCost = 0.1m; break;
+                        case OpCode.CHECKMULTISIG:
+                        case OpCode.CHECKSIG: opCost = 0.1m; break;
 
-                        case Lux.VM.OpCode.APPCALL:
-                        case Lux.VM.OpCode.TAILCALL:
-                        case Lux.VM.OpCode.SHA256:
-                        case Lux.VM.OpCode.SHA1: opCost = 0.01m; break;
+                        case OpCode.APPCALL:
+                        case OpCode.TAILCALL:
+                        case OpCode.SHA256:
+                        case OpCode.SHA1: opCost = 0.01m; break;
 
-                        case Lux.VM.OpCode.HASH256:
-                        case Lux.VM.OpCode.HASH160: opCost = 0.02m; break;
+                        case OpCode.HASH256:
+                        case OpCode.HASH160: opCost = 0.02m; break;
 
-                        case Lux.VM.OpCode.NOP: opCost = 0; break;
+                        case OpCode.NOP: opCost = 0; break;
                         default: opCost = 0.001m; break;
                     }
 
                 usedGas += opCost;
                 usedOpcodeCount++;
-
-                OnStep?.Invoke(new EmulatorStepInfo() { byteCode = engine.CurrentContext.Script, offset = engine.CurrentContext.InstructionPointer, opcode = opcode, gasCost = opCost, sysCall = opcode == Lux.VM.OpCode.SYSCALL? engine.lastSysCall : null });
+                //Console.WriteLine($"{opcode,-20}{opCost,-6}{usedGas}");
+                OnStep?.Invoke(new EmulatorStepInfo() { byteCode = engine.CurrentContext.Script, offset = engine.CurrentContext.InstructionPointer, opcode = opcode, gasCost = opCost, sysCall = null }); //opcode == OpCode.SYSCALL? engine.lastSysCall : null
             }
             catch
             {
@@ -409,9 +421,12 @@ namespace Neo.Emulation
 
             if (engine.State.HasFlag(VMState.BREAK))
             {
-                lastState = new DebuggerState(DebuggerState.State.Break, lastOffset);
-                engine.State = VMState.NONE;
-                return lastState;
+                if (_breakpoints.Contains(lastOffset))
+                {
+                    lastState = new DebuggerState(DebuggerState.State.Break, lastOffset);
+                    //engine.State = VMState.NONE;
+                    return lastState;
+                }
             }
 
             if (engine.State.HasFlag(VMState.HALT))
@@ -449,18 +464,20 @@ namespace Neo.Emulation
 
         public StackItem GetOutput()
         {
-            var result = engine.EvaluationStack.Peek();
+            var result = engine.ResultStack.Peek();
             return result;
         }
 
         public IEnumerable<StackItem> GetEvaluationStack()
         {
-            return engine.EvaluationStack;
+            var context = engine.CurrentContext;
+            return context.EvaluationStack;
         }
 
         public IEnumerable<StackItem> GetAltStack()
         {
-            return engine.AltStack;
+            var context = engine.CurrentContext;
+            return context.AltStack;
         }
 
 
