@@ -36,7 +36,7 @@ namespace NeoDebuggerUI.Views
 
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
-            this.Activated += (o, e) => { ReloadCurrentFile(); };
+            
         }
 
         public async Task NewCSharpFile()
@@ -65,14 +65,6 @@ namespace NeoDebuggerUI.Views
         {
             AvaloniaXamlLoader.Load(this);
         }
-
-        private async void ReloadCurrentFile()
-        {
-            if (!string.IsNullOrEmpty(ViewModel.SelectedFile) && File.Exists(ViewModel.SelectedFile))
-            {
-                await Task.Run(() => LoadFile(ViewModel.SelectedFile));
-            }
-        }
-
+        
     }
 }
