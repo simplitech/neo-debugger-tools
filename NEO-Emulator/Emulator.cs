@@ -194,7 +194,6 @@ namespace Neo.Emulation
                 }
             }*/
 
-            var context = engine.CurrentContext; // Needs to test
             foreach (var pos in _breakpoints)
             {
                 engine.AddBreakPoint(ContractByteCode,(uint)pos);
@@ -261,24 +260,17 @@ namespace Neo.Emulation
 
         public bool GetRunningState()
         {
-            return !engine.State.HasFlag(VMState.HALT) && !engine.State.HasFlag(VMState.FAULT) && !(engine.State.HasFlag(VMState.BREAK) && _breakpoints.Contains(lastOffset));
+            return !engine.State.HasFlag(VMState.HALT) && !engine.State.HasFlag(VMState.FAULT) && engine.State.HasFlag(VMState.BREAK);
         }
 
         private bool ExecuteSingleStep()
         {
             if (this.lastState.state == DebuggerState.State.Reset)
             {
-                //engine.State = VMState.NONE;
-
                 var initialContext = engine.CurrentContext;
                 while (engine.CurrentContext == initialContext)
                 {
                     engine.StepInto();
-
-                    //if (engine.State != VMState.NONE)
-                    //{
-                    //    return false;
-                    //}
                 }
 
                 if (this._ABI != null && _ABI.entryPoint != null)
@@ -364,6 +356,7 @@ namespace Neo.Emulation
             try
             {
                 lastOffset = engine.CurrentContext.InstructionPointer;
+                if(lastOffset == 0) opcode = OpCode.RET; // hack to fix the last opcode
 
                 //var opcode = engine.lastOpcode;
                 decimal opCost;
@@ -376,6 +369,7 @@ namespace Neo.Emulation
                     switch (opcode)
                     {
                         case OpCode.SYSCALL:
+                            // TODO
                             //{
                             //    var callInfo = interop.FindCall(engine.lastSysCall);
                             //    opCost = (callInfo != null) ? callInfo.gasCost : 0;
@@ -405,7 +399,7 @@ namespace Neo.Emulation
 
                 usedGas += opCost;
                 usedOpcodeCount++;
-                //Console.WriteLine($"{opcode,-20}{opCost,-6}{usedGas}");
+                
                 OnStep?.Invoke(new EmulatorStepInfo() { byteCode = engine.CurrentContext.Script, offset = engine.CurrentContext.InstructionPointer, opcode = opcode, gasCost = opCost, sysCall = null }); //opcode == OpCode.SYSCALL? engine.lastSysCall : null
             }
             catch
@@ -424,7 +418,6 @@ namespace Neo.Emulation
                 if (_breakpoints.Contains(lastOffset))
                 {
                     lastState = new DebuggerState(DebuggerState.State.Break, lastOffset);
-                    //engine.State = VMState.NONE;
                     return lastState;
                 }
             }

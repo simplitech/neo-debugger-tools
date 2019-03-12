@@ -407,10 +407,14 @@ namespace Neo.Debugger.Core.Utils
 
             _blockchainFilePath = chainPath;
 
-            //Create load the emulator
-            var blockchain = new Blockchain();
-            blockchain.Load(_blockchainFilePath);
-            _emulator = new Emulator(blockchain);
+            if (_emulator == null || _blockchainFilePath != _emulator.blockchain.fileName)
+            {
+                //Create load the emulator
+                var blockchain = new Blockchain();
+                blockchain.Load(_blockchainFilePath);
+
+                _emulator = new Emulator(blockchain);
+            }
 
             _emulator.OnStep = OnEmulatorStep;
 
