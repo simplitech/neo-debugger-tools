@@ -10,8 +10,8 @@ using NeoDebuggerUI.Models;
 using NeoDebuggerUI.Views;
 using System.Reactive;
 using NeoDebuggerCore.Utils;
-using Neo.Debugger.Core.Utils;
 using Avalonia;
+using Neo.Debugger.Core.Utils;
 
 namespace NeoDebuggerUI.ViewModels
 {
@@ -37,12 +37,21 @@ namespace NeoDebuggerUI.ViewModels
 			get => _log;
 			set => this.RaiseAndSetIfChanged(ref _log, value);
 		}
-
-        private string _consumedGas;
+        
+        // not using getter because the property are updated on another thread and won't update the ui
+        private string _consumedGas = DebuggerStore.instance.UsedGasCost;
         public string ConsumedGas
         {
             get => _consumedGas;
             set => this.RaiseAndSetIfChanged(ref _consumedGas, value);
+        }
+
+        // not using getter because the property are updated on another thread and won't update the ui
+        private bool _isSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
+        public bool IsSteppingOrOnBreakpoint
+        {
+            get => _isSteppingOrOnBreakpoint;
+            set => this.RaiseAndSetIfChanged(ref _isSteppingOrOnBreakpoint, value);
         }
 
         private string _fileFolder;
@@ -89,8 +98,17 @@ namespace NeoDebuggerUI.ViewModels
                     DebuggerStore.instance.manager.LoadAssignmentsFromContent(path);
                     ProjectFiles.Add(path);
                 }
+                string cSharpFile = avmFilePath.Replace(".avm", ".cs");
 
-                SelectedFile = avmFilePath;
+                if (File.Exists(cSharpFile))
+                {
+                    SelectedFile = cSharpFile;
+                    AddBreakpoints(); // test
+                }
+                else
+                {
+                    SelectedFile = avmFilePath;
+                }
             }
 
             return true;
@@ -155,6 +173,16 @@ namespace NeoDebuggerUI.ViewModels
             Log = "";
         }
 
+        public void AddBreakpoints()
+        {
+            //TODO: add breakpoint from gui
+            foreach (var entry in DebuggerStore.instance.manager.Map.Entries)
+            {
+                var line = entry.line - 1;
+                DebuggerStore.instance.manager.AddBreakpoint(line, SelectedFile);
+            }
+        }
+
         public async Task Open()
 		{
 			var dialog = new OpenFileDialog();
@@ -176,11 +204,30 @@ namespace NeoDebuggerUI.ViewModels
 		public async Task OpenRunDialog()
 		{
             CompileCurrentFile();
-			var modalWindow = new InvokeWindow();
-			var task = modalWindow.ShowDialog(new Window());
-			await Task.Run(()=> task.Wait());
-
+            var modalWindow = new InvokeWindow();
+            
+            if (!IsSteppingOrOnBreakpoint)
+            {
+                var task = modalWindow.ShowDialog(Application.Current.MainWindow);
+                await Task.Run(() => task.Wait());
+            }
+            
+            // not using getters because the properties are updated on another thread and won't update the ui
+            IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
+        }
+
+        public void StopDebugging()
+        {
+            if (IsSteppingOrOnBreakpoint)
+            {
+                DebuggerStore.instance.manager.Emulator.Stop();
+                DebuggerStore.instance.manager.Run();
+
+                // not using getter because the property are updated on another thread and won't update the ui
+                IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
+                OpenGenericSampleDialog("Debug was stopped", "OK", "", false);
+            }
         }
 
         public async void ResetBlockchain()
