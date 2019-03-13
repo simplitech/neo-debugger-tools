@@ -150,7 +150,7 @@ namespace NeoDebuggerUI.ViewModels
 
         public void AddBreakpoints()
         {
-            //test only
+            //TODO: add breakpoint from gui
             foreach (var entry in DebuggerStore.instance.manager.Map.Entries)
             {
                 var line = entry.line - 1;

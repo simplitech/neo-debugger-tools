@@ -188,6 +188,7 @@ namespace NeoDebuggerUI.ViewModels
 
         public void Run()
         {
+            //If the debug has started already, run with previous parameters
             if(DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
                 DebuggerStore.instance.manager.Run();
@@ -201,10 +202,12 @@ namespace NeoDebuggerUI.ViewModels
                 }
                 else
                 {
+                    //Is not stopping on breakpoint when run a test sequence
                     DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
                 }
             }
 
+            //Check if the Run or RunSequence has ended the debugging
             if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
                 OpenGenericSampleDialog($"Debugger has stopped at the breakpoint in line {DebuggerStore.instance.manager.CurrentLine + 1}", "OK", "", false);
