@@ -206,11 +206,11 @@ namespace NeoDebuggerUI.ViewModels
                     DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
                 }
             }
-
+            
             //Check if the Run or RunSequence has ended the debugging
             if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
-                OpenGenericSampleDialog($"Debugger has stopped at the breakpoint in line {DebuggerStore.instance.manager.CurrentLine + 1}", "OK", "", false);
+                Console.WriteLine($"Debugger passed through the line {DebuggerStore.instance.manager.CurrentLine + 1}");
                 //ui - highlight line
             }
             else

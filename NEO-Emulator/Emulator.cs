@@ -445,6 +445,16 @@ namespace Neo.Emulation
             return lastState;
         }
 
+        public void Stop()
+        {
+            var context = engine.InvocationStack;
+            while(context.Count > 0)
+            {
+                engine.InvocationStack.Pop();
+            }
+            lastState = new DebuggerState(DebuggerState.State.Finished, 0);
+        }
+
         public StackItem GetOutput()
         {
             var result = engine.ResultStack.Peek();
