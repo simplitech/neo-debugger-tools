@@ -27,8 +27,9 @@ namespace NeoDebuggerUI.Views
             _textEditor.Background = Brushes.WhiteSmoke;
             _textEditor.BorderBrush = Brushes.Gray;
             _textEditor.ShowLineNumbers = true;
+            _textEditor.Options.ConvertTabsToSpaces = true;
             _textEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinition("C#");
-            _textEditor.TextArea.IndentationStrategy = new AvaloniaEdit.Indentation.CSharp.CSharpIndentationStrategy();
+            _textEditor.TextArea.IndentationStrategy = new AvaloniaEdit.Indentation.CSharp.CSharpIndentationStrategy(_textEditor.Options);
 
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
             newCSharp.Click += async (o, e) => { await NewCSharpFile(); };

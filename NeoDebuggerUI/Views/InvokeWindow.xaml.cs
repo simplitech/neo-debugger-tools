@@ -15,7 +15,10 @@ using Avalonia.Layout;
 using LunarLabs.Parser;
 using Neo.Debugger.Core.Utils;
 using Neo.Emulation;
+using Neo.Lux.Utils;
 using NeoDebuggerUI.Models;
+using Neo.Emulation.API;
+using System.Numerics;
 
 namespace NeoDebuggerUI.Views
 {
@@ -113,6 +116,12 @@ namespace NeoDebuggerUI.Views
             {
                 var op = ExtractValueFromGrid(1, 1);
                 var args = ExtractValueFromGrid(2, 1);
+
+                if(!SetTransactionInfo())
+                {
+                    return;
+                }
+                SetOptions();
                 DebugPressed(op, args);
                 Close();
             };
@@ -121,6 +130,8 @@ namespace NeoDebuggerUI.Views
         public void RegisterEventListeners()
         {
             this.ViewModel.EvtSelectedTestCaseChanged += (fileName) => RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
+            this.FindControl<Button>("AddPrivateKey").Click += (_, __) => ViewModel.AddPrivateKey();
+            this.FindControl<Button>("RemovePrivateKey").Click += (_, __) => ViewModel.RemovePrivateKey();
         }
 
         public void DebugPressed(string field1, string field2)
@@ -128,6 +139,77 @@ namespace NeoDebuggerUI.Views
             ViewModel.DebugParams.ArgList = DebuggerUtils.GetArgsListAsNode(string.Concat(field1, ",", field2));
             ViewModel.Run();
         }
+        
+        public void SetOptions()
+        {
+            //Get the witness mode
+            CheckWitnessMode witnessMode;
+            var selectedWitness = ViewModel.SelectedWitness;
 
+            if (!Enum.TryParse<CheckWitnessMode>(selectedWitness, out witnessMode))
+            {
+                return;
+            }
+            ViewModel.DebugParams.WitnessMode = witnessMode;
+
+            //Get the trigger type
+            TriggerType type;
+            var selectedTrigger = ViewModel.SelectedTrigger;
+            
+            if (!Enum.TryParse<TriggerType>(selectedTrigger, out type))
+            {
+                return;
+            }
+            ViewModel.DebugParams.TriggerType = type;
+            //Get the timestamp
+            ViewModel.DebugParams.Timestamp = ViewModel.Timestamp;
+
+            //Get raw script
+            var rawScriptText = this.FindControl<TextBox>("RawScriptText");
+            var HasRawScript = rawScriptText.Text?.Length > 0;
+
+            ViewModel.DebugParams.RawScript = HasRawScript ? rawScriptText.Text.HexToBytes() : null;
+        }
+
+        public bool SetTransactionInfo()
+        {
+            var assetBox = this.FindControl<DropDown>("AssetBox");
+            if (assetBox.SelectedIndex > 0)
+            {
+                foreach (var entry in Asset.Entries)
+                {
+                    if (entry.name == assetBox.SelectedItem.ToString())
+                    {
+                        BigInteger amount;
+                        BigInteger.TryParse(ViewModel.AssetAmount, out amount);
+                        if (amount > 0)
+                        {
+                            amount *= Asset.Decimals; // fix decimals
+
+                            //Add the transaction info
+                            ViewModel.DebugParams.Transaction.Add(entry.id, amount);
+                        }
+                        else
+                        {
+                            ViewModel.OpenGenericSampleDialog(entry.name + " amount must be greater than zero", "OK", "", false, new Window());
+                            return false;
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            //Get the private key used
+            var privateKey = ViewModel.SelectedPrivateKey;
+
+            if (privateKey == "None")
+            {
+                privateKey = "";
+            }
+            ViewModel.DebugParams.PrivateKey = privateKey;
+
+            return true;
+        }
     }
 }
