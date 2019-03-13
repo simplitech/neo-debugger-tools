@@ -34,7 +34,10 @@ namespace NeoDebuggerUI.Views
             RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
             RegisterInteraction();
             RegisterEventListeners();
-            
+            if(DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+            {
+                ViewModel.Run();
+            }
         }
 
         private void InitializeComponent()
@@ -119,11 +122,11 @@ namespace NeoDebuggerUI.Views
 
                 if (!UseTestSequence())
                 {
-                    if (!SetTransactionInfo())
+                    if (!SaveTransactionInfo())
                     {
                         return;
                     }
-                    SetOptions();
+                    SaveOptions();
                 }
                 DebugPressed(op, args);
                 Close();
@@ -143,7 +146,7 @@ namespace NeoDebuggerUI.Views
             ViewModel.Run();
         }
         
-        public void SetOptions()
+        public void SaveOptions()
         {
             //Get the witness mode
             CheckWitnessMode witnessMode;
@@ -174,7 +177,7 @@ namespace NeoDebuggerUI.Views
             ViewModel.DebugParams.RawScript = HasRawScript ? rawScriptText.Text.HexToBytes() : null;
         }
 
-        public bool SetTransactionInfo()
+        public bool SaveTransactionInfo()
         {
             var assetBox = this.FindControl<DropDown>("AssetBox");
             if (assetBox.SelectedIndex > 0)

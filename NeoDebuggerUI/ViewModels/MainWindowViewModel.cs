@@ -87,8 +87,17 @@ namespace NeoDebuggerUI.ViewModels
                     DebuggerStore.instance.manager.LoadAssignmentsFromContent(path);
                     ProjectFiles.Add(path);
                 }
+                string cSharpFile = avmFilePath.Replace(".avm", ".cs");
 
-                SelectedFile = avmFilePath;
+                if (File.Exists(cSharpFile))
+                {
+                    SelectedFile = cSharpFile;
+                    AddBreakpoints(); // test
+                }
+                else
+                {
+                    SelectedFile = avmFilePath;
+                }
             }
 
             return true;
@@ -139,6 +148,16 @@ namespace NeoDebuggerUI.ViewModels
             Log = "";
         }
 
+        public void AddBreakpoints()
+        {
+            //TODO: add breakpoint from gui
+            foreach (var entry in DebuggerStore.instance.manager.Map.Entries)
+            {
+                var line = entry.line - 1;
+                DebuggerStore.instance.manager.AddBreakpoint(line, SelectedFile);
+            }
+        }
+
         public async Task Open()
 		{
 			var dialog = new OpenFileDialog();
@@ -160,9 +179,14 @@ namespace NeoDebuggerUI.ViewModels
 		public async Task OpenRunDialog()
 		{
             CompileCurrentFile();
-			var modalWindow = new InvokeWindow();
-			var task = modalWindow.ShowDialog();
-			await Task.Run(()=> task.Wait());
+            var openWindow = !DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
+            var modalWindow = new InvokeWindow();
+            
+            if (openWindow)
+            {
+                var task = modalWindow.ShowDialog();
+                await Task.Run(() => task.Wait());
+            }
 
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
         }
