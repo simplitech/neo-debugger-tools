@@ -35,12 +35,21 @@ namespace NeoDebuggerUI.ViewModels
 			get => _log;
 			set => this.RaiseAndSetIfChanged(ref _log, value);
 		}
-
-        private string _consumedGas;
+        
+        // not using getter because the property are updated on another thread and won't update the ui
+        private string _consumedGas = DebuggerStore.instance.UsedGasCost;
         public string ConsumedGas
         {
             get => _consumedGas;
             set => this.RaiseAndSetIfChanged(ref _consumedGas, value);
+        }
+
+        // not using getter because the property are updated on another thread and won't update the ui
+        private bool _isSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
+        public bool IsSteppingOrOnBreakpoint
+        {
+            get => _isSteppingOrOnBreakpoint;
+            set => this.RaiseAndSetIfChanged(ref _isSteppingOrOnBreakpoint, value);
         }
 
         private string _fileFolder;
@@ -124,8 +133,7 @@ namespace NeoDebuggerUI.ViewModels
             this.SelectedFile = ProjectFiles[0];
             CompileCurrentFile();
         }
-
-
+        
         //Current compiler does not support multiple files
         public void CompileCurrentFile()
         {
@@ -179,16 +187,30 @@ namespace NeoDebuggerUI.ViewModels
 		public async Task OpenRunDialog()
 		{
             CompileCurrentFile();
-            var openWindow = !DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
             var modalWindow = new InvokeWindow();
             
-            if (openWindow)
+            if (!IsSteppingOrOnBreakpoint)
             {
                 var task = modalWindow.ShowDialog();
                 await Task.Run(() => task.Wait());
             }
-
+            
+            // not using getters because the properties are updated on another thread and won't update the ui
+            IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
+        }
+
+        public void StopDebugging()
+        {
+            if (IsSteppingOrOnBreakpoint)
+            {
+                DebuggerStore.instance.manager.Emulator.Stop();
+                DebuggerStore.instance.manager.Run();
+
+                // not using getter because the property are updated on another thread and won't update the ui
+                IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
+                OpenGenericSampleDialog("Debug was stopped", "OK", "", false);
+            }
         }
 
         public async void ResetBlockchain()

@@ -87,6 +87,8 @@
       </MenuItem>
       <MenuItem Header="Contract">
         <MenuItem Header="Run (F5)" Command="{Binding OpenRunDialog}" />
+        <MenuItem Header="Stop (Shift+F5)" Command="{Binding StopDebugging}"
+                                           IsVisible="{Binding IsSteppingOrOnBreakpoint}" />
         <MenuItem Header="Step (F10)" />
         <MenuItem Header="Reset" />
         <MenuItem Header="Rebuild" Command="{Binding CompileCurrentFile}"/>
