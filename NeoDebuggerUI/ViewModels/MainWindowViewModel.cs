@@ -101,7 +101,7 @@ namespace NeoDebuggerUI.ViewModels
                 if (File.Exists(cSharpFile))
                 {
                     SelectedFile = cSharpFile;
-                    AddBreakpoints(); // test
+                    //AddBreakpoints(); // test
                 }
                 else
                 {
@@ -133,7 +133,7 @@ namespace NeoDebuggerUI.ViewModels
             this.SelectedFile = ProjectFiles[0];
             CompileCurrentFile();
         }
-        
+
         //Current compiler does not support multiple files
         public void CompileCurrentFile()
         {
@@ -166,6 +166,29 @@ namespace NeoDebuggerUI.ViewModels
             }
         }
 
+        public string GetVariableInformation(string text)
+        {
+            if (text == null)
+            {
+                return null;
+            }
+
+            var variable = DebuggerStore.instance.manager.Emulator.GetVariable(text);
+            if (variable == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return text + " = " + Neo.Emulation.Utils.FormattingUtils.StackItemAsString(variable.value, true, variable.type);
+            }
+            catch
+            {
+                return text + " = Exception";
+            }
+        }
+
         public async Task Open()
 		{
 			var dialog = new OpenFileDialog();
@@ -188,13 +211,13 @@ namespace NeoDebuggerUI.ViewModels
 		{
             CompileCurrentFile();
             var modalWindow = new InvokeWindow();
-            
+
             if (!IsSteppingOrOnBreakpoint)
             {
                 var task = modalWindow.ShowDialog();
                 await Task.Run(() => task.Wait());
             }
-            
+
             // not using getters because the properties are updated on another thread and won't update the ui
             IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
