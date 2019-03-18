@@ -1,0 +1,270 @@
+
+
+Debugger
+
+	Project
+
+		Create / open project*
+			*Instead of file
+
+		Source files
+
+			Smart Contract
+
+			Offchain*
+
+				Python
+				C#
+				Go
+				Java
+				*Project code used to interact with the blockchain (i.e. retrieve notifications)
+
+		Test files
+
+			Json test file template
+
+		Configuration files
+
+			Smart Contract
+
+				Manifest file
+
+					Author
+					Version
+					E-mail
+					Name
+					E-mail
+					Description
+					Parameters type
+					Return type
+					Dynamic Invoke
+					Storage
+					Is Payable
+
+		Resource files
+
+			Wallet files
+			Network declaration
+			Network credentials
+
+
+	Auxiliary tools
+
+		Text Editor tools
+
+			Find in files
+			Replace in files
+
+		Wallet tools
+
+			Create account
+
+				Single signature
+				Multi signature
+
+			Add / remove account
+
+				Single signature
+				Multi signature
+
+			View account
+
+				WIF
+				NEP
+				Script Hash
+
+					0x string
+					Python byte array
+
+				Address
+
+		Custom data visualization adapters
+
+			Convert serialized data to readable form
+			Reverse hex
+
+		Documentation
+
+		Contract templates
+
+
+	Debugger
+
+		Add/remove breakpoint
+
+		Create / Load project
+
+			C#
+			Python
+			Java
+			Go
+			Typescript
+
+		Line "highlighting"
+
+			Default highlighting
+			Selected line (during debug)
+			Line with breakpoint
+
+		Text Editor
+
+			Language support
+
+				C#
+
+					Auto-complete
+					Sintax highlighting
+
+				GO
+
+					Auto-complete
+					Sintax highlighting
+
+				Typescript
+
+					Auto-complete
+					Sintax highlighting
+
+				Java
+
+					Auto-complete
+					Sintax highlighting
+
+				Python
+
+					Auto-complete
+					Sintax highlighting
+
+			Other
+
+				Text wrapping
+				Code folding
+				Font size
+
+		During breakpoint
+
+			VM Stack information
+			Tooltip with variable information
+
+		Invoke in emulator
+
+			Parameters
+			Private key
+
+		Playback transaction*
+			*How?
+
+
+	Compiler
+
+		C#
+		Python
+		Go
+		Java
+
+
+	Network protocol
+
+		Node selection
+
+		Node interaction
+
+			TCP Protocol
+
+				Send handshake
+				Send / receive messages
+				Message log
+
+			Message builder
+
+				RPC Protocol
+
+					Send / Receive messages
+					Message log
+
+				Community services
+
+					Neoscan
+					Other
+
+			Transaction builder
+
+				Claim
+				Contract
+				Invocation
+				Attach fees
+
+					System fee
+					Net fee
+
+				Attach assets
+				Serialize transaction
+				Sign
+
+				Add signature
+
+					Single or multiple
+
+
+	Environment
+		Node
+			Local node
+				Project node
+			Remote node
+				Project node
+		Deploy
+			Single "project node"
+			Network of "project nodes"
+		Emulator
+			Contract storage
+			View blockchain
+			Load blockchain
+
+
+	Project node*
+	*Node implementation with additional code to track performance
+	
+
+		Log files
+
+			Node logs
+			Application logs
+
+		Debug smart contract
+
+			Add breakpoint
+			Remove breakpoint
+			Continue
+
+		Storage
+
+			Node
+
+				Accounts
+				Unspent coins
+				Spent coins
+				Assets
+				Validators
+				Contracts
+				Storages
+
+			Notifications
+
+		Server metrics
+
+			CPU
+			IO
+			Memory
+			Memory pool
+
+		Node debug bridge
+
+			Neo-cli
+			Neo-python
+			Neo-go
+
+
+	Notes
+
+		Always use official compilers as git submodules
+		In emulator, always use official NEO-VM as git submodule
