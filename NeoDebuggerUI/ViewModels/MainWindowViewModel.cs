@@ -185,6 +185,7 @@ namespace NeoDebuggerUI.ViewModels
             }
             catch
             {
+                // if some class of the vm throws an exception while trying to get the value of the variable
                 return text + " = Exception";
             }
         }
