@@ -36,7 +36,9 @@ namespace NeoDebuggerUI.Views
 
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
             newCSharp.Click += async (o, e) => { await NewCSharpFile(); };
+            RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex);
 
+            this.ViewModel.EvtVMStackChanged += (eval,alt,index) => RenderVMStack(eval, alt, index);
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
 
@@ -61,6 +63,59 @@ namespace NeoDebuggerUI.Views
         {
             FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
             _textEditor.Load(fs);
+        }
+
+        private void RenderVMStack(List<string> evalStack, List<string> altStack, int index)
+        {
+            var grid = this.FindControl<Grid>("VMStackGrid");
+            grid.Children.Clear();
+            grid.RowDefinitions.Clear();
+
+            var rowHeader = new RowDefinition { Height = new GridLength(20) };
+            grid.RowDefinitions.Add(rowHeader);
+
+            var indexHeader = new TextBlock { Text = "Index", FontWeight = FontWeight.Bold,
+                Margin = Thickness.Parse("0, 0, 5, 0")
+            };
+            Grid.SetRow(indexHeader, 0);
+            Grid.SetColumn(indexHeader, 0);
+            grid.Children.Add(indexHeader);
+
+            var evalHeader = new TextBlock { Text = "Eval", FontWeight = FontWeight.Bold };
+            Grid.SetRow(evalHeader, 0);
+            Grid.SetColumn(evalHeader, 1);
+            grid.Children.Add(evalHeader);
+
+            var altHeader = new TextBlock { Text = "Alt", FontWeight = FontWeight.Bold };
+            Grid.SetRow(altHeader, 0);
+            Grid.SetColumn(altHeader, 2);
+            grid.Children.Add(altHeader);
+
+            for(int i = 0; i <= index; i++)
+            {
+                RenderLine(grid, i + 1, index - i, evalStack[i], altStack[i]);
+            }
+        }
+
+        private void RenderLine(Grid grid, int rowCount, int index, string eval, string alt)
+        {
+            var rowView = new RowDefinition { Height = GridLength.Auto };
+            grid.RowDefinitions.Add(rowView);
+
+            var indexView = new TextBlock { Text = index.ToString() };
+            Grid.SetRow(indexView, rowCount);
+            Grid.SetColumn(indexView, 0);
+            grid.Children.Add(indexView);
+
+            var evalView = new TextBlock { Text = eval };
+            Grid.SetRow(evalView, rowCount);
+            Grid.SetColumn(evalView, 1);
+            grid.Children.Add(evalView);
+
+            var altView = new TextBlock { Text = alt };
+            Grid.SetRow(altView, rowCount);
+            Grid.SetColumn(altView, 2);
+            grid.Children.Add(altView);
         }
 
         public void SetTip(Point mousePosition)

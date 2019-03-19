@@ -133,14 +133,18 @@
       LastChildFill="True">
       <DockPanel
         DockPanel.Dock="Right"
-        Width="280"
+        Width="300"
         LastChildFill="True">
         <TextBlock
           DockPanel.Dock="Top"
           Text="VM Stack:"/>
-        <TextBlock
-          Background="White"
-          Text="Value" />
+        <Grid Name="VMStackGrid" Background="White">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+        </Grid>
       </DockPanel>
       <DockPanel
         Margin="0, 0, 5, 0"
