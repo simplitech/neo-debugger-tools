@@ -35,26 +35,28 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Input.GetHash")]
         public bool GetPrevHash(ExecutionEngine engine)
         {
-            var obj = engine.EvaluationStack.Pop();
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop();
             var input = ((VM.Types.InteropInterface)obj).GetInterface<TransactionInput>();
 
             if (input == null)
                 return false;
 
-            engine.EvaluationStack.Push(input.prevHash);
+            context.EvaluationStack.Push(input.prevHash);
             return true;
         }
 
         [Syscall("Neo.Input.GetIndex")]
         public static bool GetPrevIndex(ExecutionEngine engine)
         {
-            var obj = engine.EvaluationStack.Pop();
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop();
             var input = ((VM.Types.InteropInterface)obj).GetInterface<TransactionInput>();
 
             if (input == null)
                 return false;
 
-            engine.EvaluationStack.Push(input.prevIndex);
+            context.EvaluationStack.Push(input.prevIndex);
             return true;
         }
     }

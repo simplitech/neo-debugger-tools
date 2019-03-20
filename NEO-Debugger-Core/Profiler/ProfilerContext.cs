@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using OpCode = Neo.Lux.VM.OpCode;
+using OpCode = Neo.VM.OpCode;
 
 namespace Neo.Debugger.Profiler
 {

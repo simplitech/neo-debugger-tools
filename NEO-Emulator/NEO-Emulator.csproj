@@ -12,5 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\neo-lux\Neo.Lux\Neo.Lux.csproj" />
+    <ProjectReference Include="..\neo-vm\src\neo-vm\neo-vm.csproj" />
   </ItemGroup>
 </Project>

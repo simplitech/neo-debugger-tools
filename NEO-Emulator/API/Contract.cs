@@ -21,10 +21,11 @@ namespace Neo.Emulation.API
             // Contract
             // returns byte[] 
 
-            var obj = engine.EvaluationStack.Pop();
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop();
             var contract = ((VM.Types.InteropInterface)obj).GetInterface<Contract>();
 
-            engine.EvaluationStack.Push(contract.script);
+            context.EvaluationStack.Push(contract.script);
 
             return true;
         }
@@ -32,21 +33,22 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Runtime.Serialize")]
         public static bool Serialize(ExecutionEngine engine)
         {
+            var context = engine.CurrentContext;
             using (MemoryStream ms = new MemoryStream())
             using (BinaryWriter writer = new BinaryWriter(ms))
             {
                 try
                 {
-                    SerializeStackItem(engine.EvaluationStack.Pop(), writer);
+                    SerializeStackItem(context.EvaluationStack.Pop(), writer);
                 }
                 catch (NotSupportedException)
                 {
                     return false;
                 }
                 writer.Flush();
-                if (ms.Length > ExecutionEngine.MaxItemSize)
+                if (ms.Length > engine.MaxItemSize)
                     return false;
-                engine.EvaluationStack.Push(ms.ToArray());
+                context.EvaluationStack.Push(ms.ToArray());
             }
             return true;
         }
@@ -54,14 +56,15 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Runtime.Deserialize")]
         public static bool Deserialize(ExecutionEngine engine)
         {
-            byte[] data = engine.EvaluationStack.Pop().GetByteArray();
+            var context = engine.CurrentContext;
+            byte[] data = context.EvaluationStack.Pop().GetByteArray();
             using (MemoryStream ms = new MemoryStream(data, false))
             using (BinaryReader reader = new BinaryReader(ms))
             {
                 StackItem item;
                 try
                 {
-                    item = DeserializeStackItem(reader);
+                    item = DeserializeStackItem(reader,engine);
                 }
                 catch (FormatException)
                 {
@@ -71,7 +74,7 @@ namespace Neo.Emulation.API
                 {
                     return false;
                 }
-                engine.EvaluationStack.Push(item);
+                context.EvaluationStack.Push(item);
             }
             return true;
         }
@@ -88,15 +91,16 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Contract.Create", 500)]
         public static bool Create(ExecutionEngine engine)
         {
-            var script = engine.EvaluationStack.Pop().GetByteArray();
-            var parameterList = engine.EvaluationStack.Pop().GetByteArray();
-            var return_type = engine.EvaluationStack.Pop();
-            var need_storage = engine.EvaluationStack.Pop().GetBoolean();
-            var name = engine.EvaluationStack.Pop().GetString();
-            var version = engine.EvaluationStack.Pop().GetString();
-            var author = engine.EvaluationStack.Pop().GetString();
-            var email = engine.EvaluationStack.Pop().GetString();
-            var desc = engine.EvaluationStack.Pop().GetString();
+            var context = engine.CurrentContext;
+            var script = context.EvaluationStack.Pop().GetByteArray();
+            var parameterList = context.EvaluationStack.Pop().GetByteArray();
+            var return_type = context.EvaluationStack.Pop();
+            var need_storage = context.EvaluationStack.Pop().GetBoolean();
+            var name = context.EvaluationStack.Pop().GetString();
+            var version = context.EvaluationStack.Pop().GetString();
+            var author = context.EvaluationStack.Pop().GetString();
+            var email = context.EvaluationStack.Pop().GetString();
+            var desc = context.EvaluationStack.Pop().GetString();
 
             //byte[] script, byte[] parameter_list, byte return_type, bool need_storage, string name, string version, string author, string email, string description
 
@@ -107,7 +111,7 @@ namespace Neo.Emulation.API
             var account = blockchain.DeployContract(name, script);
             // TODO : merge Contract and Account
 
-            engine.EvaluationStack.Push(new VM.Types.InteropInterface(contract));
+            context.EvaluationStack.Push(new VM.Types.InteropInterface<Contract>(contract));
 
             return true;
         }
@@ -181,7 +185,7 @@ namespace Neo.Emulation.API
         }
 
 
-        private static StackItem DeserializeStackItem(BinaryReader reader)
+        private static StackItem DeserializeStackItem(BinaryReader reader, ExecutionEngine engine)
         {
             Stack<StackItem> deserialized = new Stack<StackItem>();
             int undeserialized = 1;
@@ -202,7 +206,7 @@ namespace Neo.Emulation.API
                     case StackItemType.Array:
                     case StackItemType.Struct:
                         {
-                            int count = (int)reader.ReadVarInt(ExecutionEngine.MaxArraySize);
+                            int count = (int)reader.ReadVarInt(engine.MaxArraySize);
                             deserialized.Push(new ContainerPlaceholder
                             {
                                 Type = type,
@@ -213,7 +217,7 @@ namespace Neo.Emulation.API
                         break;
                     case StackItemType.Map:
                         {
-                            int count = (int)reader.ReadVarInt(ExecutionEngine.MaxArraySize);
+                            int count = (int)reader.ReadVarInt(engine.MaxArraySize);
                             deserialized.Push(new ContainerPlaceholder
                             {
                                 Type = type,
