@@ -22,8 +22,10 @@ namespace Neo.Emulation.Utils
                 {
                     bytes = item.GetByteArray();
                 }
-                catch
+                catch(Exception e)
                 {
+                    // some class of the vm threw an exception
+                    Console.WriteLine(e.Message);
                 }
 
                 if (bytes != null && bytes.Length == 20)

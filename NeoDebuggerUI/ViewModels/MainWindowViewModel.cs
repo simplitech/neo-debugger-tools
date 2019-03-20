@@ -70,7 +70,7 @@ namespace NeoDebuggerUI.ViewModels
 			DebuggerStore.instance.manager.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
 
             var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile);
-			fileChanged.Subscribe(file => LoadSelectedFile());
+            fileChanged.Subscribe(file => LoadSelectedFile());
 
             EvaluationStack = new List<string>();
             AltStack = new List<string>();
