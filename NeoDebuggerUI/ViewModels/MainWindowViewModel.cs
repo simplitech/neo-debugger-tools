@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Legacy;
@@ -21,6 +22,9 @@ namespace NeoDebuggerUI.ViewModels
 
         public delegate void FileToCompileChanged();
         public event FileToCompileChanged EvtFileToCompileChanged;
+
+        public delegate void VMStackChanged(List<string> evalStack, List<string> altStack, int index);
+        public event VMStackChanged EvtVMStackChanged;
 
         private string _selectedFile;
 		public string SelectedFile
@@ -52,6 +56,10 @@ namespace NeoDebuggerUI.ViewModels
             set => this.RaiseAndSetIfChanged(ref _isSteppingOrOnBreakpoint, value);
         }
 
+        public List<string> EvaluationStack { get; set; }
+        public List<string> AltStack { get; set; }
+        public int StackIndex { get; set; } = -1;
+
         private string _fileFolder;
 		private DateTime _lastModificationDate;
 
@@ -62,7 +70,10 @@ namespace NeoDebuggerUI.ViewModels
 			DebuggerStore.instance.manager.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
 
             var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile);
-			fileChanged.Subscribe(file => LoadSelectedFile());
+            fileChanged.Subscribe(file => LoadSelectedFile());
+
+            EvaluationStack = new List<string>();
+            AltStack = new List<string>();
 		}
 
         private Unit LoadSelectedFile()
@@ -222,6 +233,11 @@ namespace NeoDebuggerUI.ViewModels
             // not using getters because the properties are updated on another thread and won't update the ui
             IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
+
+            if (IsSteppingOrOnBreakpoint)
+            {
+                UpdateStackPanel();
+            }
         }
 
         public void StopDebugging()
@@ -235,6 +251,44 @@ namespace NeoDebuggerUI.ViewModels
                 IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
                 OpenGenericSampleDialog("Debug was stopped", "OK", "", false);
             }
+        }
+
+        private void UpdateStackPanel()
+        {
+            var evalStack = DebuggerStore.instance.manager.Emulator.GetEvaluationStack().ToArray();
+            var altStack = DebuggerStore.instance.manager.Emulator.GetAltStack().ToArray();
+
+            EvaluationStack.Clear();
+            AltStack.Clear();
+
+            int index = Math.Max(evalStack.Length, altStack.Length) - 1;
+            StackIndex = index;
+
+            while (index >= 0)
+            {
+                try
+                {
+                    EvaluationStack.Add(index < evalStack.Length ? Neo.Emulation.Utils.FormattingUtils.StackItemAsString(evalStack[index]) : "");
+                }
+                catch
+                {
+                    // if some class of the vm throws an exception while trying to get the value of the variable
+                    EvaluationStack.Add("Exception");
+                }
+
+                try
+                {
+                    AltStack.Add(index < altStack.Length ? Neo.Emulation.Utils.FormattingUtils.StackItemAsString(altStack[index]) : "");
+                }
+                catch
+                {
+                    // if some class of the vm throws an exception while trying to get the value of the variable
+                    AltStack.Add("Exception");
+                }
+                
+                index--;
+            }
+            EvtVMStackChanged?.Invoke(EvaluationStack, AltStack, StackIndex);
         }
 
         public async void ResetBlockchain()

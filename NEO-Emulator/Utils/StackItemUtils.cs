@@ -17,7 +17,17 @@ namespace Neo.Emulation.Utils
         {
             if (item is ICollection && !(item is Map))
             {
-                var bytes = item.GetByteArray();
+                byte[] bytes = null;
+                try
+                {
+                    bytes = item.GetByteArray();
+                }
+                catch(Exception e)
+                {
+                    // some class of the vm threw an exception
+                    Console.WriteLine(e.Message);
+                }
+
                 if (bytes != null && bytes.Length == 20)
                 {
                     var signatureHash = new UInt160(bytes);
