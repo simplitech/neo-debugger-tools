@@ -34,6 +34,12 @@ namespace NeoDebuggerUI.Views
             _textEditor.PointerHover += (o, e) => SetTip(e.GetPosition(_textEditor));
             _textEditor.PointerHoverStopped += (o, e) => ToolTip.SetIsOpen(_textEditor, false);
 
+            var leftMargins = _textEditor.TextArea.LeftMargins;
+            foreach(var margin in _textEditor.TextArea.LeftMargins)
+            {
+                margin.PointerPressed += (o, e) => SetBreakpointState(e.GetPosition(_textEditor));
+            }
+
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
             newCSharp.Click += async (o, e) => { await NewCSharpFile(); };
             RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex);
@@ -41,6 +47,7 @@ namespace NeoDebuggerUI.Views
             this.ViewModel.EvtVMStackChanged += (eval,alt,index) => RenderVMStack(eval, alt, index);
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
+            this.ViewModel.EvtBreakpointStateChanged += (line, addBreakpoint) => UpdateBreakpoint(addBreakpoint, line);
 
             SetHotKeys();
         }
@@ -64,6 +71,46 @@ namespace NeoDebuggerUI.Views
         {
             FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
             _textEditor.Load(fs);
+        }
+
+        public void SetBreakpointState(Point clickPosition)
+        {
+            int lineIndex;
+
+            var textPosition = _textEditor.GetPositionFromPoint(clickPosition);
+            var maxLine = _textEditor.Document.LineCount;
+            if (textPosition?.Line == null || textPosition?.Line > maxLine)
+            {
+                //click was not in a valid line
+                return;
+            }
+            lineIndex = textPosition?.Line ?? 0;
+
+            Console.WriteLine($"Clicked on line {lineIndex}");
+
+            ViewModel.SetBreakpoint(lineIndex);
+        }
+
+        public void UpdateBreakpoint(bool addBreakpoint, int line)
+        {
+            if (addBreakpoint)
+            {
+                AddBreakpoint(line);
+            }
+            else
+            {
+                RemoveBreakpoint(line);
+            }
+        }
+
+        public void AddBreakpoint(int line)
+        {
+            // update ui
+        }
+
+        public void RemoveBreakpoint(int line)
+        {
+            // update ui
         }
 
         private void RenderVMStack(List<string> evalStack, List<string> altStack, int index)

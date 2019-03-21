@@ -26,6 +26,9 @@ namespace NeoDebuggerUI.ViewModels
         public delegate void VMStackChanged(List<string> evalStack, List<string> altStack, int index);
         public event VMStackChanged EvtVMStackChanged;
 
+        public delegate void BreakpointStateChanged(int line, bool addBreakpoint);
+        public event BreakpointStateChanged EvtBreakpointStateChanged;
+
         private string _selectedFile;
 		public string SelectedFile
 		{
@@ -112,7 +115,6 @@ namespace NeoDebuggerUI.ViewModels
                 if (File.Exists(cSharpFile))
                 {
                     SelectedFile = cSharpFile;
-                    //AddBreakpoints(); // test
                 }
                 else
                 {
@@ -165,16 +167,6 @@ namespace NeoDebuggerUI.ViewModels
         public void ClearLog()
         {
             Log = "";
-        }
-
-        public void AddBreakpoints()
-        {
-            //TODO: add breakpoint from gui
-            foreach (var entry in DebuggerStore.instance.manager.Map.Entries)
-            {
-                var line = entry.line - 1;
-                DebuggerStore.instance.manager.AddBreakpoint(line, SelectedFile);
-            }
         }
 
         public string GetVariableInformation(string text)
@@ -237,6 +229,57 @@ namespace NeoDebuggerUI.ViewModels
             if (IsSteppingOrOnBreakpoint)
             {
                 UpdateStackPanel();
+            }
+        }
+
+        public void AddBreakpoint(int line)
+        {
+            DebuggerStore.instance.manager.AddBreakpoint(line - 1, SelectedFile);
+        }
+
+        public void RemoveBreakpoint(int line)
+        {
+            DebuggerStore.instance.manager.RemoveBreakpoint(line - 1, SelectedFile);
+        }
+
+        public void SetBreakpoint(int line)
+        {
+            var breakpoints = DebuggerStore.instance.manager.Breakpoints.Select(x => x.lineNumber);
+
+            if (breakpoints.Contains(line - 1))
+            {
+                // remove breakpoint
+                EvtBreakpointStateChanged?.Invoke(line, false);
+                RemoveBreakpoint(line);
+                return;
+            }
+
+            if (DebuggerStore.instance.manager.Map != null)
+            {
+                var entries = DebuggerStore.instance.manager.Map.Entries.Select(x => x.line);
+                if (entries.Contains(line))
+                {
+                    // add breakpoint in line
+                    EvtBreakpointStateChanged?.Invoke(line, true);
+                    AddBreakpoint(line);
+                    return;
+                }
+
+                try
+                {
+                    // add breakpoint in the next possible line
+                    var nextLine = entries.Where(x => x > line).Min();
+                    if (!breakpoints.Contains(nextLine - 1))
+                    {
+                        EvtBreakpointStateChanged?.Invoke(nextLine, true);
+                        AddBreakpoint(nextLine);
+                        return;
+                    }
+                }
+                catch
+                {
+                    // entries list is empty - breakpoint won't be added
+                }
             }
         }
 
