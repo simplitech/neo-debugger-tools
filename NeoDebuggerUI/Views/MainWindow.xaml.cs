@@ -16,6 +16,7 @@ namespace NeoDebuggerUI.Views
     public class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         private TextEditor _textEditor;
+        private BreakpointMargin _breakpointMargin;
 
         public MainWindow()
         {
@@ -34,11 +35,11 @@ namespace NeoDebuggerUI.Views
             _textEditor.PointerHover += (o, e) => SetTip(e.GetPosition(_textEditor));
             _textEditor.PointerHoverStopped += (o, e) => ToolTip.SetIsOpen(_textEditor, false);
 
-            var leftMargins = _textEditor.TextArea.LeftMargins;
-            foreach(var margin in _textEditor.TextArea.LeftMargins)
-            {
-                margin.PointerPressed += (o, e) => SetBreakpointState(e.GetPosition(_textEditor));
-            }
+            _breakpointMargin = new BreakpointMargin();
+            _breakpointMargin.Width = 20;
+            _breakpointMargin.PointerPressed += (o, e) => SetBreakpointState(e.GetPosition(_textEditor));
+            _breakpointMargin.EvtBreakpointListChanged += () => _textEditor.TextArea.TextView.Redraw();
+            _textEditor.TextArea.LeftMargins.Insert(0, _breakpointMargin);
 
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
             newCSharp.Click += async (o, e) => { await NewCSharpFile(); };
@@ -47,6 +48,7 @@ namespace NeoDebuggerUI.Views
             this.ViewModel.EvtVMStackChanged += (eval,alt,index) => RenderVMStack(eval, alt, index);
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
+            this.ViewModel.EvtDebugCurrentLineChanged += (isOnBreakpoint, line) => HighlightOnBreakpoint(isOnBreakpoint, line);
             this.ViewModel.EvtBreakpointStateChanged += (line, addBreakpoint) => UpdateBreakpoint(addBreakpoint, line);
 
             SetHotKeys();
@@ -106,11 +108,33 @@ namespace NeoDebuggerUI.Views
         public void AddBreakpoint(int line)
         {
             // update ui
+            _breakpointMargin.AddBreakpoint(line);
         }
 
         public void RemoveBreakpoint(int line)
         {
             // update ui
+            _breakpointMargin.RemoveBreakpoint(line);
+        }
+
+        public void HighlightOnBreakpoint(bool isOnBreakpoint, int currentLine)
+        {
+            if (isOnBreakpoint)
+            {
+                var currentDocumentLine = _textEditor.Document.GetLineByNumber(currentLine);
+
+                var lineText = _textEditor.Document.GetText(currentDocumentLine.Offset, currentDocumentLine.Length);
+                var offset = Regex.Match(lineText, @"\S").Index;
+                var regex = Regex.Match(lineText, @"(?<=^\s*)(\S|\S\s)+(?=\s*$)").Value;
+
+                _textEditor.SelectionStart = offset + currentDocumentLine.Offset;
+                _textEditor.SelectionLength = regex.Length;
+            }
+            else
+            {
+                _textEditor.SelectionLength = 0;
+            }
+            _textEditor.IsReadOnly = isOnBreakpoint;
         }
 
         private void RenderVMStack(List<string> evalStack, List<string> altStack, int index)

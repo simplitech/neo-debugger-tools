@@ -26,6 +26,9 @@ namespace NeoDebuggerUI.ViewModels
         public delegate void VMStackChanged(List<string> evalStack, List<string> altStack, int index);
         public event VMStackChanged EvtVMStackChanged;
 
+        public delegate void DebugCurrentLineChanged(bool isOnBreakpoint, int currentLine);
+        public event DebugCurrentLineChanged EvtDebugCurrentLineChanged;
+
         public delegate void BreakpointStateChanged(int line, bool addBreakpoint);
         public event BreakpointStateChanged EvtBreakpointStateChanged;
 
@@ -228,6 +231,7 @@ namespace NeoDebuggerUI.ViewModels
 
             if (IsSteppingOrOnBreakpoint)
             {
+                EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.CurrentLine + 1);
                 UpdateStackPanel();
             }
         }
