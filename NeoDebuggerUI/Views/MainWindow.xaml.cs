@@ -38,7 +38,6 @@ namespace NeoDebuggerUI.Views
             _breakpointMargin = new BreakpointMargin();
             _breakpointMargin.Width = 20;
             _breakpointMargin.PointerPressed += (o, e) => SetBreakpointState(e.GetPosition(_textEditor));
-            _breakpointMargin.EvtBreakpointListChanged += () => _textEditor.TextArea.TextView.Redraw();
             _textEditor.TextArea.LeftMargins.Insert(0, _breakpointMargin);
 
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
@@ -88,51 +87,44 @@ namespace NeoDebuggerUI.Views
             }
             lineIndex = textPosition?.Line ?? 0;
 
-            Console.WriteLine($"Clicked on line {lineIndex}");
-
             ViewModel.SetBreakpoint(lineIndex);
         }
 
         public void UpdateBreakpoint(bool addBreakpoint, int line)
         {
-            if (addBreakpoint)
-            {
-                AddBreakpoint(line);
-            }
-            else
-            {
-                RemoveBreakpoint(line);
-            }
-        }
-
-        public void AddBreakpoint(int line)
-        {
             // update ui
-            _breakpointMargin.AddBreakpoint(line);
-        }
-
-        public void RemoveBreakpoint(int line)
-        {
-            // update ui
-            _breakpointMargin.RemoveBreakpoint(line);
+            _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints);
+            // fix gui bug when inserting breakpoint in the same line of the caret
+            var offset = _textEditor.Document.GetOffset(line, 0);
+            _textEditor.CaretOffset = offset - 1;
         }
 
         public void HighlightOnBreakpoint(bool isOnBreakpoint, int currentLine)
         {
             if (isOnBreakpoint)
             {
+                // highlight the line when stopped on a breakpoint
                 var currentDocumentLine = _textEditor.Document.GetLineByNumber(currentLine);
-
+                
                 var lineText = _textEditor.Document.GetText(currentDocumentLine.Offset, currentDocumentLine.Length);
                 var offset = Regex.Match(lineText, @"\S").Index;
                 var regex = Regex.Match(lineText, @"(?<=^\s*)(\S|\S\s)+(?=\s*$)").Value;
 
-                _textEditor.SelectionStart = offset + currentDocumentLine.Offset;
-                _textEditor.SelectionLength = regex.Length;
+                _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints, currentLine, offset, regex.Length);
+
+                // change selection to fix gui bug to update
+                _textEditor.SelectionStart = currentDocumentLine.Offset - 1;
+                _textEditor.SelectionLength = 1; // there must be a selection to update textview
+
             }
             else
             {
-                _textEditor.SelectionLength = 0;
+                // clear highlight of the last stopped line 
+                _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints);
+
+                // change selection to fix gui bug to update
+                _textEditor.SelectionStart = _textEditor.CaretOffset;
+                _textEditor.SelectionLength = 1; // there must be a selection to update textview
             }
             _textEditor.IsReadOnly = isOnBreakpoint;
         }

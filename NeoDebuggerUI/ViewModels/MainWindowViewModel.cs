@@ -32,6 +32,11 @@ namespace NeoDebuggerUI.ViewModels
         public delegate void BreakpointStateChanged(int line, bool addBreakpoint);
         public event BreakpointStateChanged EvtBreakpointStateChanged;
 
+        public HashSet<int> Breakpoints
+        {
+            get => DebuggerStore.instance.manager.Emulator.Breakpoints.Select(x => DebuggerStore.instance.manager.ResolveLine(x, true, out _selectedFile) + 1).ToHashSet();
+        }
+
         private string _selectedFile;
 		public string SelectedFile
 		{
@@ -229,9 +234,9 @@ namespace NeoDebuggerUI.ViewModels
             IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
 
+            EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.CurrentLine + 1);
             if (IsSteppingOrOnBreakpoint)
             {
-                EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.CurrentLine + 1);
                 UpdateStackPanel();
             }
         }
@@ -248,13 +253,11 @@ namespace NeoDebuggerUI.ViewModels
 
         public void SetBreakpoint(int line)
         {
-            var breakpoints = DebuggerStore.instance.manager.Breakpoints.Select(x => x.lineNumber);
-
-            if (breakpoints.Contains(line - 1))
+            if (Breakpoints.Contains(line))
             {
                 // remove breakpoint
-                EvtBreakpointStateChanged?.Invoke(line, false);
                 RemoveBreakpoint(line);
+                EvtBreakpointStateChanged?.Invoke(line, false);
                 return;
             }
 
@@ -264,8 +267,8 @@ namespace NeoDebuggerUI.ViewModels
                 if (entries.Contains(line))
                 {
                     // add breakpoint in line
-                    EvtBreakpointStateChanged?.Invoke(line, true);
                     AddBreakpoint(line);
+                    EvtBreakpointStateChanged?.Invoke(line, true);
                     return;
                 }
 
@@ -273,10 +276,10 @@ namespace NeoDebuggerUI.ViewModels
                 {
                     // add breakpoint in the next possible line
                     var nextLine = entries.Where(x => x > line).Min();
-                    if (!breakpoints.Contains(nextLine - 1))
+                    if (!Breakpoints.Contains(nextLine))
                     {
-                        EvtBreakpointStateChanged?.Invoke(nextLine, true);
                         AddBreakpoint(nextLine);
+                        EvtBreakpointStateChanged?.Invoke(nextLine, true);
                         return;
                     }
                 }

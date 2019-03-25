@@ -13,9 +13,11 @@ namespace NeoDebuggerUI
     class BreakpointMargin : LineNumberMargin
     {
         private HashSet<int> BreakpointLines { get; set; } = new HashSet<int>();
+        private int CurrentLine { get; set; } = 0;
+        private int SelectionStartOffset { get; set; } = 0;
+        private int SelectionEndOffset { get; set; } = 0;
 
-        public delegate void BreakpointListChanged();
-        public event BreakpointListChanged EvtBreakpointListChanged;
+        private IBrush BreakpointLineColor = new SolidColorBrush(Colors.PaleVioletRed);
 
         public override void Render(DrawingContext drawingContext)
         {
@@ -30,6 +32,24 @@ namespace NeoDebuggerUI
                 {
                     if (BreakpointLines.Contains(line.FirstDocumentLine.LineNumber))
                     {
+                        if (line.FirstDocumentLine.LineNumber == CurrentLine)
+                        {
+                            foreach (var element in line.Elements)
+                            {
+                                if (line.Elements.Count == 1)
+                                {
+                                    element.BackgroundBrush = BreakpointLineColor;
+                                    break;
+                                }
+
+                                var elementEndOffset = element.RelativeTextOffset + element.DocumentLength;
+                                if (element.RelativeTextOffset >= SelectionStartOffset && elementEndOffset <= SelectionEndOffset)
+                                {
+                                    element.BackgroundBrush = BreakpointLineColor;
+                                }
+                            }
+                        }
+
                         var y = line.GetTextLineVisualYPosition(line.TextLines[0], VisualYPosition.TextTop);
 
                         var breakpointForm = new EllipseGeometry(new Rect((Bounds.Size.Width / 4) - 1,
@@ -43,16 +63,23 @@ namespace NeoDebuggerUI
             }
         }
 
-        public void AddBreakpoint(int lineNumber)
+        public void UpdateBreakpointMargin(HashSet<int> breakpoints, int currentLine = 0, int offset = 0, int length = 0)
         {
-            BreakpointLines.Add(lineNumber);
-            EvtBreakpointListChanged?.Invoke();
-        }
-
-        public void RemoveBreakpoint(int lineNumber)
-        {
-            BreakpointLines.Remove(lineNumber);
-            EvtBreakpointListChanged?.Invoke();
+            BreakpointLines = breakpoints;
+            if (currentLine >= 0 && currentLine != CurrentLine)
+            {
+                if (CurrentLine != 0)
+                {
+                    var line = TextView.GetVisualLine(CurrentLine);
+                    foreach (var element in line.Elements)
+                    {
+                        element.BackgroundBrush = null;
+                    }
+                }
+                CurrentLine = currentLine;
+                SelectionStartOffset = offset;
+                SelectionEndOffset = offset + length;
+            }
         }
     }
 }
