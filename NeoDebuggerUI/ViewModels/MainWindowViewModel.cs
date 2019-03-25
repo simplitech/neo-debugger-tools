@@ -11,6 +11,7 @@ using NeoDebuggerUI.Models;
 using NeoDebuggerUI.Views;
 using System.Reactive;
 using NeoDebuggerCore.Utils;
+using Avalonia;
 
 namespace NeoDebuggerUI.ViewModels
 {
@@ -76,7 +77,7 @@ namespace NeoDebuggerUI.ViewModels
 
 		public MainWindowViewModel()
 		{
-			Log = "Debugger started\n";
+            Log = "Debugger started\n";
 			Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
 			DebuggerStore.instance.manager.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
 
@@ -169,7 +170,7 @@ namespace NeoDebuggerUI.ViewModels
 
         public void SendLogToPanel(string s)
         {
-            Log += s + "\n";
+            Log = s + "\n" + Log;
         }
 
         public void ClearLog()
@@ -211,7 +212,7 @@ namespace NeoDebuggerUI.ViewModels
 			dialog.Filters = filters;
 			dialog.AllowMultiple = false;
 
-			var result = await dialog.ShowAsync();
+			var result = await dialog.ShowAsync(new Window());
 
 			if (result != null && result.Length > 0)
 			{
@@ -226,7 +227,7 @@ namespace NeoDebuggerUI.ViewModels
 
             if (!IsSteppingOrOnBreakpoint)
             {
-                var task = modalWindow.ShowDialog();
+                var task = modalWindow.ShowDialog(new Window());
                 await Task.Run(() => task.Wait());
             }
 
