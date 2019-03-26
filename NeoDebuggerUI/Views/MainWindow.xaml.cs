@@ -123,8 +123,8 @@ namespace NeoDebuggerUI.Views
                 _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints);
 
                 // change selection to fix gui bug to update
-                _textEditor.SelectionStart = _textEditor.CaretOffset;
-                _textEditor.SelectionLength = 1; // there must be a selection to update textview
+                _textEditor.SelectionStart = _textEditor.CaretOffset < 1 ? _textEditor.CaretOffset - 1 : _textEditor.CaretOffset + 1;
+                // there must be a modification to update textview
             }
             _textEditor.IsReadOnly = isOnBreakpoint;
         }
@@ -244,20 +244,24 @@ namespace NeoDebuggerUI.Views
         public void SetHotKeys()
         {
             var keyBindings = this.KeyBindings;
-            
+
+            var runControl = this.FindControl<MenuItem>("RunContract");
             var runKeyBinding = new Avalonia.Input.KeyBinding()
             {
                 // hotkey: F5
                 Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5),
-                Command = this.FindControl<MenuItem>("RunContract").Command
+                Command = runControl.Command,
+                CommandParameter = runControl.CommandParameter
             };
             keyBindings.Add(runKeyBinding);
-            
+
+            var stepControl = this.FindControl<MenuItem>("StepContract");
             var stepKeyBinding = new Avalonia.Input.KeyBinding()
             {
                 // hotkey: F10
                 Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F10),
-                Command = this.FindControl<MenuItem>("StepContract").Command
+                Command = stepControl.Command,
+                CommandParameter = stepControl.CommandParameter
             };
             keyBindings.Add(stepKeyBinding);
             
