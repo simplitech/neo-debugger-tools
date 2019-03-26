@@ -6,11 +6,8 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using AvaloniaEdit;
-using AvaloniaEdit.Highlighting;
 using NEODebuggerUI.ViewModels;
 using ReactiveUI;
-using System.IO;
-using System.Linq;
 using Avalonia.Layout;
 using LunarLabs.Parser;
 using Neo.Debugger.Core.Utils;
@@ -19,24 +16,38 @@ using Neo.Lux.Utils;
 using NEODebuggerUI.Models;
 using Neo.Emulation.API;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace NEODebuggerUI.Views
 {
     public class InvokeWindow : ReactiveWindow<InvokeWindowViewModel>
     {
-        public InvokeWindow()
+        public InvokeWindow(bool stepping)
         {
             InitializeComponent();
 #if DEBUG
             this.AttachDevTools();
 #endif
-
-            RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
+            ViewModel.Stepping = stepping;
             RegisterInteraction();
-            RegisterEventListeners();
-            if(DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+            Reload();
+        }
+
+        public void Reload()
+        {
+            RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
+        }
+
+        public void UseOffset(bool useOffset)
+        {
+            ViewModel.UseOffset = useOffset;
+        }
+
+        public async Task RunOrStep()
+        {
+            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
-                ViewModel.Run();
+                await ViewModel.RunOrStep();
             }
         }
 
@@ -115,7 +126,10 @@ namespace NEODebuggerUI.Views
 
         private void RegisterInteraction()
         {
-            this.FindControl<Button>("DebugBtn").Click += (_,__) =>
+            this.ViewModel.EvtSelectedTestCaseChanged += (fileName) => RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
+            this.FindControl<Button>("AddPrivateKey").Click += async (_, __) => await ViewModel.AddPrivateKey();
+            this.FindControl<Button>("RemovePrivateKey").Click += async (_, __) => await ViewModel.RemovePrivateKey();
+            this.FindControl<Button>("DebugBtn").Click += async(_,__) =>
             {
                 var op = ExtractValueFromGrid(1, 1);
                 var args = ExtractValueFromGrid(2, 1);
@@ -128,22 +142,15 @@ namespace NEODebuggerUI.Views
                     }
                     SaveOptions();
                 }
-                DebugPressed(op, args);
+                await DebugPressed(op, args);
                 Close();
             };
         }
 
-        public void RegisterEventListeners()
-        {
-            this.ViewModel.EvtSelectedTestCaseChanged += (fileName) => RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
-            this.FindControl<Button>("AddPrivateKey").Click += (_, __) => ViewModel.AddPrivateKey();
-            this.FindControl<Button>("RemovePrivateKey").Click += (_, __) => ViewModel.RemovePrivateKey();
-        }
-
-        public void DebugPressed(string field1, string field2)
+        public async Task DebugPressed(string field1, string field2)
         {
             ViewModel.DebugParams.ArgList = DebuggerUtils.GetArgsListAsNode(string.Concat(field1, ",", field2));
-            ViewModel.Run();
+            await ViewModel.RunOrStep();
         }
         
         public void SaveOptions()

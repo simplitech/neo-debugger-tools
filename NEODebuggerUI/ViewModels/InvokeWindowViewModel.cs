@@ -22,6 +22,8 @@ namespace NEODebuggerUI.ViewModels
 
         public DataNode SelectedTestCaseParams => SelectedTestCase != null ? DebuggerStore.instance.Tests.cases[SelectedTestCase].args : null;
         public DebugParameters DebugParams { get; set; } = new DebugParameters();
+        public bool Stepping;
+        public bool UseOffset;
 
         public delegate void SelectedTestChanged(string selectedTestCase);
         public event SelectedTestChanged EvtSelectedTestCaseChanged;
@@ -154,11 +156,18 @@ namespace NEODebuggerUI.ViewModels
 
         public InvokeWindowViewModel()
         {
-            if(DebuggerStore.instance.Tests != null && DebuggerStore.instance.Tests.cases.Count > 0) {
+            if (DebuggerStore.instance.Tests != null && DebuggerStore.instance.Tests.cases.Count > 0)
+            {
                 _selectedTestCase = DebuggerStore.instance.Tests.cases.ElementAt(0).Key;
             }
             _selectedTestSequence = null;
-            _selectedFunction = DebuggerStore.instance.manager.ABI.entryPoint.name;
+
+            _selectedFunction = "main";
+            if (DebuggerStore.instance.manager.ABI != null)
+            {
+                _selectedFunction = DebuggerStore.instance.manager.ABI.entryPoint.name;
+            }
+
             _selectedTrigger = DebuggerStore.instance.manager.Emulator.currentTrigger.ToString();
             _selectedWitness = DebuggerStore.instance.manager.Emulator.checkWitnessMode.ToString();
             _selectedDate = DateTime.UtcNow;
@@ -186,10 +195,39 @@ namespace NEODebuggerUI.ViewModels
             selectedPrivateKeyChanged.Subscribe(time => UpdatePrivateKeyAddress());
         }
 
+        public void Step()
+        {
+            if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+            {
+                if (SelectedTestSequence == null)
+                {
+                    DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
+                }
+                else
+                {
+                    //TODO: there is no step on DebugManager for test sequences
+                    //DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
+                }
+            }
+
+            if (!UseOffset)
+            {
+                var previousLine = DebuggerStore.instance.manager.CurrentLine;
+                do
+                {
+                    DebuggerStore.instance.manager.Step();
+                } while (previousLine == DebuggerStore.instance.manager.CurrentLine);
+            }
+            else
+            {
+                DebuggerStore.instance.manager.Step();
+            }
+        }
+
         public void Run()
         {
             //If the debug has started already, run with previous parameters
-            if(DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
                 DebuggerStore.instance.manager.Run();
             }
@@ -206,7 +244,19 @@ namespace NEODebuggerUI.ViewModels
                     DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
                 }
             }
-            
+        }
+
+        public async Task RunOrStep()
+        {
+            if(Stepping)
+            {
+                Step();
+            }
+            else
+            {
+                Run();
+            }
+
             //Check if the Run or RunSequence has ended the debugging
             if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
@@ -223,11 +273,11 @@ namespace NEODebuggerUI.ViewModels
 
                 if (result != null)
                 {
-                    OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
+                    await OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
                 }
                 else
                 {
-                    OpenGenericSampleDialog(errorMessage, "Error", "", false);
+                    await OpenGenericSampleDialog(errorMessage, "Error", "", false);
                 }
                 DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
             }
@@ -259,13 +309,13 @@ namespace NEODebuggerUI.ViewModels
             }
         }
 
-        public void AddPrivateKey()
+        public async Task AddPrivateKey()
         {
             if (PrivateKeys.Contains(InputPrivateKey))
             {
                 SelectedPrivateKey = InputPrivateKey;
                 InputPrivateKey = "";
-                OpenGenericSampleDialog("This private key is already loaded", "OK", "", false);
+                await OpenGenericSampleDialog("This private key is already loaded", "OK", "", false);
                 return;
             }
 
@@ -278,11 +328,11 @@ namespace NEODebuggerUI.ViewModels
             }
             else
             {
-                OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false);
+                await OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false);
             }
         }
 
-        public void RemovePrivateKey()
+        public async Task RemovePrivateKey()
         {
             if(SelectedPrivateKey != PrivateKeys.ElementAt(0))
             {
