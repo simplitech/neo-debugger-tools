@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using NeoDebuggerUI.ViewModels;
 
@@ -47,7 +48,7 @@ namespace NeoDebuggerUI.Views
 
         public async Task<bool> Open()
         {
-            var task = ShowDialog();
+            var task = ShowDialog(new Window());
             await Task.Run(()=> task.Wait());
             return ViewModel.ClickedOk == true;
         }

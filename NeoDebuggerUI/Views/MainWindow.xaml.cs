@@ -16,6 +16,7 @@ namespace NeoDebuggerUI.Views
     public class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         private TextEditor _textEditor;
+        private BreakpointMargin _breakpointMargin;
 
         public MainWindow()
         {
@@ -34,6 +35,11 @@ namespace NeoDebuggerUI.Views
             _textEditor.PointerHover += (o, e) => SetTip(e.GetPosition(_textEditor));
             _textEditor.PointerHoverStopped += (o, e) => ToolTip.SetIsOpen(_textEditor, false);
 
+            _breakpointMargin = new BreakpointMargin();
+            _breakpointMargin.Width = 20;
+            _breakpointMargin.PointerPressed += (o, e) => SetBreakpointState(e.GetPosition(_textEditor));
+            _textEditor.TextArea.LeftMargins.Insert(0, _breakpointMargin);
+
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
             newCSharp.Click += async (o, e) => { await NewCSharpFile(); };
             RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex);
@@ -41,6 +47,8 @@ namespace NeoDebuggerUI.Views
             this.ViewModel.EvtVMStackChanged += (eval,alt,index) => RenderVMStack(eval, alt, index);
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
+            this.ViewModel.EvtDebugCurrentLineChanged += (isOnBreakpoint, line) => HighlightOnBreakpoint(isOnBreakpoint, line);
+            this.ViewModel.EvtBreakpointStateChanged += (line, addBreakpoint) => UpdateBreakpoint(addBreakpoint, line);
 
             SetHotKeys();
         }
@@ -64,6 +72,61 @@ namespace NeoDebuggerUI.Views
         {
             FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
             _textEditor.Load(fs);
+        }
+
+        public void SetBreakpointState(Point clickPosition)
+        {
+            int lineIndex;
+
+            var textPosition = _textEditor.GetPositionFromPoint(clickPosition);
+            var maxLine = _textEditor.Document.LineCount;
+            if (textPosition?.Line == null || textPosition?.Line > maxLine)
+            {
+                //click was not in a valid line
+                return;
+            }
+            lineIndex = textPosition?.Line ?? 0;
+
+            ViewModel.SetBreakpoint(lineIndex);
+        }
+
+        public void UpdateBreakpoint(bool addBreakpoint, int line)
+        {
+            // update ui
+            _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints);
+            // fix gui bug when inserting breakpoint in the same line of the caret
+            var offset = _textEditor.Document.GetOffset(line, 0);
+            _textEditor.CaretOffset = offset - 1;
+        }
+
+        public void HighlightOnBreakpoint(bool isOnBreakpoint, int currentLine)
+        {
+            if (isOnBreakpoint)
+            {
+                // highlight the line when stopped on a breakpoint
+                var currentDocumentLine = _textEditor.Document.GetLineByNumber(currentLine);
+                
+                var lineText = _textEditor.Document.GetText(currentDocumentLine.Offset, currentDocumentLine.Length);
+                var offset = Regex.Match(lineText, @"\S").Index;
+                var regex = Regex.Match(lineText, @"(?<=^\s*)(\S|\S\s)+(?=\s*$)").Value;
+
+                _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints, currentLine, offset, regex.Length);
+
+                // change selection to fix gui bug to update
+                _textEditor.SelectionStart = currentDocumentLine.Offset - 1;
+                _textEditor.SelectionLength = 1; // there must be a selection to update textview
+
+            }
+            else
+            {
+                // clear highlight of the last stopped line 
+                _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints);
+
+                // change selection to fix gui bug to update
+                _textEditor.SelectionStart = _textEditor.CaretOffset;
+                _textEditor.SelectionLength = 1; // there must be a selection to update textview
+            }
+            _textEditor.IsReadOnly = isOnBreakpoint;
         }
 
         private void RenderVMStack(List<string> evalStack, List<string> altStack, int index)
