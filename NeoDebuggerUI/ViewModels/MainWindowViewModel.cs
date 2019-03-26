@@ -181,5 +181,28 @@ namespace NeoDebuggerUI.ViewModels
 
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
         }
+
+        public async void ResetBlockchain()
+        {
+            if(!DebuggerStore.instance.manager.BlockchainLoaded)
+            {
+                OpenGenericSampleDialog("No blockchain loaded yet!", "Ok", "", false);
+                return;
+            }
+
+            if (DebuggerStore.instance.manager.Blockchain.currentHeight > 1)
+            {
+                if(!(await OpenGenericSampleDialog("The current loaded Blockchain already has some transactions.\n" +
+                    "This action can not be reversed, are you sure you want to reset it?", "Yes", "No", true)))
+                {
+                    return;
+                }
+            }
+
+            DebuggerStore.instance.manager.Blockchain.Reset();
+            DebuggerStore.instance.manager.Blockchain.Save();
+
+            SendLogToPanel("Reset to virtual blockchain at path: " + DebuggerStore.instance.manager.Blockchain.fileName);
+        }
     }
 }

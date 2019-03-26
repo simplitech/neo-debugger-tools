@@ -8,10 +8,8 @@ using System;
 using System.Threading.Tasks;
 using Neo.VM;
 using System.Collections.Generic;
-using Avalonia.Controls;
 using System.Collections.ObjectModel;
 using Neo.Emulation.API;
-
 
 namespace NeoDebuggerUI.ViewModels
 {
@@ -143,9 +141,7 @@ namespace NeoDebuggerUI.ViewModels
                 PrivateKeyAddress = "(No key loaded)";
                 return;
             }
-            var keyPair = DebuggerStore.instance.GetKeyFromString(SelectedPrivateKey);
-            PrivateKeyAddress = keyPair.address;
-            Runtime.invokerKeys = keyPair;
+            PrivateKeyAddress = DebuggerStore.instance.GetKeyAddressFromString(SelectedPrivateKey);
         }
 
         public InvokeWindowViewModel()
@@ -199,11 +195,11 @@ namespace NeoDebuggerUI.ViewModels
 
             if (result != null)
             {
-                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false, new Window());
+                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
             }
             else
             {
-                OpenGenericSampleDialog(errorMessage, "Error", "", false, new Window());
+                OpenGenericSampleDialog(errorMessage, "Error", "", false);
             }
             DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
         }
@@ -240,7 +236,7 @@ namespace NeoDebuggerUI.ViewModels
             {
                 SelectedPrivateKey = InputPrivateKey;
                 InputPrivateKey = "";
-                OpenGenericSampleDialog("This private key is already loaded", "OK", "", false, new Window());
+                OpenGenericSampleDialog("This private key is already loaded", "OK", "", false);
                 return;
             }
 
@@ -253,7 +249,7 @@ namespace NeoDebuggerUI.ViewModels
             }
             else
             {
-                OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false, new Window());
+                OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false);
             }
         }
 
