@@ -16,6 +16,7 @@ namespace NeoDebuggerUI.ViewModels
     public class InvokeWindowViewModel : ViewModelBase
     {
         public IEnumerable<string> TestCases { get => DebuggerStore.instance.Tests.cases.Keys; }
+        public IEnumerable<string> TestSequences { get => DebuggerStore.instance.Tests.sequences.Keys; }
         public IEnumerable<string> FunctionList { get => DebuggerStore.instance.manager.ABI.functions.Select(x => x.Value.name); }
         public List<string> AssetItems { get; } = new List<string>();
 
@@ -41,6 +42,13 @@ namespace NeoDebuggerUI.ViewModels
         {
             get => _timestamp;
             set => this.RaiseAndSetIfChanged(ref _timestamp, value);
+        }
+
+        private string _selectedTestSequence;
+        public string SelectedTestSequence
+        {
+            get => _selectedTestSequence;
+            set => this.RaiseAndSetIfChanged(ref _selectedTestSequence, value);
         }
 
         private string _selectedTestCase;
@@ -149,7 +157,7 @@ namespace NeoDebuggerUI.ViewModels
             if(DebuggerStore.instance.Tests != null && DebuggerStore.instance.Tests.cases.Count > 0) {
                 _selectedTestCase = DebuggerStore.instance.Tests.cases.ElementAt(0).Key;
             }
-            
+            _selectedTestSequence = null;
             _selectedFunction = DebuggerStore.instance.manager.ABI.entryPoint.name;
             _selectedTrigger = DebuggerStore.instance.manager.Emulator.currentTrigger.ToString();
             _selectedWitness = DebuggerStore.instance.manager.Emulator.checkWitnessMode.ToString();
@@ -180,8 +188,15 @@ namespace NeoDebuggerUI.ViewModels
 
         public void Run()
         {
-            DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
-            DebuggerStore.instance.manager.Run();
+            if (SelectedTestSequence == null)
+            {
+                DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
+                DebuggerStore.instance.manager.Run();
+            }
+            else
+            {
+                DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
+            }
             StackItem result = null;
             string errorMessage = null;
             try
