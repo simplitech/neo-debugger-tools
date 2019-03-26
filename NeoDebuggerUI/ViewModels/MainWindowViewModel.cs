@@ -11,6 +11,7 @@ using NeoDebuggerUI.Views;
 using System.Reactive;
 using NeoDebuggerCore.Utils;
 using Neo.Debugger.Core.Utils;
+using Avalonia;
 
 namespace NeoDebuggerUI.ViewModels
 {
@@ -164,7 +165,7 @@ namespace NeoDebuggerUI.ViewModels
 			dialog.Filters = filters;
 			dialog.AllowMultiple = false;
 
-			var result = await dialog.ShowAsync(new Window());
+			var result = await dialog.ShowAsync(Application.Current.MainWindow);
 
 			if (result != null && result.Length > 0)
 			{

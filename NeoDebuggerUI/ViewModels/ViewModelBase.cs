@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Avalonia;
 using NeoDebuggerUI.Views;
 using ReactiveUI;
 
@@ -16,7 +17,7 @@ namespace NeoDebuggerUI.ViewModels
                 .SetOkText(okText)
                 .SetCancelText(cancelText)
                 .ShowCancel(showCancel)
-                .Open();
+                .Open(Application.Current.MainWindow);
 
             var wasOk = clickedOk;
             return wasOk;
