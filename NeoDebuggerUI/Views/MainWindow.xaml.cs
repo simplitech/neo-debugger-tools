@@ -42,6 +42,7 @@ namespace NeoDebuggerUI.Views
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
 
+            SetHotKeys();
         }
 
         public async Task NewCSharpFile()
@@ -175,6 +176,35 @@ namespace NeoDebuggerUI.Views
             var length = end - start + lineOffset;
 
             return lineStr.Substring(start, length);
+        }
+
+        public void SetHotKeys()
+        {
+            var keyBindings = this.KeyBindings;
+            
+            var runKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: F5
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5),
+                Command = this.FindControl<MenuItem>("RunContract").Command
+            };
+            keyBindings.Add(runKeyBinding);
+            
+            var stepKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: F10
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F10),
+                Command = this.FindControl<MenuItem>("StepContract").Command
+            };
+            keyBindings.Add(stepKeyBinding);
+            
+            var stopKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: Shift + F5
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5, Avalonia.Input.InputModifiers.Shift),
+                Command = this.FindControl<MenuItem>("StopContract").Command
+            };
+            keyBindings.Add(stopKeyBinding);
         }
 
         private void InitializeComponent()
