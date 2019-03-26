@@ -245,11 +245,13 @@ namespace NeoDebuggerUI.ViewModels
         public void AddBreakpoint(int line)
         {
             DebuggerStore.instance.manager.AddBreakpoint(line - 1, SelectedFile);
+            EvtBreakpointStateChanged?.Invoke(line, true);
         }
 
         public void RemoveBreakpoint(int line)
         {
             DebuggerStore.instance.manager.RemoveBreakpoint(line - 1, SelectedFile);
+            EvtBreakpointStateChanged?.Invoke(line, false);
         }
 
         public void SetBreakpoint(int line)
@@ -258,35 +260,35 @@ namespace NeoDebuggerUI.ViewModels
             {
                 // remove breakpoint
                 RemoveBreakpoint(line);
-                EvtBreakpointStateChanged?.Invoke(line, false);
-                return;
             }
-
-            if (DebuggerStore.instance.manager.Map != null)
+            else
             {
-                var entries = DebuggerStore.instance.manager.Map.Entries.Select(x => x.line);
-                if (entries.Contains(line))
+                if (DebuggerStore.instance.manager.Map != null)
                 {
-                    // add breakpoint in line
-                    AddBreakpoint(line);
-                    EvtBreakpointStateChanged?.Invoke(line, true);
-                    return;
-                }
-
-                try
-                {
-                    // add breakpoint in the next possible line
-                    var nextLine = entries.Where(x => x > line).Min();
-                    if (!Breakpoints.Contains(nextLine))
+                    var entries = DebuggerStore.instance.manager.Map.Entries.Select(x => x.line);
+                    if (entries.Contains(line))
                     {
-                        AddBreakpoint(nextLine);
-                        EvtBreakpointStateChanged?.Invoke(nextLine, true);
-                        return;
+                        // add breakpoint in line
+                        AddBreakpoint(line);
                     }
-                }
-                catch
-                {
-                    // entries list is empty - breakpoint won't be added
+                    else
+                    {
+                        try
+                        {
+                            // add breakpoint in the next possible line
+                            var nextLine = entries.Where(x => x > line).Min();
+                            if (!Breakpoints.Contains(nextLine))
+                            {
+                                AddBreakpoint(nextLine);
+                            }
+                        }
+                        catch (InvalidOperationException e)
+                        {
+                            // Min() method throws an Invalid Operation Exception cause Where() method returns an empty enumerable
+                            // entries list is empty - breakpoint won't be added
+                            Console.WriteLine(e.Message + '\n' + e.StackTrace);
+                        }
+                    }
                 }
             }
         }
