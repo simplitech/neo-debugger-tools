@@ -344,6 +344,24 @@ namespace NeoDebuggerUI.ViewModels
             EvtVMStackChanged?.Invoke(EvaluationStack, AltStack, StackIndex);
         }
 
+        public async Task LoadBlockchain()
+        {
+            var dialog = new OpenFileDialog();
+            var filters = new List<FileDialogFilter>();
+            var filteredExtensions = new List<string>(new string[] { "chain.json" });
+            var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "Virtual blockchain files" };
+            filters.Add(filter);
+            dialog.Filters = filters;
+            dialog.AllowMultiple = false;
+
+            var result = await dialog.ShowAsync();
+
+            if (result != null && result.Length > 0)
+            {
+                DebuggerStore.instance.manager.Blockchain.Load(result[0]);
+            }
+        }
+
         public async void ResetBlockchain()
         {
             if(!DebuggerStore.instance.manager.BlockchainLoaded)

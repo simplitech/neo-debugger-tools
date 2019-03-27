@@ -89,7 +89,7 @@
       </MenuItem>
       <MenuItem Header="Blockchain">
         <MenuItem Header="View" IsEnabled="false"/>
-        <MenuItem Header="Load" />
+        <MenuItem Header="Load" Command="{Binding LoadBlockchain}" />
         <MenuItem Header="Reset" Command="{Binding ResetBlockchain}"/>
       </MenuItem>
       <MenuItem Header="Tools">
