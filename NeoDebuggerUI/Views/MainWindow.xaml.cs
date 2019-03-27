@@ -43,7 +43,6 @@ namespace NeoDebuggerUI.Views
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
             newCSharp.Click += async (o, e) => { await NewCSharpFile(); };
 
-<<<<<<< HEAD
             MenuItem newPython = this.FindControl<MenuItem>("MenuItemNewPython");
             newPython.Click += async (o, e) => { await NewPythonFile(); };
 
@@ -51,9 +50,7 @@ namespace NeoDebuggerUI.Views
             newNEP5.Click += async (o, e) => { await NewPythonFile(); };
 
 
-=======
-            this.ViewModel.EvtVMStackChanged += (eval, alt, index) => RenderVMStack(eval, alt, index);
->>>>>>> 0f4bb1334a0fc8131bca0e7eeeb67ef597a7dc45
+            
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
             this.Activated += (o, e) => { ReloadCurrentFile(); };
@@ -201,15 +198,9 @@ namespace NeoDebuggerUI.Views
             Grid.SetColumn(altHeader, 2);
             grid.Children.Add(altHeader);
 
-<<<<<<< HEAD
             for (int i = 0; i <= index; i++)
             {
                 RenderLine(grid, i + 1, index - i, evalStack[i], altStack[i]);
-=======
-            for (int i = 0; i <= index; i++)
-            {
-                RenderLine(grid, i + 1, index - i, evalStack[i], altStack[i]);
->>>>>>> 0f4bb1334a0fc8131bca0e7eeeb67ef597a7dc45
             }
         }
 
@@ -292,50 +283,8 @@ namespace NeoDebuggerUI.Views
             var length = end - start + lineOffset;
 
             return lineStr.Substring(start, length);
-<<<<<<< HEAD
+
         }
-
-=======
-        }
-
-        public void SetHotKeys()
-        {
-            var keyBindings = this.KeyBindings;
-
-            var runControl = this.FindControl<MenuItem>("RunContract");
-            var runKeyBinding = new Avalonia.Input.KeyBinding()
-            {
-                // hotkey: F5
-                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5),
-                Command = runControl.Command,
-                CommandParameter = runControl.CommandParameter
-            };
-            keyBindings.Add(runKeyBinding);
-
-            var stepControl = this.FindControl<MenuItem>("StepContract");
-            var stepKeyBinding = new Avalonia.Input.KeyBinding()
-            {
-                // hotkey: F10
-                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F10),
-                Command = stepControl.Command,
-                CommandParameter = stepControl.CommandParameter
-            };
-            keyBindings.Add(stepKeyBinding);
-
-            var stopKeyBinding = new Avalonia.Input.KeyBinding()
-            {
-                // hotkey: Shift + F5
-                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5, Avalonia.Input.InputModifiers.Shift),
-                Command = this.FindControl<MenuItem>("StopContract").Command
-            };
-            keyBindings.Add(stopKeyBinding);
-        }
-
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
->>>>>>> 0f4bb1334a0fc8131bca0e7eeeb67ef597a7dc45
 
     }
 }
