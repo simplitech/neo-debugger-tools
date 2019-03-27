@@ -183,6 +183,30 @@ namespace NeoDebuggerUI.ViewModels
             }
         }
 
+        public string GetVariableInformation(string text)
+        {
+            if (text == null)
+            {
+                return null;
+            }
+
+            var variable = DebuggerStore.instance.manager.Emulator.GetVariable(text);
+            if (variable == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return text + " = " + Neo.Emulation.Utils.FormattingUtils.StackItemAsString(variable.value, true, variable.type);
+            }
+            catch
+            {
+                // if some class of the vm throws an exception while trying to get the value of the variable
+                return text + " = Exception";
+            }
+        }
+
         public async Task Open()
 		{
 			var dialog = new OpenFileDialog();
