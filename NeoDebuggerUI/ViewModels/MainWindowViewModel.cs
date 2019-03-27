@@ -236,10 +236,10 @@ namespace NeoDebuggerUI.ViewModels
 			}
 		}
 
-		public async Task OpenRunDialog()
+		public async Task OpenRunDialog(bool stepping)
 		{
             CompileCurrentFile();
-            var modalWindow = new InvokeWindow();
+            var modalWindow = new InvokeWindow(stepping);
 
             if (!IsSteppingOrOnBreakpoint)
             {
@@ -309,7 +309,7 @@ namespace NeoDebuggerUI.ViewModels
             }
         }
 
-        public async void StopDebugging()
+        public void StopDebugging()
         {
             if (IsSteppingOrOnBreakpoint)
             {
@@ -318,7 +318,7 @@ namespace NeoDebuggerUI.ViewModels
 
                 // not using getter because the property are updated on another thread and won't update the ui
                 IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
-                await OpenGenericSampleDialog("Debug was stopped", "OK", "", false);
+                EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.CurrentLine + 1);
             }
         }
 

@@ -43,6 +43,7 @@ namespace NeoDebuggerUI.Views
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
             newCSharp.Click += async (o, e) => { await NewCSharpFile(); };
 
+<<<<<<< HEAD
             MenuItem newPython = this.FindControl<MenuItem>("MenuItemNewPython");
             newPython.Click += async (o, e) => { await NewPythonFile(); };
 
@@ -50,6 +51,9 @@ namespace NeoDebuggerUI.Views
             newNEP5.Click += async (o, e) => { await NewPythonFile(); };
 
 
+=======
+            this.ViewModel.EvtVMStackChanged += (eval, alt, index) => RenderVMStack(eval, alt, index);
+>>>>>>> 0f4bb1334a0fc8131bca0e7eeeb67ef597a7dc45
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
             this.Activated += (o, e) => { ReloadCurrentFile(); };
@@ -117,7 +121,8 @@ namespace NeoDebuggerUI.Views
         public void UpdateBreakpoint(bool addBreakpoint, int line)
         {
             // update ui
-            _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints);
+            _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints, line);
+
             // fix gui bug when inserting breakpoint in the same line of the caret
             var offset = _textEditor.Document.GetOffset(line, 0);
             _textEditor.CaretOffset = offset - 1;
@@ -129,26 +134,26 @@ namespace NeoDebuggerUI.Views
             {
                 // highlight the line when stopped on a breakpoint
                 var currentDocumentLine = _textEditor.Document.GetLineByNumber(currentLine);
-                
+
                 var lineText = _textEditor.Document.GetText(currentDocumentLine.Offset, currentDocumentLine.Length);
                 var offset = Regex.Match(lineText, @"\S").Index;
                 var regex = Regex.Match(lineText, @"(?<=^\s*)(\S|\S\s)+(?=\s*$)").Value;
 
-                _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints, currentLine, offset, regex.Length);
+                _breakpointMargin.UpdateBreakpointView(ViewModel.Breakpoints, currentLine, offset, regex.Length);
 
                 // change selection to fix gui bug to update
-                _textEditor.SelectionStart = currentDocumentLine.Offset - 1;
+                _textEditor.SelectionStart = currentDocumentLine.NextLine.Offset;
                 _textEditor.SelectionLength = 1; // there must be a selection to update textview
 
             }
             else
             {
                 // clear highlight of the last stopped line 
-                _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints);
+                _breakpointMargin.UpdateBreakpointView(ViewModel.Breakpoints, 0);
 
                 // change selection to fix gui bug to update
-                _textEditor.SelectionStart = _textEditor.CaretOffset;
-                _textEditor.SelectionLength = 1; // there must be a selection to update textview
+                _textEditor.SelectionStart = _textEditor.CaretOffset < 1 ? _textEditor.CaretOffset - 1 : _textEditor.CaretOffset + 1;
+                // there must be a modification to update textview
             }
             _textEditor.IsReadOnly = isOnBreakpoint;
         }
@@ -181,6 +186,7 @@ namespace NeoDebuggerUI.Views
                 FontWeight = FontWeight.Bold,
                 Margin = Thickness.Parse("0, 0, 5, 0")
             };
+
             Grid.SetRow(indexHeader, 0);
             Grid.SetColumn(indexHeader, 0);
             grid.Children.Add(indexHeader);
@@ -195,9 +201,15 @@ namespace NeoDebuggerUI.Views
             Grid.SetColumn(altHeader, 2);
             grid.Children.Add(altHeader);
 
+<<<<<<< HEAD
             for (int i = 0; i <= index; i++)
             {
                 RenderLine(grid, i + 1, index - i, evalStack[i], altStack[i]);
+=======
+            for (int i = 0; i <= index; i++)
+            {
+                RenderLine(grid, i + 1, index - i, evalStack[i], altStack[i]);
+>>>>>>> 0f4bb1334a0fc8131bca0e7eeeb67ef597a7dc45
             }
         }
 
@@ -280,8 +292,50 @@ namespace NeoDebuggerUI.Views
             var length = end - start + lineOffset;
 
             return lineStr.Substring(start, length);
+<<<<<<< HEAD
         }
 
+=======
+        }
+
+        public void SetHotKeys()
+        {
+            var keyBindings = this.KeyBindings;
+
+            var runControl = this.FindControl<MenuItem>("RunContract");
+            var runKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: F5
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5),
+                Command = runControl.Command,
+                CommandParameter = runControl.CommandParameter
+            };
+            keyBindings.Add(runKeyBinding);
+
+            var stepControl = this.FindControl<MenuItem>("StepContract");
+            var stepKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: F10
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F10),
+                Command = stepControl.Command,
+                CommandParameter = stepControl.CommandParameter
+            };
+            keyBindings.Add(stepKeyBinding);
+
+            var stopKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: Shift + F5
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5, Avalonia.Input.InputModifiers.Shift),
+                Command = this.FindControl<MenuItem>("StopContract").Command
+            };
+            keyBindings.Add(stopKeyBinding);
+        }
+
+        private void InitializeComponent()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
+>>>>>>> 0f4bb1334a0fc8131bca0e7eeeb67ef597a7dc45
 
     }
 }
