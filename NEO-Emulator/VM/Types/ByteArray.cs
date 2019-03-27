@@ -19,6 +19,11 @@ namespace Neo_Emulator.VM.Types
             return value.SequenceEqual(other.GetByteArray());
         }
 
+        public override bool GetBoolean()
+        {
+            return value != null && value[0] != 0;
+        }
+
         public override byte[] GetByteArray()
         {
             return value;
