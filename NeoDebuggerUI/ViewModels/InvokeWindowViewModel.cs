@@ -208,12 +208,7 @@ namespace NeoDebuggerUI.ViewModels
             }
             
             //Check if the Run or RunSequence has ended the debugging
-            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
-            {
-                Console.WriteLine($"Debugger passed through the line {DebuggerStore.instance.manager.CurrentLine + 1}");
-                //ui - highlight line
-            }
-            else
+            if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
                 StackItem result = null;
                 string errorMessage = null;
