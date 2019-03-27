@@ -39,7 +39,8 @@ namespace Neo.Emulation.API
 
         private static Transaction GetTransactionFromStack(ExecutionEngine engine)
         {
-            var obj = engine.EvaluationStack.Pop() as VM.Types.InteropInterface;
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop() as VM.Types.InteropInterface;
             if (obj == null)
             {
                 return null;
@@ -54,13 +55,14 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Transaction.GetHash")]
         public static bool GetHash(ExecutionEngine engine)
         {
+            var context = engine.CurrentContext;
             var tx = GetTransactionFromStack(engine);
 
             if (tx== null) {
                 return false;
             }
 
-            engine.EvaluationStack.Push(tx.hash);
+            context.EvaluationStack.Push(tx.hash);
 
             return true;
         }
@@ -69,6 +71,7 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Transaction.GetType")]
         public static bool GetType(ExecutionEngine engine)
         {
+            var context = engine.CurrentContext;
             var tx = GetTransactionFromStack(engine);
 
             if (tx == null) {
@@ -78,7 +81,7 @@ namespace Neo.Emulation.API
             // The type is fixed, at least for now?
             // Also, is passing a byte array here the proper format? Or should be a BigInteger?
             byte[] result = new byte[] { (byte)TransactionType.ContractTransaction };
-            engine.EvaluationStack.Push(result);
+            context.EvaluationStack.Push(result);
 
             throw new NotImplementedException();
         }
@@ -94,6 +97,7 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Transaction.GetInputs")]
         public static bool GetInputs(ExecutionEngine engine)
         {
+            var context = engine.CurrentContext;
             var tx = GetTransactionFromStack(engine);
 
             if (tx == null)
@@ -105,12 +109,12 @@ namespace Neo.Emulation.API
 
             foreach (var entry in tx.inputs)
             {
-                transactions.Add(new VM.Types.InteropInterface(entry));
+                transactions.Add(new VM.Types.InteropInterface<TransactionInput>(entry));
             }
 
             var inputs = new VM.Types.Array(transactions.ToArray<StackItem>());
 
-            engine.EvaluationStack.Push(inputs);
+            context.EvaluationStack.Push(inputs);
 
             return true;
         }
@@ -118,6 +122,7 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Transaction.GetOutputs")]
         public static bool GetOutputs(ExecutionEngine engine)
         {
+            var context = engine.CurrentContext;
             var tx = GetTransactionFromStack(engine);
 
             if (tx == null)
@@ -129,12 +134,12 @@ namespace Neo.Emulation.API
 
             foreach (var entry in tx.outputs)
             {
-                transactions.Add(new VM.Types.InteropInterface(entry));
+                transactions.Add(new VM.Types.InteropInterface<TransactionOutput>(entry));
             }
 
             var outputs = new VM.Types.Array(transactions.ToArray<StackItem>());
 
-            engine.EvaluationStack.Push(outputs);
+            context.EvaluationStack.Push(outputs);
 
             return true;
         }
@@ -143,6 +148,7 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Transaction.GetReferences", 0.2)]
         public static bool GetReferences(ExecutionEngine engine)
         {
+            var context = engine.CurrentContext;
             var tx = GetTransactionFromStack(engine);
 
             if (tx == null)
@@ -154,12 +160,12 @@ namespace Neo.Emulation.API
 
             foreach (var entry in tx.outputs)
             {
-                transactions.Add(new VM.Types.InteropInterface(entry));
+                transactions.Add(new VM.Types.InteropInterface<TransactionOutput>(entry));
             }
 
             var outputs = new VM.Types.Array(transactions.ToArray<StackItem>());
 
-            engine.EvaluationStack.Push(outputs);
+            context.EvaluationStack.Push(outputs);
 
             return true;
         }

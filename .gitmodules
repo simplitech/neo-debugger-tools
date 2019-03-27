@@ -1,3 +1,9 @@
 [submodule "neo-lux"]
 	path = neo-lux
 	url = https://github.com/CityOfZion/neo-lux.git
+[submodule "neo-vm"]
+	path = neo-official-vm
+	url = https://github.com/neo-project/neo-vm.git
+[submodule "neo-official-vm"]
+	path = neo-official-vm
+	url = https://github.com/neo-project/neo-vm.git

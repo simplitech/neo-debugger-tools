@@ -21,8 +21,8 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Header.GetHash")]
         public static bool GetHash(ExecutionEngine engine)
         {
-
-            var obj = engine.EvaluationStack.Pop() as VM.Types.InteropInterface;
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop() as VM.Types.InteropInterface;
 
             if (obj == null)
             {
@@ -31,7 +31,7 @@ namespace Neo.Emulation.API
 
             var header = obj.GetInterface<Header>();
 
-            engine.EvaluationStack.Push(header.hash.ToArray());
+            context.EvaluationStack.Push(header.hash.ToArray());
             return true;
         }
 
@@ -62,7 +62,8 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Header.GetTimestamp")]
         public static bool GetTimestamp(ExecutionEngine engine)
         {
-            var obj = engine.EvaluationStack.Pop() as VM.Types.InteropInterface;
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop() as VM.Types.InteropInterface;
 
             if (obj == null)
             {
@@ -71,14 +72,15 @@ namespace Neo.Emulation.API
 
             var header = obj.GetInterface<Header>();
 
-            engine.EvaluationStack.Push(header.timestamp);
+            context.EvaluationStack.Push(header.timestamp);
             return true;
         }
 
         [Syscall("Neo.Header.GetConsensusData")]
         public static bool GetConsensusData(ExecutionEngine engine)
         {
-			var obj = engine.EvaluationStack.Pop() as VM.Types.InteropInterface;
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop() as VM.Types.InteropInterface;
 
 			if (obj == null)
 			{
@@ -86,7 +88,7 @@ namespace Neo.Emulation.API
 			}
 
 			var header = obj.GetInterface<Header>();
-			engine.EvaluationStack.Push(header.consensusData);
+			context.EvaluationStack.Push(header.consensusData);
 			// Header
 			//returns ulong 
 			return true;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Neo.VM
+namespace Neo_Emulator.VM
 {
     [Flags]
     public enum VMState : byte

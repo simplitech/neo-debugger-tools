@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using System.Numerics;
+using Neo.VM;
 
-namespace Neo.VM.Types
+namespace Neo_Emulator.VM.Types
 {
     public class Boolean : StackItem
     {
