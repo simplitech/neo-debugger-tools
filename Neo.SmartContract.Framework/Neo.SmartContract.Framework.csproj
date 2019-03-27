@@ -34,7 +34,6 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\neo-vm\src\neo-vm\neo-vm.csproj" />
+    <ProjectReference Include="..\neo-official-vm\src\neo-vm\neo-vm.csproj" />
   </ItemGroup>
-
 </Project>

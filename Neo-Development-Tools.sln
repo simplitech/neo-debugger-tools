@@ -34,7 +34,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neo-Compiler-Lib", "Neo-Com
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neo.Lux", "neo-lux\Neo.Lux\Neo.Lux.csproj", "{093B45CE-A803-4E10-838F-691216997CAD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "neo-vm", "neo-vm\src\neo-vm\neo-vm.csproj", "{99B36112-4AC6-406D-9349-42480F84603E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "neo-vm", "neo-official-vm\src\neo-vm\neo-vm.csproj", "{0B8FF51A-0A79-489C-BA61-9319E3CEB48A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,10 +106,10 @@ Global
 		{093B45CE-A803-4E10-838F-691216997CAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{093B45CE-A803-4E10-838F-691216997CAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{093B45CE-A803-4E10-838F-691216997CAD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{99B36112-4AC6-406D-9349-42480F84603E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{99B36112-4AC6-406D-9349-42480F84603E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{99B36112-4AC6-406D-9349-42480F84603E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{99B36112-4AC6-406D-9349-42480F84603E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B8FF51A-0A79-489C-BA61-9319E3CEB48A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B8FF51A-0A79-489C-BA61-9319E3CEB48A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B8FF51A-0A79-489C-BA61-9319E3CEB48A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B8FF51A-0A79-489C-BA61-9319E3CEB48A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
