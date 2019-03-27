@@ -44,7 +44,7 @@ namespace NeoDebuggerUI.Views
             newCSharp.Click += async (o, e) => { await NewCSharpFile(); };
             RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex);
 
-            this.ViewModel.EvtVMStackChanged += (eval,alt,index) => RenderVMStack(eval, alt, index);
+            this.ViewModel.EvtVMStackChanged += (eval, alt, index) => RenderVMStack(eval, alt, index);
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
             this.ViewModel.EvtDebugCurrentLineChanged += (isOnBreakpoint, line) => HighlightOnBreakpoint(isOnBreakpoint, line);
@@ -93,7 +93,8 @@ namespace NeoDebuggerUI.Views
         public void UpdateBreakpoint(bool addBreakpoint, int line)
         {
             // update ui
-            _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints);
+            _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints, line);
+
             // fix gui bug when inserting breakpoint in the same line of the caret
             var offset = _textEditor.Document.GetOffset(line, 0);
             _textEditor.CaretOffset = offset - 1;
@@ -105,26 +106,26 @@ namespace NeoDebuggerUI.Views
             {
                 // highlight the line when stopped on a breakpoint
                 var currentDocumentLine = _textEditor.Document.GetLineByNumber(currentLine);
-                
+
                 var lineText = _textEditor.Document.GetText(currentDocumentLine.Offset, currentDocumentLine.Length);
                 var offset = Regex.Match(lineText, @"\S").Index;
                 var regex = Regex.Match(lineText, @"(?<=^\s*)(\S|\S\s)+(?=\s*$)").Value;
 
-                _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints, currentLine, offset, regex.Length);
+                _breakpointMargin.UpdateBreakpointView(ViewModel.Breakpoints, currentLine, offset, regex.Length);
 
                 // change selection to fix gui bug to update
-                _textEditor.SelectionStart = currentDocumentLine.Offset - 1;
+                _textEditor.SelectionStart = currentDocumentLine.NextLine.Offset;
                 _textEditor.SelectionLength = 1; // there must be a selection to update textview
 
             }
             else
             {
                 // clear highlight of the last stopped line 
-                _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints);
+                _breakpointMargin.UpdateBreakpointView(ViewModel.Breakpoints, 0);
 
                 // change selection to fix gui bug to update
-                _textEditor.SelectionStart = _textEditor.CaretOffset;
-                _textEditor.SelectionLength = 1; // there must be a selection to update textview
+                _textEditor.SelectionStart = _textEditor.CaretOffset < 1 ? _textEditor.CaretOffset - 1 : _textEditor.CaretOffset + 1;
+                // there must be a modification to update textview
             }
             _textEditor.IsReadOnly = isOnBreakpoint;
         }
@@ -138,9 +139,7 @@ namespace NeoDebuggerUI.Views
             var rowHeader = new RowDefinition { Height = new GridLength(20) };
             grid.RowDefinitions.Add(rowHeader);
 
-            var indexHeader = new TextBlock { Text = "Index", FontWeight = FontWeight.Bold,
-                Margin = Thickness.Parse("0, 0, 5, 0")
-            };
+            var indexHeader = new TextBlock { Text = "Index", FontWeight = FontWeight.Bold, Margin = Thickness.Parse("0, 0, 5, 0") };
             Grid.SetRow(indexHeader, 0);
             Grid.SetColumn(indexHeader, 0);
             grid.Children.Add(indexHeader);
@@ -155,7 +154,7 @@ namespace NeoDebuggerUI.Views
             Grid.SetColumn(altHeader, 2);
             grid.Children.Add(altHeader);
 
-            for(int i = 0; i <= index; i++)
+            for (int i = 0; i <= index; i++)
             {
                 RenderLine(grid, i + 1, index - i, evalStack[i], altStack[i]);
             }
@@ -244,23 +243,27 @@ namespace NeoDebuggerUI.Views
         public void SetHotKeys()
         {
             var keyBindings = this.KeyBindings;
-            
+
+            var runControl = this.FindControl<MenuItem>("RunContract");
             var runKeyBinding = new Avalonia.Input.KeyBinding()
             {
                 // hotkey: F5
                 Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5),
-                Command = this.FindControl<MenuItem>("RunContract").Command
+                Command = runControl.Command,
+                CommandParameter = runControl.CommandParameter
             };
             keyBindings.Add(runKeyBinding);
-            
+
+            var stepControl = this.FindControl<MenuItem>("StepContract");
             var stepKeyBinding = new Avalonia.Input.KeyBinding()
             {
                 // hotkey: F10
                 Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F10),
-                Command = this.FindControl<MenuItem>("StepContract").Command
+                Command = stepControl.Command,
+                CommandParameter = stepControl.CommandParameter
             };
             keyBindings.Add(stepKeyBinding);
-            
+
             var stopKeyBinding = new Avalonia.Input.KeyBinding()
             {
                 // hotkey: Shift + F5
