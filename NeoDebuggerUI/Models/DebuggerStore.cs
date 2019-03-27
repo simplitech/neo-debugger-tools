@@ -4,7 +4,6 @@ using System.IO;
 using System.Reactive.Linq;
 using Neo.Debugger.Core.Models;
 using Neo.Debugger.Core.Utils;
-using Neo.Lux.Cryptography;
 using NEO_Emulator.SmartContractTestSuite;
 using ReactiveUI;
 
@@ -45,14 +44,9 @@ namespace NeoDebuggerUI.Models
             }
         }
 
-        public KeyPair GetKeyFromString(string privateKey)
-        {
-            return DebuggerUtils.GetKeyFromString(privateKey);
-        }
-
         public string GetKeyAddressFromString(string privateKey)
         {
-            var key = GetKeyFromString(privateKey);
+            var key = DebuggerUtils.GetKeyFromString(privateKey);
             return key?.address;
         }
 

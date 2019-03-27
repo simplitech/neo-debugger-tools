@@ -8,16 +8,15 @@ using System;
 using System.Threading.Tasks;
 using Neo.VM;
 using System.Collections.Generic;
-using Avalonia.Controls;
 using System.Collections.ObjectModel;
 using Neo.Emulation.API;
-
 
 namespace NeoDebuggerUI.ViewModels
 {
     public class InvokeWindowViewModel : ViewModelBase
     {
         public IEnumerable<string> TestCases { get => DebuggerStore.instance.Tests.cases.Keys; }
+        public IEnumerable<string> TestSequences { get => DebuggerStore.instance.Tests.sequences.Keys; }
         public IEnumerable<string> FunctionList { get => DebuggerStore.instance.manager.ABI.functions.Select(x => x.Value.name); }
         public List<string> AssetItems { get; } = new List<string>();
 
@@ -43,6 +42,13 @@ namespace NeoDebuggerUI.ViewModels
         {
             get => _timestamp;
             set => this.RaiseAndSetIfChanged(ref _timestamp, value);
+        }
+
+        private string _selectedTestSequence;
+        public string SelectedTestSequence
+        {
+            get => _selectedTestSequence;
+            set => this.RaiseAndSetIfChanged(ref _selectedTestSequence, value);
         }
 
         private string _selectedTestCase;
@@ -143,9 +149,7 @@ namespace NeoDebuggerUI.ViewModels
                 PrivateKeyAddress = "(No key loaded)";
                 return;
             }
-            var keyPair = DebuggerStore.instance.GetKeyFromString(SelectedPrivateKey);
-            PrivateKeyAddress = keyPair.address;
-            Runtime.invokerKeys = keyPair;
+            PrivateKeyAddress = DebuggerStore.instance.GetKeyAddressFromString(SelectedPrivateKey);
         }
 
         public InvokeWindowViewModel()
@@ -153,7 +157,7 @@ namespace NeoDebuggerUI.ViewModels
             if(DebuggerStore.instance.Tests != null && DebuggerStore.instance.Tests.cases.Count > 0) {
                 _selectedTestCase = DebuggerStore.instance.Tests.cases.ElementAt(0).Key;
             }
-            
+            _selectedTestSequence = null;
             _selectedFunction = DebuggerStore.instance.manager.ABI.entryPoint.name;
             _selectedTrigger = DebuggerStore.instance.manager.Emulator.currentTrigger.ToString();
             _selectedWitness = DebuggerStore.instance.manager.Emulator.checkWitnessMode.ToString();
@@ -184,8 +188,15 @@ namespace NeoDebuggerUI.ViewModels
 
         public void Run()
         {
-            DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
-            DebuggerStore.instance.manager.Run();
+            if (SelectedTestSequence == null)
+            {
+                DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
+                DebuggerStore.instance.manager.Run();
+            }
+            else
+            {
+                DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
+            }
             StackItem result = null;
             string errorMessage = null;
             try
@@ -199,11 +210,11 @@ namespace NeoDebuggerUI.ViewModels
 
             if (result != null)
             {
-                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false, new Window());
+                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
             }
             else
             {
-                OpenGenericSampleDialog(errorMessage, "Error", "", false, new Window());
+                OpenGenericSampleDialog(errorMessage, "Error", "", false);
             }
             DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
         }
@@ -240,7 +251,7 @@ namespace NeoDebuggerUI.ViewModels
             {
                 SelectedPrivateKey = InputPrivateKey;
                 InputPrivateKey = "";
-                OpenGenericSampleDialog("This private key is already loaded", "OK", "", false, new Window());
+                OpenGenericSampleDialog("This private key is already loaded", "OK", "", false);
                 return;
             }
 
@@ -253,7 +264,7 @@ namespace NeoDebuggerUI.ViewModels
             }
             else
             {
-                OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false, new Window());
+                OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false);
             }
         }
 

@@ -96,7 +96,7 @@
       <MenuItem Header="Blockchain">
         <MenuItem Header="View" Command="{Binding OpenGenericSampleDialog}" />
         <MenuItem Header="Load" />
-        <MenuItem Header="Reset" />
+        <MenuItem Header="Reset" Command="{Binding ResetBlockchain}"/>
       </MenuItem>
       <MenuItem Header="Tools">
         <MenuItem Header="Compile" />

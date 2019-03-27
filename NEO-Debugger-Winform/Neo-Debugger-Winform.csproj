@@ -50,9 +50,6 @@
     <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=2.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.2.10.0\lib\netstandard1.3\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Neo.Lux, Version=0.8.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NeoLux.0.8.2\lib\net461\Neo.Lux.dll</HintPath>
-    </Reference>
     <Reference Include="ScintillaNET, Version=3.6.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\jacobslusser.ScintillaNET.3.6.3\lib\net40\ScintillaNET.dll</HintPath>
     </Reference>
@@ -208,6 +205,10 @@
     <ProjectReference Include="..\Neo-Emulator\Neo-Emulator.csproj">
       <Project>{ECFD546B-9CA5-4FEF-8289-3ED9BD26F806}</Project>
       <Name>Neo-Emulator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\neo-lux\Neo.Lux\Neo.Lux.csproj">
+      <Project>{093b45ce-a803-4e10-838f-691216997cad}</Project>
+      <Name>Neo.Lux</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

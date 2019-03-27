@@ -117,11 +117,14 @@ namespace NeoDebuggerUI.Views
                 var op = ExtractValueFromGrid(1, 1);
                 var args = ExtractValueFromGrid(2, 1);
 
-                if(!SetTransactionInfo())
+                if (!UseTestSequence())
                 {
-                    return;
+                    if (!SetTransactionInfo())
+                    {
+                        return;
+                    }
+                    SetOptions();
                 }
-                SetOptions();
                 DebugPressed(op, args);
                 Close();
             };
@@ -191,7 +194,7 @@ namespace NeoDebuggerUI.Views
                         }
                         else
                         {
-                            ViewModel.OpenGenericSampleDialog(entry.name + " amount must be greater than zero", "OK", "", false, new Window());
+                            ViewModel.OpenGenericSampleDialog(entry.name + " amount must be greater than zero", "OK", "", false);
                             return false;
                         }
 
@@ -210,6 +213,20 @@ namespace NeoDebuggerUI.Views
             ViewModel.DebugParams.PrivateKey = privateKey;
 
             return true;
+        }
+
+        public bool UseTestSequence()
+        {
+            var selectedTab = this.FindControl<TabControl>("TabPages").SelectedItem;
+            var testSequencesTab = this.FindControl<TabItem>("TestSequencesTab");
+
+            if(selectedTab == testSequencesTab)
+            {
+                return ViewModel.SelectedTestSequence != null;
+            }
+
+            ViewModel.SelectedTestSequence = null;
+            return false;
         }
     }
 }

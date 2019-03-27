@@ -1,0 +1,3 @@
+[submodule "neo-lux"]
+	path = neo-lux
+	url = https://github.com/CityOfZion/neo-lux.git

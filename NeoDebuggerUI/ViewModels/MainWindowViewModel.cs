@@ -11,6 +11,7 @@ using NeoDebuggerUI.Views;
 using System.Reactive;
 using NeoDebuggerCore.Utils;
 using Neo.Debugger.Core.Utils;
+using Avalonia;
 
 namespace NeoDebuggerUI.ViewModels
 {
@@ -164,7 +165,7 @@ namespace NeoDebuggerUI.ViewModels
 			dialog.Filters = filters;
 			dialog.AllowMultiple = false;
 
-			var result = await dialog.ShowAsync(new Window());
+			var result = await dialog.ShowAsync(Application.Current.MainWindow);
 
 			if (result != null && result.Length > 0)
 			{
@@ -180,6 +181,29 @@ namespace NeoDebuggerUI.ViewModels
 			await Task.Run(()=> task.Wait());
 
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
+        }
+
+        public async void ResetBlockchain()
+        {
+            if(!DebuggerStore.instance.manager.BlockchainLoaded)
+            {
+                OpenGenericSampleDialog("No blockchain loaded yet!", "Ok", "", false);
+                return;
+            }
+
+            if (DebuggerStore.instance.manager.Blockchain.currentHeight > 1)
+            {
+                if(!(await OpenGenericSampleDialog("The current loaded Blockchain already has some transactions.\n" +
+                    "This action can not be reversed, are you sure you want to reset it?", "Yes", "No", true)))
+                {
+                    return;
+                }
+            }
+
+            DebuggerStore.instance.manager.Blockchain.Reset();
+            DebuggerStore.instance.manager.Blockchain.Save();
+
+            SendLogToPanel("Reset to virtual blockchain at path: " + DebuggerStore.instance.manager.Blockchain.fileName);
         }
     }
 }
