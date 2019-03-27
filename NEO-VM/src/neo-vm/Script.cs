@@ -80,10 +80,5 @@ namespace Neo.VM
             _scriptHash = hash;
             _value = script;
         }
-
-        public static implicit operator byte[](Script script)
-        {
-            return script._value;
-        }
     }
 }

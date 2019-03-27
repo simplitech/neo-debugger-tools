@@ -1,5 +1,8 @@
-﻿namespace Neo.VM
+﻿using System;
+
+namespace Neo.VM
 {
+    [Flags]
     public enum VMState : byte
     {
         NONE = 0,
