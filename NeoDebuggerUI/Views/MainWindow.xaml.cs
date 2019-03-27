@@ -49,7 +49,6 @@ namespace NeoDebuggerUI.Views
             MenuItem newNEP5 = this.FindControl<MenuItem>("MenuItemNewNEP5");
             newNEP5.Click += async (o, e) => { await NewPythonFile(); };
 
-
             
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
@@ -59,7 +58,43 @@ namespace NeoDebuggerUI.Views
             this.ViewModel.EvtVMStackChanged += (eval, alt, index) => RenderVMStack(eval, alt, index);
             this.ViewModel.EvtDebugCurrentLineChanged += (isOnBreakpoint, line) => HighlightOnBreakpoint(isOnBreakpoint, line);
             this.ViewModel.EvtBreakpointStateChanged += (line, addBreakpoint) => UpdateBreakpoint(addBreakpoint, line);
+
+            SetHotKeys();
         }
+
+        public void SetHotKeys()
+        {
+            var keyBindings = this.KeyBindings;
+
+            var runControl = this.FindControl<MenuItem>("RunContract");
+            var runKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: F5
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5),
+                Command = runControl.Command,
+                CommandParameter = runControl.CommandParameter
+            };
+            keyBindings.Add(runKeyBinding);
+
+            var stepControl = this.FindControl<MenuItem>("StepContract");
+            var stepKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: F10
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F10),
+                Command = stepControl.Command,
+                CommandParameter = stepControl.CommandParameter
+            };
+            keyBindings.Add(stepKeyBinding);
+
+            var stopKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: Shift + F5
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5, Avalonia.Input.InputModifiers.Shift),
+                Command = this.FindControl<MenuItem>("StopContract").Command
+            };
+            keyBindings.Add(stopKeyBinding);
+        }
+
 
         public async Task NewCSharpFile()
         {
