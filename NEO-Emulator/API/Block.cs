@@ -75,20 +75,22 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Block.GetTransactionCount")]
         public bool GetTransactionCount(ExecutionEngine engine)
         {
-            var obj = engine.EvaluationStack.Pop();
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop();
             var block = ((VM.Types.InteropInterface)obj).GetInterface<Block>();
 
             if (block == null)
                 return false;
 
-            engine.EvaluationStack.Push(block._transactions.Count);
+            context.EvaluationStack.Push(block._transactions.Count);
             return true;
         }
 
         [Syscall("Neo.Block.GetTransactions")]
         public bool GetTransactions(ExecutionEngine engine)
         {
-            var obj = engine.EvaluationStack.Pop();
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop();
             var block = ((VM.Types.InteropInterface)obj).GetInterface<Block>();
 
             if (block == null)
@@ -101,7 +103,7 @@ namespace Neo.Emulation.API
             int index = 0;
             foreach (var tx in block.Transactions)
             {
-                txs[index] = new VM.Types.InteropInterface(tx);
+                txs[index] = new VM.Types.InteropInterface<Transaction>(tx);
                 index++;
             }
 
@@ -114,8 +116,9 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Block.GetTransaction")]
         public bool GetTransaction(ExecutionEngine engine)
         {
-            var index = (int)engine.EvaluationStack.Pop().GetBigInteger();
-            var obj = engine.EvaluationStack.Pop();
+            var context = engine.CurrentContext;
+            var index = (int)context.EvaluationStack.Pop().GetBigInteger();
+            var obj = context.EvaluationStack.Pop();
             var block = ((VM.Types.InteropInterface)obj).GetInterface<Block>();
 
             if (block == null)
@@ -127,7 +130,7 @@ namespace Neo.Emulation.API
             }
 
             var tx = block.GetTransactionByIndex(index);
-            engine.EvaluationStack.Push(new VM.Types.InteropInterface(tx));
+            context.EvaluationStack.Push(new VM.Types.InteropInterface<Transaction>(tx));
             return true;
         }
 

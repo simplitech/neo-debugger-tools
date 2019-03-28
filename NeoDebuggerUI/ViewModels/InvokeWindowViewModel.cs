@@ -188,35 +188,54 @@ namespace NeoDebuggerUI.ViewModels
 
         public void Run()
         {
-            if (SelectedTestSequence == null)
+            //If the debug has started already, run with previous parameters
+            if(DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
-                DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
                 DebuggerStore.instance.manager.Run();
             }
             else
             {
-                DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
+                if (SelectedTestSequence == null)
+                {
+                    DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
+                    DebuggerStore.instance.manager.Run();
+                }
+                else
+                {
+                    //Is not stopping on breakpoint when run a test sequence
+                    DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
+                }
             }
-            StackItem result = null;
-            string errorMessage = null;
-            try
+            
+            //Check if the Run or RunSequence has ended the debugging
+            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
-                result = DebuggerStore.instance.manager.Emulator.GetOutput();
-            }
-            catch(Exception ex)
-            {
-                errorMessage = ex.Message;
-            }
-
-            if (result != null)
-            {
-                OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
+                Console.WriteLine($"Debugger passed through the line {DebuggerStore.instance.manager.CurrentLine + 1}");
+                //ui - highlight line
             }
             else
             {
-                OpenGenericSampleDialog(errorMessage, "Error", "", false);
+                StackItem result = null;
+                string errorMessage = null;
+                try
+                {
+                    result = DebuggerStore.instance.manager.Emulator.GetOutput();
+                }
+                catch (Exception ex)
+                {
+                    errorMessage = ex.Message;
+                }
+
+                if (result != null)
+                {
+                    OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
+                }
+                else
+                {
+                    OpenGenericSampleDialog(errorMessage, "Error", "", false);
+                }
+                DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
             }
-            DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
         }
 
         public void LoadPrivateKeys()

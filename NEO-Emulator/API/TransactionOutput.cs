@@ -64,7 +64,8 @@ namespace Neo.Emulation.API
         [Syscall("Neo.Output.GetAssetId")]
         public static bool GetAssetId(ExecutionEngine engine)
         {
-            var obj = engine.EvaluationStack.Pop() as VM.Types.InteropInterface;
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop() as VM.Types.InteropInterface;
 
             if  (obj == null)
             {
@@ -73,14 +74,15 @@ namespace Neo.Emulation.API
 
             var tx = obj.GetInterface<TransactionOutput>();
 
-            engine.EvaluationStack.Push(tx.assetID);
+            context.EvaluationStack.Push(tx.assetID);
             return true;
         }
 
         [Syscall("Neo.Output.GetValue")]
         public static bool GetValue(ExecutionEngine engine)
         {
-            var obj = engine.EvaluationStack.Pop() as VM.Types.InteropInterface;
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop() as VM.Types.InteropInterface;
 
             if (obj == null)
             {
@@ -89,14 +91,15 @@ namespace Neo.Emulation.API
 
             var tx = obj.GetInterface<TransactionOutput>();
 
-            engine.EvaluationStack.Push(tx.amount);
+            context.EvaluationStack.Push(tx.amount);
             return true;
         }
 
         [Syscall("Neo.Output.GetScriptHash")]
         public static bool GetScriptHash(ExecutionEngine engine)
         {
-            var obj = engine.EvaluationStack.Pop() as VM.Types.InteropInterface;
+            var context = engine.CurrentContext;
+            var obj = context.EvaluationStack.Pop() as VM.Types.InteropInterface;
 
             if (obj == null)
             {
@@ -104,7 +107,7 @@ namespace Neo.Emulation.API
             }
 
             var tx = obj.GetInterface<TransactionOutput>();
-            engine.EvaluationStack.Push(tx.hash.ToArray());
+            context.EvaluationStack.Push(tx.hash.ToArray());
 
             /*var debugger = engine.ScriptContainer as NeoDebugger;
 

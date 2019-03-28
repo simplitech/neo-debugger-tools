@@ -83,19 +83,18 @@ namespace NeoDebuggerUI.Views
             _textEditor.Load(fs);
         }
 
+        private void ReloadCurrentFile()
+        {
+            if (!string.IsNullOrEmpty(ViewModel.SelectedFile) && File.Exists(ViewModel.SelectedFile))
+            {
+                Task.Run(() => LoadFile(ViewModel.SelectedFile));
+            }
+        }
 
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
         }
-
-        private async void ReloadCurrentFile()
-        {
-            if (!string.IsNullOrEmpty(ViewModel.SelectedFile) && File.Exists(ViewModel.SelectedFile))
-            {
-                await Task.Run(() => LoadFile(ViewModel.SelectedFile));
-            }
-        }
-
+        
     }
 }

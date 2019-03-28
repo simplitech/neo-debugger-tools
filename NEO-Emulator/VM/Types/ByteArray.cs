@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using Neo.VM;
 
-namespace Neo.VM.Types
+namespace Neo_Emulator.VM.Types
 {
     public class ByteArray : StackItem
     {
@@ -16,6 +17,11 @@ namespace Neo.VM.Types
             if (ReferenceEquals(this, other)) return true;
             if (ReferenceEquals(null, other)) return false;
             return value.SequenceEqual(other.GetByteArray());
+        }
+
+        public override bool GetBoolean()
+        {
+            return value != null && value[0] != 0;
         }
 
         public override byte[] GetByteArray()

@@ -12,7 +12,7 @@ namespace Neo.VM
         public decimal gasCost;
     }
 
-    public class InteropService
+    public class InteropService : IInteropService
     {
         public const decimal defaultGasCost = 0.001m;
 
@@ -64,26 +64,35 @@ namespace Neo.VM
 
         private static bool GetScriptContainer(ExecutionEngine engine)
         {
-            engine.EvaluationStack.Push(StackItem.FromInterface(engine.ScriptContainer));
+            var context = engine.CurrentContext;
+            context.EvaluationStack.Push(StackItem.FromInterface(engine.ScriptContainer));
             return true;
         }
 
         private static bool GetExecutingScriptHash(ExecutionEngine engine)
         {
-            engine.EvaluationStack.Push(engine.CurrentContext.ScriptHash.ToArray());
+            var context = engine.CurrentContext;
+            context.EvaluationStack.Push(engine.CurrentContext.ScriptHash.ToArray());
             return true;
         }
 
         private static bool GetCallingScriptHash(ExecutionEngine engine)
         {
-            engine.EvaluationStack.Push(engine.CallingContext.ScriptHash.ToArray());
+            var context = engine.CurrentContext;
+            context.EvaluationStack.Push(engine.CallingContext.ScriptHash.ToArray());
             return true;
         }
 
         private static bool GetEntryScriptHash(ExecutionEngine engine)
         {
-            engine.EvaluationStack.Push(engine.EntryContext.ScriptHash.ToArray());
+            var context = engine.CurrentContext;
+            context.EvaluationStack.Push(engine.EntryContext.ScriptHash.ToArray());
             return true;
+        }
+
+        public bool Invoke(byte[] method, ExecutionEngine engine)
+        {
+            return Invoke(method.ToString(), engine);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Neo.VM
+﻿namespace Neo_Framework.VM
 {
     public enum OpCode : byte
     {

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Neo.VM;
 
-namespace Neo.VM.Types
+namespace Neo_Emulator.VM.Types
 {
     public class Map : StackItem, ICollection, IDictionary<StackItem, StackItem>
     {
