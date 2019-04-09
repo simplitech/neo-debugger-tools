@@ -20,8 +20,13 @@ namespace NEO_Emulator.SmartContractTestSuite
 		}
 
 		public SmartContractTestSuite(string fileName)
-		{
-			fileName = fileName.Replace(".avm", ".test.json");
+		{			
+            if(fileName == null)
+            {
+                return;
+            }
+
+            fileName = fileName.Replace(".avm", ".test.json");
 
 			if (File.Exists(fileName))
 			{

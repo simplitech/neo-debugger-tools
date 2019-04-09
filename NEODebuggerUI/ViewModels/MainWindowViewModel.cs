@@ -7,14 +7,14 @@ using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Legacy;
 using System.Reactive.Linq;
-using NeoDebuggerUI.Models;
-using NeoDebuggerUI.Views;
+using NEODebuggerUI.Models;
+using NEODebuggerUI.Views;
 using System.Reactive;
 using NeoDebuggerCore.Utils;
 using Avalonia;
 using Neo.Debugger.Core.Utils;
 
-namespace NeoDebuggerUI.ViewModels
+namespace NEODebuggerUI.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
@@ -143,6 +143,8 @@ namespace NeoDebuggerUI.ViewModels
                 return;
             }
 
+            SendLogToPanel("Resetting with new file");
+
             if (!File.Exists(result))
             {
                 LoadTemplate(result);
@@ -156,10 +158,12 @@ namespace NeoDebuggerUI.ViewModels
 
         private void LoadTemplate(string result)
         {
+            SendLogToPanel("Loading template. "); 
             string path = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
             string fullFilePath = null;
             if (result.EndsWith("cs", StringComparison.Ordinal))
             {
+                SendLogToPanel("Loading CS Template");
                 fullFilePath = Path.Combine(path, "ContractTemplate.cs");
             }
             else if (result.EndsWith("py", StringComparison.Ordinal))

@@ -20,11 +20,11 @@
     <PackageReference Include="Mono.Cecil" Version="0.10.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Neo-Emulator\Neo-Emulator.csproj" />
     <ProjectReference Include="..\neo-lux\Neo.Lux\Neo.Lux.csproj">
       <Aliases></Aliases>
       <Private>true</Private>
     </ProjectReference>
     <ProjectReference Include="..\Neo.SmartContract.Framework\Neo.SmartContract.Framework.csproj" />
+    <ProjectReference Include="..\NEO-Emulator\NEO-Emulator.csproj" />
   </ItemGroup>
 </Project>

@@ -7,7 +7,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using AvaloniaEdit;
 using AvaloniaEdit.Highlighting;
-using NeoDebuggerUI.ViewModels;
+using NEODebuggerUI.ViewModels;
 using ReactiveUI;
 using System.IO;
 using System.Linq;
@@ -16,11 +16,11 @@ using LunarLabs.Parser;
 using Neo.Debugger.Core.Utils;
 using Neo.Emulation;
 using Neo.Lux.Utils;
-using NeoDebuggerUI.Models;
+using NEODebuggerUI.Models;
 using Neo.Emulation.API;
 using System.Numerics;
 
-namespace NeoDebuggerUI.Views
+namespace NEODebuggerUI.Views
 {
     public class InvokeWindow : ReactiveWindow<InvokeWindowViewModel>
     {

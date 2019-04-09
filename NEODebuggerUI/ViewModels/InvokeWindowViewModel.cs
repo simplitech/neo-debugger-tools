@@ -3,7 +3,7 @@ using Neo.Debugger.Core.Models;
 using ReactiveUI;
 using System.Reactive.Linq;
 using LunarLabs.Parser;
-using NeoDebuggerUI.Models;
+using NEODebuggerUI.Models;
 using System;
 using System.Threading.Tasks;
 using Neo.VM;
@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Neo.Emulation.API;
 
-namespace NeoDebuggerUI.ViewModels
+namespace NEODebuggerUI.ViewModels
 {
     public class InvokeWindowViewModel : ViewModelBase
     {

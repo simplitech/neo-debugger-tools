@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
-using NeoDebuggerUI.Views;
+using NEODebuggerUI.Views;
 using ReactiveUI;
 
-namespace NeoDebuggerUI.ViewModels
+namespace NEODebuggerUI.ViewModels
 {
 	public class ViewModelBase : ReactiveObject
 	{

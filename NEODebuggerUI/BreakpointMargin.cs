@@ -8,7 +8,7 @@ using AvaloniaEdit.Utils;
 using AvaloniaEdit.Editing;
 using AvaloniaEdit.Rendering;
 
-namespace NeoDebuggerUI
+namespace NEODebuggerUI
 {
     class BreakpointMargin : LineNumberMargin
     {

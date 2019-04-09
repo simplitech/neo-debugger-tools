@@ -9,9 +9,9 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using AvaloniaEdit;
 using AvaloniaEdit.Highlighting;
-using NeoDebuggerUI.ViewModels;
+using NEODebuggerUI.ViewModels;
 
-namespace NeoDebuggerUI.Views
+namespace NEODebuggerUI.Views
 {
     public class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
@@ -41,7 +41,7 @@ namespace NeoDebuggerUI.Views
             _textEditor.TextArea.LeftMargins.Insert(0, _breakpointMargin);
 
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
-            newCSharp.Click += async (o, e) => { await NewCSharpFile(); };
+            newCSharp.Click += (o, e) => { NewCSharpFile(); };
 
             MenuItem newPython = this.FindControl<MenuItem>("MenuItemNewPython");
             newPython.Click += async (o, e) => { await NewPythonFile(); };
@@ -52,7 +52,7 @@ namespace NeoDebuggerUI.Views
 
             this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
             this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
-            this.Activated += (o, e) => { ReloadCurrentFile(); };
+            //this.Activated += (o, e) => { ReloadCurrentFile(); };
 
             RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex);
             this.ViewModel.EvtVMStackChanged += (eval, alt, index) => RenderVMStack(eval, alt, index);
@@ -60,18 +60,20 @@ namespace NeoDebuggerUI.Views
             this.ViewModel.EvtBreakpointStateChanged += (line, addBreakpoint) => UpdateBreakpoint(addBreakpoint, line);
         }
 
-        public async Task NewCSharpFile()
+        public void NewCSharpFile()
         {
+            this.ViewModel.SendLogToPanel("New CSharp File 1"); 
             var dialog = new SaveFileDialog();
             var filters = new List<FileDialogFilter>();
             var filteredExtensions = new List<string>(new string[] { "cs" });
             var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "C# File" };
             filters.Add(filter);
             dialog.Filters = filters;
-            var result = await dialog.ShowAsync(this);
+            var result = dialog.ShowAsync(this);
+            this.ViewModel.SendLogToPanel("New CSharp File 2 ");
             if (result != null)
             {
-                this.ViewModel.ResetWithNewFile(result);
+                this.ViewModel.ResetWithNewFile(result.Result);
             }
         }
 

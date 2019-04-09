@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using NeoDebuggerUI.ViewModels;
+using NEODebuggerUI.ViewModels;
 
-namespace NeoDebuggerUI
+namespace NEODebuggerUI
 {
 	public class ViewLocator : IDataTemplate
 	{

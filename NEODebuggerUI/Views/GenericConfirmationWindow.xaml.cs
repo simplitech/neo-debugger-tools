@@ -2,9 +2,9 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using NeoDebuggerUI.ViewModels;
+using NEODebuggerUI.ViewModels;
 
-namespace NeoDebuggerUI.Views
+namespace NEODebuggerUI.Views
 {
     public class GenericConfirmationWindow : ReactiveWindow<GenericConfirmationWindowViewModel>
     {

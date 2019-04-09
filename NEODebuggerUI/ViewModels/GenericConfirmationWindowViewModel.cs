@@ -1,6 +1,6 @@
 ﻿using ReactiveUI;
 
-namespace NeoDebuggerUI.ViewModels
+namespace NEODebuggerUI.ViewModels
 {
     public class GenericConfirmationWindowViewModel : ViewModelBase
     {

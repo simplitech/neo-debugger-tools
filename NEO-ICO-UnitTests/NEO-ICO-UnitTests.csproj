@@ -9,6 +9,6 @@
     <PackageReference Include="NUnit" Version="3.11.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Neo-Debugger-Core\Neo-Debugger-Core.csproj" />
+    <ProjectReference Include="..\NEO-Debugger-Core\NEO-Debugger-Core.csproj" />
   </ItemGroup>
 </Project>

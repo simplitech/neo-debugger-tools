@@ -2,10 +2,10 @@
 
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:NeoDebuggerUI.ViewModels;assembly=NeoDebuggerUI"
+        xmlns:vm="clr-namespace:NEODebuggerUI.ViewModels;assembly=NEODebuggerUI"
         xmlns:AvalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
-        Icon="resm:NeoDebuggerUI.Assets.avalonia-logo.ico"
-        Title="NeoDebuggerUI"
+        Icon="resm:NEODebuggerUI.Assets.avalonia-logo.ico"
+        Title="NEODebuggerUI"
         Background="LightGray"
         Width="500"
         Height="600">
