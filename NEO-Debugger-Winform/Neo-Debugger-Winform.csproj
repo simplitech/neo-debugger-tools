@@ -196,15 +196,15 @@
   <ItemGroup>
     <ProjectReference Include="..\Neo-Compiler-Lib\Neo-Compiler-Lib.csproj">
       <Project>{5DF60A44-42C0-4E64-9290-58F997E609B2}</Project>
-      <Name>Neo-Compiler-Lib</Name>
+      <Name>NEO-Compiler-Lib</Name>
     </ProjectReference>
     <ProjectReference Include="..\Neo-Debugger-Core\Neo-Debugger-Core.csproj">
       <Project>{AADF2584-4C29-40F9-A11E-6BB94536D49A}</Project>
-      <Name>Neo-Debugger-Core</Name>
+      <Name>NEO-Debugger-Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Neo-Emulator\Neo-Emulator.csproj">
       <Project>{ECFD546B-9CA5-4FEF-8289-3ED9BD26F806}</Project>
-      <Name>Neo-Emulator</Name>
+      <Name>NEO-Emulator</Name>
     </ProjectReference>
     <ProjectReference Include="..\neo-lux\Neo.Lux\Neo.Lux.csproj">
       <Project>{093b45ce-a803-4e10-838f-691216997cad}</Project>
