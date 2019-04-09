@@ -19,8 +19,7 @@ namespace Neo_Debugger_UI_UnitTests
             var fullFilePath = Path.Combine(path, "ContractTemplate.cs");
             var sourceCode = File.ReadAllText(fullFilePath);
             Assert.NotNull(sourceCode);
-            var compilerFolder = Path.Combine(Path.Combine(Directory.GetParent(path).Parent.Parent.Parent.FullName, "Output"), "neo-compiler");
-            var compiled = compiler.CompileContract(sourceCode, fullFilePath, Neo.Debugger.Core.Data.SourceLanguage.CSharp, compilerFolder);
+            var compiled = compiler.CompileContract(sourceCode, fullFilePath, Neo.Debugger.Core.Data.SourceLanguage.CSharp);
             Assert.IsTrue(compiled);
         }
 
