@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>Neo_Debugger_WebServices</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Neo-Debugger-Core\Neo-Debugger-Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="LunarParser" Version="1.1.5" />
+    <PackageReference Include="LunarLabs.Server" Version="1.3.13" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Output\contracts\DefaultContract.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Output\contracts\DefaultContract.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+  </ItemGroup>
+</Project>
