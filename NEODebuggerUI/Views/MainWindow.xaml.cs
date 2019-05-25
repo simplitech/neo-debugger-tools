@@ -55,7 +55,7 @@ namespace NEODebuggerUI.Views
             this.ViewModel.EvtFileToCompileChanged += async () => await ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
             //this.Activated += (o, e) => { ReloadCurrentFile(); };
 
-            Task.Run(() => RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex));
+            Dispatcher.UIThread.InvokeAsync(() => RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex));
             this.ViewModel.EvtVMStackChanged += async (eval, alt, index) => await RenderVMStack(eval, alt, index);
             this.ViewModel.EvtDebugCurrentLineChanged += async (isOnBreakpoint, line) => await HighlightOnBreakpoint(isOnBreakpoint, line);
             this.ViewModel.EvtBreakpointStateChanged += async (line, addBreakpoint) => await UpdateBreakpoint(line);
@@ -97,8 +97,10 @@ namespace NEODebuggerUI.Views
 
         private async Task LoadFile(string filename)
         {
-            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-            await Dispatcher.UIThread.InvokeAsync(() => _textEditor.Load(fs) );
+            if (File.Exists(filename)) {
+                FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+                await Dispatcher.UIThread.InvokeAsync(() => _textEditor.Load(fs));
+            }
         }
 
         public void SetBreakpointState(Point clickPosition)

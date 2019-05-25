@@ -10,6 +10,7 @@ using Neo.VM;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Neo.Emulation.API;
+using Avalonia.Threading;
 
 namespace NEODebuggerUI.ViewModels
 {
@@ -334,13 +335,17 @@ namespace NEODebuggerUI.ViewModels
 
         public async Task RemovePrivateKey()
         {
-            if(SelectedPrivateKey != PrivateKeys.ElementAt(0))
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                var i = PrivateKeys.IndexOf(SelectedPrivateKey);
+                if (SelectedPrivateKey != PrivateKeys.ElementAt(0))
+                {
+                    var i = PrivateKeys.IndexOf(SelectedPrivateKey);
 
-                SelectedPrivateKey = PrivateKeys.ElementAt(i - 1);
-                PrivateKeys.RemoveAt(i);
-            }
+                    SelectedPrivateKey = PrivateKeys.ElementAt(i - 1);
+                    PrivateKeys.RemoveAt(i);
+                }
+            });
+
         }
     }
 }

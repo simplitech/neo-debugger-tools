@@ -13,6 +13,7 @@ using System.Reactive;
 using NeoDebuggerCore.Utils;
 using Avalonia;
 using Neo.Debugger.Core.Utils;
+using Avalonia.Threading;
 
 #pragma warning disable RECS0061 // Warns when a culture-aware 'EndsWith' call is used by default.
 namespace NEODebuggerUI.ViewModels
@@ -38,19 +39,19 @@ namespace NEODebuggerUI.ViewModels
         public HashSet<int> Breakpoints { get => GetBreakpointHashSet(); }
 
         private string _selectedFile;
-		public string SelectedFile
-		{
-			get => _selectedFile;
-			set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
-		}
+        public string SelectedFile
+        {
+            get => _selectedFile;
+            set => this.RaiseAndSetIfChanged(ref _selectedFile, value);
+        }
 
-		private string _log;
-		public string Log
-		{
-			get => _log;
-			set => this.RaiseAndSetIfChanged(ref _log, value);
-		}
-        
+        private string _log;
+        public string Log
+        {
+            get => _log;
+            set => this.RaiseAndSetIfChanged(ref _log, value);
+        }
+
         // not using getter because the property are updated on another thread and won't update the ui
         private string _consumedGas = DebuggerStore.instance.UsedGasCost;
         public string ConsumedGas
@@ -72,24 +73,24 @@ namespace NEODebuggerUI.ViewModels
         public int StackIndex { get; set; } = -1;
 
         private string _fileFolder;
-		private DateTime _lastModificationDate;
+        private DateTime _lastModificationDate;
 
-		public MainWindowViewModel()
-		{
+        public MainWindowViewModel()
+        {
             Log = "Debugger started\n";
-			Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
-			DebuggerStore.instance.manager.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
+            Neo.Emulation.API.Runtime.OnLogMessage = SendLogToPanel;
+            DebuggerStore.instance.manager.SendToLog += (o, e) => { SendLogToPanel(e.Message); };
 
             var fileChanged = this.WhenAnyValue(vm => vm.SelectedFile);
             fileChanged.Subscribe(file => LoadSelectedFile());
 
             EvaluationStack = new List<string>();
             AltStack = new List<string>();
-		}
+        }
 
         private Unit LoadSelectedFile()
         {
-            if(_selectedFile == null)
+            if (_selectedFile == null)
             {
                 EvtFileChanged?.Invoke(_selectedFile);
                 return Unit.Default;
@@ -123,42 +124,49 @@ namespace NEODebuggerUI.ViewModels
 
         public async Task SaveCurrentFileWithContent(string content)
         {
-            await Task.Run(()=>File.WriteAllText(this.SelectedFile, content));
+            await Task.Run(() => File.WriteAllText(this.SelectedFile, content));
         }
 
-        private bool LoadContract(string avmFilePath)
+        private async Task LoadAvm(string avmFilePath)
         {
-            if (!DebuggerStore.instance.manager.LoadContract(avmFilePath))
+            bool loaded = DebuggerStore.instance.manager.LoadContract(avmFilePath);
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                return false;
-            }
-
-            _lastModificationDate = File.GetLastWriteTime(DebuggerStore.instance.manager.AvmFilePath);
-            DebuggerStore.instance.manager.Emulator.ClearAssignments();
-
-            if (DebuggerStore.instance.manager.IsMapLoaded)
-            {
-                ProjectFiles.Clear();
-                _fileFolder = Path.GetDirectoryName(avmFilePath);
-                ProjectFiles.Add(Path.GetFileName(avmFilePath));
-                foreach (var path in DebuggerStore.instance.manager.Map.FileNames)
+                if (loaded)
                 {
-                    DebuggerStore.instance.manager.LoadAssignmentsFromContent(path);
-                    ProjectFiles.Add(path);
+                    _lastModificationDate = File.GetLastWriteTime(DebuggerStore.instance.manager.AvmFilePath);
+                    DebuggerStore.instance.manager.Emulator.ClearAssignments();
+
+                    if (DebuggerStore.instance.manager.IsMapLoaded)
+                    {
+                        ProjectFiles.Clear();
+                        _fileFolder = Path.GetDirectoryName(avmFilePath);
+                        ProjectFiles.Add(Path.GetFileName(avmFilePath));
+                        foreach (var path in DebuggerStore.instance.manager.Map.FileNames)
+                        {
+                            DebuggerStore.instance.manager.LoadAssignmentsFromContent(path);
+                            ProjectFiles.Add(path);
+                        }
+                    }
                 }
-                string cSharpFile = avmFilePath.Replace(".avm", ".cs");
+            });
+        }
 
-                if (File.Exists(cSharpFile))
+        private async Task LoadContract(string file)
+        {
+            await Dispatcher.UIThread.InvokeAsync(async () =>
+            {
+                SelectedFile = file;
+                if (file.EndsWith("avm"))
                 {
-                    SelectedFile = cSharpFile;
+                    await LoadAvm(file);
                 }
                 else
                 {
-                    SelectedFile = avmFilePath;
+                    await CompileCurrentFile();
                 }
-            }
+            });
 
-            return true;
         }
 
         internal async Task ResetWithNewFile(string result)
@@ -187,24 +195,23 @@ namespace NEODebuggerUI.ViewModels
         {
             // when selected file is .avm it is not finding the avm file path
 
-            if (!SelectedFile.EndsWith(".avm"))
+            if (SelectedFile.EndsWith(".cs") || SelectedFile.EndsWith("py"))
             {
                 EvtFileToCompileChanged?.Invoke();
                 var sourceCode = File.ReadAllText(this.SelectedFile);
-                await Task.Run(() =>
+
+                bool compiled = DebuggerStore.instance.manager.CompileContract(sourceCode, LanguageSupport.DetectLanguage(this.SelectedFile), this.SelectedFile);
+                if (compiled)
                 {
-                    bool compiled = DebuggerStore.instance.manager.CompileContract(sourceCode, LanguageSupport.DetectLanguage(this.SelectedFile), this.SelectedFile);
-                    if (compiled)
-                    {
-                        DebuggerStore.instance.manager.LoadContract(this.SelectedFile.Replace(LanguageSupport.GetExtension(LanguageSupport.DetectLanguage(this.SelectedFile)), ".avm"));
-                    }
-                });
+                    string avmFile = this.SelectedFile.Replace(LanguageSupport.GetExtension(LanguageSupport.DetectLanguage(this.SelectedFile)), ".avm");
+                    await LoadAvm(avmFile);
+                }
             }
         }
 
         private void LoadTemplate(string result)
         {
-            SendLogToPanel("Loading template. "); 
+            SendLogToPanel("Loading template. ");
             string path = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
             string fullFilePath = null;
             if (result.EndsWith("cs", StringComparison.Ordinal))
@@ -258,24 +265,25 @@ namespace NEODebuggerUI.ViewModels
         }
 
         public async Task Open()
-		{
-			var dialog = new OpenFileDialog();
-			var filters = new List<FileDialogFilter>();
-			var filteredExtensions = new List<string>(new string[] { "avm" });
-			var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "NEO AVM files" };
-			filters.Add(filter);
-			dialog.Filters = filters;
-			dialog.AllowMultiple = false;
+        {
+            var dialog = new OpenFileDialog();
+            var filters = new List<FileDialogFilter>();
+            var filteredExtensions = new List<string>(new string[] { "avm", "cs", "py" });
+            var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "NEO AVM files" };
+            filters.Add(filter);
+            dialog.Filters = filters;
+            dialog.AllowMultiple = false;
 
-			var result = await dialog.ShowAsync(Application.Current.MainWindow);
+            var result = await dialog.ShowAsync(Application.Current.MainWindow);
 
-			if (result != null && result.Length > 0)
-			{
-				LoadContract(result[0]);
-			}
-		}
+            if (result != null && result.Length > 0)
+            {
+                await LoadContract(result[0]);
+            }
+        }
 
-		public async Task Run(bool stepping)
+
+        public async Task RunDebugger(bool stepping)
         {
             var invokeWindow = new InvokeWindow(stepping);
 
@@ -441,7 +449,7 @@ namespace NEODebuggerUI.ViewModels
                     // if some class of the vm throws an exception while trying to get the value of the variable
                     AltStack.Add("Exception");
                 }
-                
+
                 index--;
             }
             EvtVMStackChanged?.Invoke(EvaluationStack, AltStack, StackIndex);
@@ -463,8 +471,10 @@ namespace NEODebuggerUI.ViewModels
 
         public void UpdateBreakpointView(int line, bool addBreakpoint)
         {
-            EvtBreakpointStateChanged?.Invoke(line, addBreakpoint);
-            UpdateCurrentLineView();
+            Dispatcher.UIThread.InvokeAsync(() => {
+                EvtBreakpointStateChanged?.Invoke(line, addBreakpoint);
+                UpdateCurrentLineView();
+            });
         }
 
         public async Task LoadBlockchain()
@@ -487,7 +497,7 @@ namespace NEODebuggerUI.ViewModels
 
         public async void ResetBlockchain()
         {
-            if(!DebuggerStore.instance.manager.BlockchainLoaded)
+            if (!DebuggerStore.instance.manager.BlockchainLoaded)
             {
                 await OpenGenericSampleDialog("No blockchain loaded yet!", "Ok", "", false);
                 return;
@@ -495,7 +505,7 @@ namespace NEODebuggerUI.ViewModels
 
             if (DebuggerStore.instance.manager.Blockchain.currentHeight > 1)
             {
-                if(!(await OpenGenericSampleDialog("The current loaded Blockchain already has some transactions.\n" +
+                if (!(await OpenGenericSampleDialog("The current loaded Blockchain already has some transactions.\n" +
                     "This action can not be reversed, are you sure you want to reset it?", "Yes", "No", true)))
                 {
                     return;

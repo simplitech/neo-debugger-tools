@@ -136,7 +136,7 @@ namespace NEODebuggerUI.Views
 
                 if (!UseTestSequence())
                 {
-                    if (!SaveTransactionInfo())
+                    if (!SaveTransactionInfo().Result)
                     {
                         return;
                     }
@@ -184,7 +184,7 @@ namespace NEODebuggerUI.Views
             ViewModel.DebugParams.RawScript = HasRawScript ? rawScriptText.Text.HexToBytes() : null;
         }
 
-        public bool SaveTransactionInfo()
+        public async Task<bool> SaveTransactionInfo()
         {
             var assetBox = this.FindControl<DropDown>("AssetBox");
             if (assetBox.SelectedIndex > 0)
@@ -204,7 +204,7 @@ namespace NEODebuggerUI.Views
                         }
                         else
                         {
-                            ViewModel.OpenGenericSampleDialog(entry.name + " amount must be greater than zero", "OK", "", false);
+                            await ViewModel.OpenGenericSampleDialog(entry.name + " amount must be greater than zero", "OK", "", false);
                             return false;
                         }
 
