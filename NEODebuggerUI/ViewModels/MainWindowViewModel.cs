@@ -181,7 +181,7 @@ namespace NEODebuggerUI.ViewModels
 
             if (!File.Exists(result))
             {
-                LoadTemplate(result);
+                await LoadTemplate(result);
             }
 
             this.ProjectFiles.Clear();
@@ -200,16 +200,19 @@ namespace NEODebuggerUI.ViewModels
                 EvtFileToCompileChanged?.Invoke();
                 var sourceCode = File.ReadAllText(this.SelectedFile);
 
-                bool compiled = DebuggerStore.instance.manager.CompileContract(sourceCode, LanguageSupport.DetectLanguage(this.SelectedFile), this.SelectedFile);
-                if (compiled)
+                await Task.Run(async () =>
                 {
-                    string avmFile = this.SelectedFile.Replace(LanguageSupport.GetExtension(LanguageSupport.DetectLanguage(this.SelectedFile)), ".avm");
-                    await LoadAvm(avmFile);
-                }
+                    bool compiled = DebuggerStore.instance.manager.CompileContract(sourceCode, LanguageSupport.DetectLanguage(this.SelectedFile), this.SelectedFile);
+                    if (compiled)
+                    {
+                        string avmFile = this.SelectedFile.Replace(LanguageSupport.GetExtension(LanguageSupport.DetectLanguage(this.SelectedFile)), ".avm");
+                        await LoadAvm(avmFile);
+                    }
+                });
             }
         }
 
-        private void LoadTemplate(string result)
+        private async Task LoadTemplate(string result)
         {
             SendLogToPanel("Loading template. ");
             string path = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
@@ -224,8 +227,12 @@ namespace NEODebuggerUI.ViewModels
                 fullFilePath = Path.Combine(path, "NEP5.py");
             }
 
-            var sourceCode = File.ReadAllText(fullFilePath);
-            File.WriteAllText(result, sourceCode);
+            await Task.Run(() =>
+            {
+                var sourceCode = File.ReadAllText(fullFilePath);
+                File.WriteAllText(result, sourceCode);
+            });
+
         }
 
 

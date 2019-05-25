@@ -65,19 +65,17 @@ namespace NEODebuggerUI.Views
 
         public async Task NewCSharpFile()
         {
-            this.ViewModel.SendLogToPanel("New CSharp File 1"); 
+            this.ViewModel.SendLogToPanel("New CSharp File 1");
             var dialog = new SaveFileDialog();
             var filters = new List<FileDialogFilter>();
             var filteredExtensions = new List<string>(new string[] { "cs" });
             var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "C# File" };
             filters.Add(filter);
             dialog.Filters = filters;
-            var result = dialog.ShowAsync(this);
-            this.ViewModel.SendLogToPanel("New CSharp File 2 ");
-            if (result != null)
-            {
-                await ViewModel.ResetWithNewFile(result.Result);
-            }
+
+
+            var result = await dialog.ShowAsync(this);
+            await ViewModel.ResetWithNewFile(result);
         }
 
         public async Task NewPythonFile()
@@ -97,7 +95,8 @@ namespace NEODebuggerUI.Views
 
         private async Task LoadFile(string filename)
         {
-            if (File.Exists(filename)) {
+            if (File.Exists(filename))
+            {
                 FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
                 await Dispatcher.UIThread.InvokeAsync(() => _textEditor.Load(fs));
             }
@@ -122,7 +121,7 @@ namespace NEODebuggerUI.Views
         public async Task UpdateBreakpoint(int line)
         {
             // update ui
-            await Dispatcher.UIThread.InvokeAsync(()=>_breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints, line));
+            await Dispatcher.UIThread.InvokeAsync(() => _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints, line));
 
             // fix gui bug when inserting breakpoint in the same line of the caret
             if (_textEditor.Document.GetLineByOffset(_textEditor.CaretOffset).LineNumber == line)
@@ -169,7 +168,7 @@ namespace NEODebuggerUI.Views
             _textEditor.IsReadOnly = isOnBreakpoint;
         }
 
-        private void ReloadCurrentFile() 
+        private void ReloadCurrentFile()
         {
             if (!string.IsNullOrEmpty(ViewModel.SelectedFile) && File.Exists(ViewModel.SelectedFile))
             {
@@ -211,7 +210,8 @@ namespace NEODebuggerUI.Views
             Grid.SetColumn(altHeader, 2);
             grid.Children.Add(altHeader);
 
-            await Dispatcher.UIThread.InvokeAsync(() => {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
                 for (int i = 0; i <= index; i++)
                 {
                     RenderLine(grid, i + 1, index - i, evalStack[i], altStack[i]);
