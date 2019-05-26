@@ -36,8 +36,11 @@ namespace NEODebuggerUI.ViewModels
         public delegate void BreakpointStateChanged(int line, bool addBreakpoint);
         public event BreakpointStateChanged EvtBreakpointStateChanged;
 
+        public String EditorFileContent;
+
         public HashSet<int> Breakpoints { get => GetBreakpointHashSet(); }
 
+        private string _selectedProjectFile;
         private string _selectedFile;
         public string SelectedFile
         {
@@ -88,26 +91,24 @@ namespace NEODebuggerUI.ViewModels
             AltStack = new List<string>();
         }
 
-        private Unit LoadSelectedFile()
+        private void LoadSelectedFile()
         {
-            if (_selectedFile == null)
+            if (_selectedFile != null)
             {
-                EvtFileChanged?.Invoke(_selectedFile);
-                return Unit.Default;
+                if (_selectedFile.EndsWith(".avm"))
+                {
+                    EvtFileChanged?.Invoke(DebuggerStore.instance.manager.AvmFilePath);
+                }
+                else
+                {
+                    if(_selectedFile.EndsWith("py") || _selectedFile.EndsWith("cs"))
+                    {
+                        _selectedProjectFile = _selectedFile;
+                    }
+                    EvtFileChanged?.Invoke(_selectedFile);
+                }
+                UpdateBreakpointView(1, false);
             }
-
-            //  when selected file is .avm it is not finding the avm file path
-            if (_selectedFile.EndsWith(".avm"))
-            {
-                EvtFileChanged?.Invoke(DebuggerStore.instance.manager.AvmFilePath);
-            }
-            else
-            {
-                EvtFileChanged?.Invoke(_selectedFile);
-            }
-            UpdateBreakpointView(1, false);
-
-            return Unit.Default;
         }
 
         public string DisassembleAVMFile(string avmSourceCode)
@@ -122,10 +123,6 @@ namespace NEODebuggerUI.ViewModels
             return content;
         }
 
-        public async Task SaveCurrentFileWithContent(string content)
-        {
-            await Task.Run(() => File.WriteAllText(this.SelectedFile, content));
-        }
 
         private async Task LoadAvm(string avmFilePath)
         {
@@ -147,6 +144,7 @@ namespace NEODebuggerUI.ViewModels
                             DebuggerStore.instance.manager.LoadAssignmentsFromContent(path);
                             ProjectFiles.Add(path);
                         }
+                        SelectedFile = avmFilePath;
                     }
                 }
             });
@@ -177,12 +175,11 @@ namespace NEODebuggerUI.ViewModels
                 return;
             }
 
-            SendLogToPanel("Resetting with new file");
-
             if (!File.Exists(result))
             {
-                await LoadTemplate(result);
+                LoadTemplate(result);
             }
+            SendLogToPanel("Resetting with new file");
 
             this.ProjectFiles.Clear();
             this.ProjectFiles.Add(result);
@@ -190,32 +187,41 @@ namespace NEODebuggerUI.ViewModels
             await CompileCurrentFile();
         }
 
+        public async Task SaveAndRebuild()
+        {
+            await Task.Run(async () =>
+            {
+                File.WriteAllText(SelectedFile, EditorFileContent);
+                await CompileCurrentFile();
+            });
+        }
+
         //Current compiler does not support multiple files
         public async Task CompileCurrentFile()
         {
-            // when selected file is .avm it is not finding the avm file path
-
-            if (SelectedFile.EndsWith(".cs") || SelectedFile.EndsWith("py"))
+            if (_selectedProjectFile != null)
             {
                 EvtFileToCompileChanged?.Invoke();
-                var sourceCode = File.ReadAllText(this.SelectedFile);
+                var sourceCode = File.ReadAllText(_selectedProjectFile);
 
                 await Task.Run(async () =>
                 {
+                    SendLogToPanel("Compiling project...");
                     bool compiled = DebuggerStore.instance.manager.CompileContract(sourceCode, LanguageSupport.DetectLanguage(this.SelectedFile), this.SelectedFile);
                     if (compiled)
                     {
                         string avmFile = this.SelectedFile.Replace(LanguageSupport.GetExtension(LanguageSupport.DetectLanguage(this.SelectedFile)), ".avm");
+                        SendLogToPanel("Compiled file located at " + avmFile);
                         await LoadAvm(avmFile);
                     }
                 });
             }
         }
 
-        private async Task LoadTemplate(string result)
+        private void LoadTemplate(string result)
         {
             SendLogToPanel("Loading template. ");
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources");
             string fullFilePath = null;
             if (result.EndsWith("cs", StringComparison.Ordinal))
             {
@@ -227,12 +233,8 @@ namespace NEODebuggerUI.ViewModels
                 fullFilePath = Path.Combine(path, "NEP5.py");
             }
 
-            await Task.Run(() =>
-            {
-                var sourceCode = File.ReadAllText(fullFilePath);
-                File.WriteAllText(result, sourceCode);
-            });
-
+            var sourceCode = File.ReadAllText(fullFilePath);
+            File.WriteAllText(result, sourceCode);
         }
 
 

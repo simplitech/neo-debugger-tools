@@ -35,7 +35,7 @@ namespace NEODebuggerUI.Views
             _textEditor.TextArea.IndentationStrategy = new AvaloniaEdit.Indentation.CSharp.CSharpIndentationStrategy(_textEditor.Options);
             _textEditor.PointerHover += (o, e) => SetTip(e.GetPosition(_textEditor));
             _textEditor.PointerHoverStopped += (o, e) => ToolTip.SetIsOpen(_textEditor, false);
-
+            _textEditor.TextChanged += (object sender, EventArgs e) => { ViewModel.EditorFileContent = _textEditor.Text; };
             _breakpointMargin = new BreakpointMargin();
             _breakpointMargin.Width = 20;
             _breakpointMargin.PointerPressed += (o, e) => SetBreakpointState(e.GetPosition(_textEditor));
@@ -52,13 +52,14 @@ namespace NEODebuggerUI.Views
 
 
             this.ViewModel.EvtFileChanged += async (fileName) => await LoadFile(fileName);
-            this.ViewModel.EvtFileToCompileChanged += async () => await ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
+            //this.ViewModel.EvtFileToCompileChanged += async () => await ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
             //this.Activated += (o, e) => { ReloadCurrentFile(); };
 
             Dispatcher.UIThread.InvokeAsync(() => RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex));
             this.ViewModel.EvtVMStackChanged += async (eval, alt, index) => await RenderVMStack(eval, alt, index);
             this.ViewModel.EvtDebugCurrentLineChanged += async (isOnBreakpoint, line) => await HighlightOnBreakpoint(isOnBreakpoint, line);
             this.ViewModel.EvtBreakpointStateChanged += async (line, addBreakpoint) => await UpdateBreakpoint(line);
+
 
             this.SetHotKeys();
         }
@@ -72,8 +73,6 @@ namespace NEODebuggerUI.Views
             var filter = new FileDialogFilter { Extensions = filteredExtensions, Name = "C# File" };
             filters.Add(filter);
             dialog.Filters = filters;
-
-
             var result = await dialog.ShowAsync(this);
             await ViewModel.ResetWithNewFile(result);
         }

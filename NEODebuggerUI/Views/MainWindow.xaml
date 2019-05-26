@@ -86,7 +86,7 @@
                                       CommandParameter="true"
                                       Name="StepContract"/>
         <MenuItem Header="Reset" IsEnabled="false" />
-        <MenuItem Header="Rebuild" Command="{Binding CompileCurrentFile}"/>
+        <MenuItem Header="Rebuild" Command="{Binding SaveAndRebuild}"/>
         <MenuItem Header="Storage (F6)" IsEnabled="false" />
       </MenuItem>
       <MenuItem Header="Blockchain">
