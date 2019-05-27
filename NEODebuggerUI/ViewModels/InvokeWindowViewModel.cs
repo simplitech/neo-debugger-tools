@@ -196,72 +196,30 @@ namespace NEODebuggerUI.ViewModels
             selectedPrivateKeyChanged.Subscribe(time => UpdatePrivateKeyAddress());
         }
 
-        public void Step()
+        //public async Task Step()
+        //{
+        //    if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+        //    {
+        //        if (SelectedTestSequence == null)
+        //        {
+        //            DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
+        //        }
+        //    }
+
+        //    var previousLine = DebuggerStore.instance.manager.CurrentLine;
+        //    do
+        //    {
+        //        DebuggerStore.instance.manager.Step();
+        //    } while (previousLine == DebuggerStore.instance.manager.CurrentLine);
+
+        //    await CheckResults();
+        //}
+
+        public async Task CheckResults()
         {
             if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
-                if (SelectedTestSequence == null)
-                {
-                    DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
-                }
-                else
-                {
-                    //TODO: there is no step on DebugManager for test sequences
-                    //DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
-                }
-            }
-
-            if (!UseOffset)
-            {
-                var previousLine = DebuggerStore.instance.manager.CurrentLine;
-                do
-                {
-                    DebuggerStore.instance.manager.Step();
-                } while (previousLine == DebuggerStore.instance.manager.CurrentLine);
-            }
-            else
-            {
-                DebuggerStore.instance.manager.Step();
-            }
-        }
-
-        public void Run()
-        {
-            //If the debug has started already, run with previous parameters
-            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
-            {
-                DebuggerStore.instance.manager.Run();
-            }
-            else
-            {
-                if (SelectedTestSequence == null)
-                {
-                    DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
-                    DebuggerStore.instance.manager.Run();
-                }
-                else
-                {
-                    //Is not stopping on breakpoint when run a test sequence
-                    DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
-                }
-            }
-        }
-
-        public async Task RunOrStep()
-        {
-            if(Stepping)
-            {
-                Step();
-            }
-            else
-            {
-                Run();
-            }
-
-            //Check if the Run or RunSequence has ended the debugging
-            if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
-            {
-                StackItem result = null;
+                Neo.VM.StackItem result = null;
                 string errorMessage = null;
                 try
                 {
@@ -280,9 +238,27 @@ namespace NEODebuggerUI.ViewModels
                 {
                     await OpenGenericSampleDialog(errorMessage, "Error", "", false);
                 }
-                DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
             }
         }
+
+        public async Task Run()
+        {
+            await Task.Run(() =>
+            {
+                if (SelectedTestSequence == null)
+                {
+                    DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
+                    DebuggerStore.instance.manager.Run();
+                }
+                else
+                {
+                    DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
+                }
+            });
+
+            await CheckResults();
+        }
+
 
         public void LoadPrivateKeys()
         {
@@ -331,6 +307,7 @@ namespace NEODebuggerUI.ViewModels
             {
                 await OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false);
             }
+            DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
         }
 
         public async Task RemovePrivateKey()
@@ -345,7 +322,7 @@ namespace NEODebuggerUI.ViewModels
                     PrivateKeys.RemoveAt(i);
                 }
             });
-
+            DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
         }
     }
 }

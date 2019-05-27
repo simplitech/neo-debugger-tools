@@ -22,13 +22,12 @@ namespace NEODebuggerUI.Views
 {
     public class InvokeWindow : ReactiveWindow<InvokeWindowViewModel>
     {
-        public InvokeWindow(bool stepping)
+        public InvokeWindow()
         {
             InitializeComponent();
 #if DEBUG
             this.AttachDevTools();
 #endif
-            ViewModel.Stepping = stepping;
             RegisterInteraction();
             Reload();
         }
@@ -41,14 +40,6 @@ namespace NEODebuggerUI.Views
         public void UseOffset(bool useOffset)
         {
             ViewModel.UseOffset = useOffset;
-        }
-
-        public async Task RunOrStep()
-        {
-            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
-            {
-                await ViewModel.RunOrStep();
-            }
         }
 
         private void InitializeComponent()
@@ -150,7 +141,7 @@ namespace NEODebuggerUI.Views
         public async Task DebugPressed(string field1, string field2)
         {
             ViewModel.DebugParams.ArgList = DebuggerUtils.GetArgsListAsNode(string.Concat(field1, ",", field2));
-            await ViewModel.RunOrStep();
+            await ViewModel.Run();
         }
         
         public void SaveOptions()

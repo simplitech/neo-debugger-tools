@@ -230,8 +230,8 @@ namespace NEODebuggerUI.Views
                     RenderLine(grid, i + 1, index - i, evalStack[i], altStack[i]);
                 }
             });
-
         }
+
 
         private void RenderLine(Grid grid, int rowCount, int index, string eval, string alt)
         {
@@ -313,7 +313,6 @@ namespace NEODebuggerUI.Views
 
             return lineStr.Substring(start, length);
         }
-
 
         public void SetHotKeys()
         {

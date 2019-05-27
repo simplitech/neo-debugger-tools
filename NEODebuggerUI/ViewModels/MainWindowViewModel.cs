@@ -291,40 +291,66 @@ namespace NEODebuggerUI.ViewModels
             }
         }
 
-
-        public async Task RunDebugger(bool stepping)
+        public async Task TryRun()
         {
-            var invokeWindow = new InvokeWindow(stepping);
-
-            var useOffsetAvmOffset = SelectedFile.EndsWith(".avm");
-            invokeWindow.UseOffset(useOffsetAvmOffset);
-
-            if (!IsSteppingOrOnBreakpoint)
+            if(DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
-                var task = invokeWindow.ShowDialog(Application.Current.MainWindow);
-                await Task.Run(() => task.Wait());
+                await RunDebugger();
+                await CheckResults();
             }
             else
             {
-                await invokeWindow.RunOrStep();
+                await OpenInvokeWindow();
             }
+        }
 
-            //  compiler does not support .avm
-            if (SelectedFile.EndsWith(".avm"))
+        public async Task CheckResults()
+        {
+            if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
-                await CompileCurrentFile();
+                Neo.VM.StackItem result = null;
+                string errorMessage = null;
+                try
+                {
+                    result = DebuggerStore.instance.manager.Emulator.GetOutput();
+                }
+                catch (Exception ex)
+                {
+                    errorMessage = ex.Message;
+                }
+
+                if (result != null)
+                {
+                    await OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
+                }
+                else
+                {
+                    await OpenGenericSampleDialog(errorMessage, "Error", "", false);
+                }
             }
+        }
 
-            // not using getters because the properties are updated on another thread and won't update the ui
-            IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
-            ConsumedGas = DebuggerStore.instance.UsedGasCost;
+        public async Task OpenInvokeWindow()
+        {
+            var invokeWindow = new InvokeWindow();
+            await invokeWindow.ShowDialog(Application.Current.MainWindow);
+        }
 
-            UpdateCurrentLineView();
-
-            if (IsSteppingOrOnBreakpoint)
+        public async Task RunDebugger()
+        {
+            await Task.Run(() =>
             {
+                DebuggerStore.instance.manager.Run();
+            });
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
+                ConsumedGas = DebuggerStore.instance.UsedGasCost;
+
+                UpdateCurrentLineView();
                 UpdateStackPanel();
-            }
+            });
         }
 
         private HashSet<int> GetBreakpointHashSet()
@@ -466,16 +492,20 @@ namespace NEODebuggerUI.ViewModels
 
         public void UpdateCurrentLineView()
         {
-            //  when selected file is .avm needs to you disassembler
-            if (SelectedFile.EndsWith(".avm"))
+            Dispatcher.UIThread.InvokeAsync(() =>
             {
-                var offset = DebuggerStore.instance.manager.Offset;
-                EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.avmDisassemble.ResolveLine(offset) + 1);
-            }
-            else
-            {
-                EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.CurrentLine + 1);
-            }
+                //  when selected file is .avm needs to you disassembler
+                if (SelectedFile.EndsWith(".avm"))
+                {
+                    var offset = DebuggerStore.instance.manager.Offset;
+                    EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.avmDisassemble.ResolveLine(offset) + 1);
+                }
+                else
+                {
+                    EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.CurrentLine + 1);
+                }
+
+            });
         }
 
         public void UpdateBreakpointView(int line, bool addBreakpoint)

@@ -76,7 +76,7 @@
         <MenuItem Header="Expand All" />
       </MenuItem>
       <MenuItem Header="Contract">
-        <MenuItem Header="Run (F5)" Command="{Binding RunDebugger}"
+        <MenuItem Header="Run (F5)" Command="{Binding TryRun}"
                                     CommandParameter="false"
                                     Name="RunContract"/>
         <MenuItem Header="Stop (Shift+F5)" Command="{Binding StopDebugging}"
