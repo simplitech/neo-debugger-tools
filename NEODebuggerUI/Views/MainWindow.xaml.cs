@@ -12,6 +12,7 @@ using AvaloniaEdit;
 using AvaloniaEdit.Highlighting;
 using NEODebuggerUI.ViewModels;
 
+#pragma warning disable RECS0061 // Warns when a culture-aware 'EndsWith' call is used by default.
 namespace NEODebuggerUI.Views
 {
     public class MainWindow : ReactiveWindow<MainWindowViewModel>
@@ -92,12 +93,25 @@ namespace NEODebuggerUI.Views
             }
         }
 
+
         private async Task LoadFile(string filename)
         {
             if (File.Exists(filename))
             {
-                FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-                await Dispatcher.UIThread.InvokeAsync(() => _textEditor.Load(fs));
+                await Dispatcher.UIThread.InvokeAsync(() => 
+                { 
+
+                    if (filename.EndsWith(".avm"))
+                    {
+                        _textEditor.Text = ViewModel.DisassembleAVMFile(_textEditor.Text);
+                    }
+                    else
+                    {
+                        FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        _textEditor.Load(fs);
+                    }
+                    _textEditor.IsReadOnly = filename.EndsWith(".avm");
+                });
             }
         }
 
