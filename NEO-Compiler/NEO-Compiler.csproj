@@ -18,6 +18,6 @@
     <Compile Remove="AVM\AVMCompiler.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Neo-Compiler-Lib\Neo-Compiler-Lib.csproj" />
+    <ProjectReference Include="..\NEO-Compiler-Lib\NEO-Compiler-Lib.csproj" />
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Markup.Xaml;
 
-namespace NeoDebuggerUI
+namespace NEODebuggerUI
 {
 	public class App : Application
 	{

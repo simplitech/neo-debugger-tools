@@ -9,10 +9,10 @@
     <DependsOnNETStandard>true</DependsOnNETStandard>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Neo-Emulator\Neo-Emulator.csproj" />
-    <ProjectReference Include="..\Neo-Compiler-Lib\Neo-Compiler-Lib.csproj" />
-    <ProjectReference Include="..\Neo-Boa-Proxy-Lib\Neo-Boa-Proxy-Lib.csproj" />
     <ProjectReference Include="..\neo-official-vm\src\neo-vm\neo-vm.csproj" />
+    <ProjectReference Include="..\NEO-Boa-Proxy-Lib\NEO-Boa-Proxy-Lib.csproj" />
+    <ProjectReference Include="..\NEO-Compiler-Lib\NEO-Compiler-Lib.csproj" />
+    <ProjectReference Include="..\NEO-Emulator\NEO-Emulator.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />

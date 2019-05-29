@@ -690,6 +690,9 @@ namespace Neo.Debugger.Core.Utils
             //STEP
             _state = Emulator.Step();
             UpdateState();
+
+            if (_resetFlag)
+                Reset();
         }
 
         public void UpdateState()

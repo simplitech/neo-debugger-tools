@@ -1,10 +1,10 @@
 ﻿using System;
 using Avalonia;
 using Avalonia.Logging.Serilog;
-using NeoDebuggerUI.ViewModels;
-using NeoDebuggerUI.Views;
+using NEODebuggerUI.ViewModels;
+using NEODebuggerUI.Views;
 
-namespace NeoDebuggerUI
+namespace NEODebuggerUI
 {
 	class Program
 	{

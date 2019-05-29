@@ -6,21 +6,20 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using AvaloniaEdit;
-using AvaloniaEdit.Highlighting;
-using NeoDebuggerUI.ViewModels;
+using NEODebuggerUI.ViewModels;
 using ReactiveUI;
-using System.IO;
-using System.Linq;
 using Avalonia.Layout;
 using LunarLabs.Parser;
 using Neo.Debugger.Core.Utils;
 using Neo.Emulation;
 using Neo.Lux.Utils;
-using NeoDebuggerUI.Models;
+using NEODebuggerUI.Models;
 using Neo.Emulation.API;
 using System.Numerics;
+using System.Threading.Tasks;
+using Avalonia.Threading;
 
-namespace NeoDebuggerUI.Views
+namespace NEODebuggerUI.Views
 {
     public class InvokeWindow : ReactiveWindow<InvokeWindowViewModel>
     {
@@ -30,14 +29,18 @@ namespace NeoDebuggerUI.Views
 #if DEBUG
             this.AttachDevTools();
 #endif
-
-            RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
             RegisterInteraction();
-            RegisterEventListeners();
-            if(DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
-            {
-                ViewModel.Run();
-            }
+            Reload();
+        }
+
+        public void Reload()
+        {
+            RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
+        }
+
+        public void UseOffset(bool useOffset)
+        {
+            ViewModel.UseOffset = useOffset;
         }
 
         private void InitializeComponent()
@@ -115,35 +118,30 @@ namespace NeoDebuggerUI.Views
 
         private void RegisterInteraction()
         {
-            this.FindControl<Button>("DebugBtn").Click += (_,__) =>
+            this.ViewModel.EvtSelectedTestCaseChanged += (fileName) => RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
+            this.FindControl<Button>("AddPrivateKey").Click += async (_, __) => await ViewModel.AddPrivateKey();
+            this.FindControl<Button>("RemovePrivateKey").Click += async (_, __) => await ViewModel.RemovePrivateKey();
+            this.FindControl<Button>("DebugBtn").Click += async(_,__) =>
             {
                 var op = ExtractValueFromGrid(1, 1);
                 var args = ExtractValueFromGrid(2, 1);
 
                 if (!UseTestSequence())
                 {
-                    if (!SaveTransactionInfo())
+                    if (!SaveTransactionInfo().Result)
                     {
                         return;
                     }
                     SaveOptions();
                 }
-                DebugPressed(op, args);
+                await DebugPressed(op, args);
                 Close();
             };
         }
 
-        public void RegisterEventListeners()
+        public async Task DebugPressed(string field1, string field2)
         {
-            this.ViewModel.EvtSelectedTestCaseChanged += (fileName) => RenderTestCaseParams(ViewModel.SelectedTestCaseParams);
-            this.FindControl<Button>("AddPrivateKey").Click += (_, __) => ViewModel.AddPrivateKey();
-            this.FindControl<Button>("RemovePrivateKey").Click += (_, __) => ViewModel.RemovePrivateKey();
-        }
-
-        public void DebugPressed(string field1, string field2)
-        {
-            ViewModel.DebugParams.ArgList = DebuggerUtils.GetArgsListAsNode(string.Concat(field1, ",", field2));
-            ViewModel.Run();
+            await Dispatcher.UIThread.InvokeAsync(() => DebuggerStore.instance.DebugParams.ArgList = DebuggerUtils.GetArgsListAsNode(string.Concat(field1, ",", field2)));
         }
         
         public void SaveOptions()
@@ -156,7 +154,7 @@ namespace NeoDebuggerUI.Views
             {
                 return;
             }
-            ViewModel.DebugParams.WitnessMode = witnessMode;
+            DebuggerStore.instance.DebugParams.WitnessMode = witnessMode;
 
             //Get the trigger type
             TriggerType type;
@@ -166,18 +164,18 @@ namespace NeoDebuggerUI.Views
             {
                 return;
             }
-            ViewModel.DebugParams.TriggerType = type;
+            DebuggerStore.instance.DebugParams.TriggerType = type;
             //Get the timestamp
-            ViewModel.DebugParams.Timestamp = ViewModel.Timestamp;
+            DebuggerStore.instance.DebugParams.Timestamp = ViewModel.Timestamp;
 
             //Get raw script
             var rawScriptText = this.FindControl<TextBox>("RawScriptText");
             var HasRawScript = rawScriptText.Text?.Length > 0;
 
-            ViewModel.DebugParams.RawScript = HasRawScript ? rawScriptText.Text.HexToBytes() : null;
+            DebuggerStore.instance.DebugParams.RawScript = HasRawScript ? rawScriptText.Text.HexToBytes() : null;
         }
 
-        public bool SaveTransactionInfo()
+        public async Task<bool> SaveTransactionInfo()
         {
             var assetBox = this.FindControl<DropDown>("AssetBox");
             if (assetBox.SelectedIndex > 0)
@@ -193,11 +191,11 @@ namespace NeoDebuggerUI.Views
                             amount *= Asset.Decimals; // fix decimals
 
                             //Add the transaction info
-                            ViewModel.DebugParams.Transaction.Add(entry.id, amount);
+                            DebuggerStore.instance.DebugParams.Transaction.Add(entry.id, amount);
                         }
                         else
                         {
-                            ViewModel.OpenGenericSampleDialog(entry.name + " amount must be greater than zero", "OK", "", false);
+                            await ViewModel.OpenGenericSampleDialog(entry.name + " amount must be greater than zero", "OK", "", false);
                             return false;
                         }
 
@@ -213,7 +211,7 @@ namespace NeoDebuggerUI.Views
             {
                 privateKey = "";
             }
-            ViewModel.DebugParams.PrivateKey = privateKey;
+            DebuggerStore.instance.DebugParams.PrivateKey = privateKey;
 
             return true;
         }

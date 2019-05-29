@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Linq;
@@ -7,12 +7,13 @@ using Neo.Debugger.Core.Utils;
 using NEO_Emulator.SmartContractTestSuite;
 using ReactiveUI;
 
-namespace NeoDebuggerUI.Models
+namespace NEODebuggerUI.Models
 {
     public class DebuggerStore : ReactiveObject
     {
         public static readonly DebuggerStore instance;
 
+        public DebugParameters DebugParams { get; set; } = new DebugParameters();
         static DebuggerStore()
         {
             instance = new DebuggerStore();

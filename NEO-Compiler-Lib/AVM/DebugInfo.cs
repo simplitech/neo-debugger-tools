@@ -7,6 +7,7 @@ namespace Neo.Compiler.AVM
 {
     public static class DebugInfo
     {
+
         public static MyJson.JsonNode_Object ExportDebugInfo(string avmName, NeoModule module)
         {
             var outjson = new MyJson.JsonNode_Object();
@@ -56,7 +57,6 @@ namespace Neo.Compiler.AVM
                     {
                         bytes.Add(c.bytes[i]);
                     }
-
             }
 
             var hash = CalculateMD5(bytes.ToArray());

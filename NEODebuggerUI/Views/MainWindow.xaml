@@ -1,9 +1,9 @@
 ﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="clr-namespace:NeoDebuggerUI.ViewModels;assembly=NeoDebuggerUI"
+        xmlns:vm="clr-namespace:NEODebuggerUI.ViewModels;assembly=NEODebuggerUI"
         xmlns:AvalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
-        Icon="resm:NeoDebuggerUI.Assets.avalonia-logo.ico"
-        Title="NeoDebuggerUI"
+        Icon="resm:NEODebuggerUI.Assets.avalonia-logo.ico"
+        Title="NEODebuggerUI"
             Background="LightGray"
         Width="950"
         Height="600">
@@ -76,14 +76,18 @@
         <MenuItem Header="Expand All" />
       </MenuItem>
       <MenuItem Header="Contract">
-        <MenuItem Header="Run (F5)" Command="{Binding OpenRunDialog}"
+        <MenuItem Header="Run (Ctrl + R)" Command="{Binding TryRun}"
+                                    CommandParameter="false"
                                     Name="RunContract"/>
-        <MenuItem Header="Stop (Shift+F5)" Command="{Binding StopDebugging}"
-                                           IsVisible="{Binding IsSteppingOrOnBreakpoint}"
+        <MenuItem Header="Stop (Ctrl + P)" Command="{Binding StopDebugging}"
+                                           IsEnabled="{Binding IsStopped}"
                                            Name="StopContract"/>
-        <MenuItem Header="Step (F10)" Name="StepContract"/>
+        <MenuItem Header="Step (Ctrl + D)" Command="{Binding Step}"
+                                      CommandParameter="true"
+                                      IsEnabled="{Binding IsStopped}"
+                                      Name="StepContract"/>
         <MenuItem Header="Reset" IsEnabled="false" />
-        <MenuItem Header="Rebuild" Command="{Binding CompileCurrentFile}"/>
+        <MenuItem Header="Rebuild" Command="{Binding SaveAndRebuild}"/>
         <MenuItem Header="Storage (F6)" IsEnabled="false" />
       </MenuItem>
       <MenuItem Header="Blockchain">
@@ -143,10 +147,13 @@
           DockPanel.Dock="Top"
           Margin="5, 0, 0, 0"
           Text="Log:"/>
+        <ScrollViewer>
         <TextBlock
           VerticalAlignment="Stretch"
           Background="White"
+                    
           Text="{Binding Log}" />
+        </ScrollViewer>
       </DockPanel>
     </DockPanel>
 

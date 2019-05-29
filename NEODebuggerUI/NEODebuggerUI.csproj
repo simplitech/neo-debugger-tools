@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Resources\ContractTemplate.cs" />
+    <Compile Remove="Resources\ContractTemplate %28copy%29.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="**\*.xaml.cs">
@@ -56,9 +57,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Neo-Debugger-Core\Neo-Debugger-Core.csproj" />
     <ProjectReference Include="..\neo-lux\Neo.Lux\Neo.Lux.csproj" />
     <ProjectReference Include="..\Neo.SmartContract.Framework\Neo.SmartContract.Framework.csproj" />
     <ProjectReference Include="..\neo-official-vm\src\neo-vm\neo-vm.csproj" />
+    <ProjectReference Include="..\NEO-Debugger-Core\NEO-Debugger-Core.csproj" />
   </ItemGroup>
 </Project>

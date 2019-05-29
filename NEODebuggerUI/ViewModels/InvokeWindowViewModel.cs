@@ -3,15 +3,16 @@ using Neo.Debugger.Core.Models;
 using ReactiveUI;
 using System.Reactive.Linq;
 using LunarLabs.Parser;
-using NeoDebuggerUI.Models;
+using NEODebuggerUI.Models;
 using System;
 using System.Threading.Tasks;
 using Neo.VM;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Neo.Emulation.API;
+using Avalonia.Threading;
 
-namespace NeoDebuggerUI.ViewModels
+namespace NEODebuggerUI.ViewModels
 {
     public class InvokeWindowViewModel : ViewModelBase
     {
@@ -21,7 +22,9 @@ namespace NeoDebuggerUI.ViewModels
         public List<string> AssetItems { get; } = new List<string>();
 
         public DataNode SelectedTestCaseParams => SelectedTestCase != null ? DebuggerStore.instance.Tests.cases[SelectedTestCase].args : null;
-        public DebugParameters DebugParams { get; set; } = new DebugParameters();
+
+        public bool Stepping;
+        public bool UseOffset;
 
         public delegate void SelectedTestChanged(string selectedTestCase);
         public event SelectedTestChanged EvtSelectedTestCaseChanged;
@@ -154,11 +157,18 @@ namespace NeoDebuggerUI.ViewModels
 
         public InvokeWindowViewModel()
         {
-            if(DebuggerStore.instance.Tests != null && DebuggerStore.instance.Tests.cases.Count > 0) {
+            if (DebuggerStore.instance.Tests != null && DebuggerStore.instance.Tests.cases.Count > 0)
+            {
                 _selectedTestCase = DebuggerStore.instance.Tests.cases.ElementAt(0).Key;
             }
             _selectedTestSequence = null;
-            _selectedFunction = DebuggerStore.instance.manager.ABI.entryPoint.name;
+
+            _selectedFunction = "main";
+            if (DebuggerStore.instance.manager.ABI != null)
+            {
+                _selectedFunction = DebuggerStore.instance.manager.ABI.entryPoint.name;
+            }
+
             _selectedTrigger = DebuggerStore.instance.manager.Emulator.currentTrigger.ToString();
             _selectedWitness = DebuggerStore.instance.manager.Emulator.checkWitnessMode.ToString();
             _selectedDate = DateTime.UtcNow;
@@ -186,52 +196,6 @@ namespace NeoDebuggerUI.ViewModels
             selectedPrivateKeyChanged.Subscribe(time => UpdatePrivateKeyAddress());
         }
 
-        public void Run()
-        {
-            //If the debug has started already, run with previous parameters
-            if(DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
-            {
-                DebuggerStore.instance.manager.Run();
-            }
-            else
-            {
-                if (SelectedTestSequence == null)
-                {
-                    DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
-                    DebuggerStore.instance.manager.Run();
-                }
-                else
-                {
-                    //Is not stopping on breakpoint when run a test sequence
-                    DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
-                }
-            }
-            
-            //Check if the Run or RunSequence has ended the debugging
-            if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
-            {
-                StackItem result = null;
-                string errorMessage = null;
-                try
-                {
-                    result = DebuggerStore.instance.manager.Emulator.GetOutput();
-                }
-                catch (Exception ex)
-                {
-                    errorMessage = ex.Message;
-                }
-
-                if (result != null)
-                {
-                    OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
-                }
-                else
-                {
-                    OpenGenericSampleDialog(errorMessage, "Error", "", false);
-                }
-                DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
-            }
-        }
 
         public void LoadPrivateKeys()
         {
@@ -259,13 +223,13 @@ namespace NeoDebuggerUI.ViewModels
             }
         }
 
-        public void AddPrivateKey()
+        public async Task AddPrivateKey()
         {
             if (PrivateKeys.Contains(InputPrivateKey))
             {
                 SelectedPrivateKey = InputPrivateKey;
                 InputPrivateKey = "";
-                OpenGenericSampleDialog("This private key is already loaded", "OK", "", false);
+                await OpenGenericSampleDialog("This private key is already loaded", "OK", "", false);
                 return;
             }
 
@@ -278,19 +242,24 @@ namespace NeoDebuggerUI.ViewModels
             }
             else
             {
-                OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false);
+                await OpenGenericSampleDialog("Invalid private key, length should be 52 or 64", "OK", "", false);
             }
+            DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
         }
 
-        public void RemovePrivateKey()
+        public async Task RemovePrivateKey()
         {
-            if(SelectedPrivateKey != PrivateKeys.ElementAt(0))
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                var i = PrivateKeys.IndexOf(SelectedPrivateKey);
+                if (SelectedPrivateKey != PrivateKeys.ElementAt(0))
+                {
+                    var i = PrivateKeys.IndexOf(SelectedPrivateKey);
 
-                SelectedPrivateKey = PrivateKeys.ElementAt(i - 1);
-                PrivateKeys.RemoveAt(i);
-            }
+                    SelectedPrivateKey = PrivateKeys.ElementAt(i - 1);
+                    PrivateKeys.RemoveAt(i);
+                }
+            });
+            DebuggerStore.instance.PrivateKeysList = PrivateKeys.ToList();
         }
     }
 }

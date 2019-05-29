@@ -7,6 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Neo-Debugger-Core\Neo-Debugger-Core.csproj" />
+    <ProjectReference Include="..\NEO-Debugger-Core\NEO-Debugger-Core.csproj" />
   </ItemGroup>
 </Project>

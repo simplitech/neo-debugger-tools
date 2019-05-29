@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -7,11 +7,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Threading;
 using AvaloniaEdit;
 using AvaloniaEdit.Highlighting;
-using NeoDebuggerUI.ViewModels;
+using NEODebuggerUI.ViewModels;
 
-namespace NeoDebuggerUI.Views
+#pragma warning disable RECS0061 // Warns when a culture-aware 'EndsWith' call is used by default.
+namespace NEODebuggerUI.Views
 {
     public class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
@@ -34,7 +36,7 @@ namespace NeoDebuggerUI.Views
             _textEditor.TextArea.IndentationStrategy = new AvaloniaEdit.Indentation.CSharp.CSharpIndentationStrategy(_textEditor.Options);
             _textEditor.PointerHover += (o, e) => SetTip(e.GetPosition(_textEditor));
             _textEditor.PointerHoverStopped += (o, e) => ToolTip.SetIsOpen(_textEditor, false);
-
+            _textEditor.TextChanged += (object sender, EventArgs e) => { ViewModel.EditorFileContent = _textEditor.Text; };
             _breakpointMargin = new BreakpointMargin();
             _breakpointMargin.Width = 20;
             _breakpointMargin.PointerPressed += (o, e) => SetBreakpointState(e.GetPosition(_textEditor));
@@ -50,18 +52,22 @@ namespace NeoDebuggerUI.Views
             newNEP5.Click += async (o, e) => { await NewPythonFile(); };
 
 
-            this.ViewModel.EvtFileChanged += (fileName) => LoadFile(fileName);
-            this.ViewModel.EvtFileToCompileChanged += () => ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
-            this.Activated += (o, e) => { ReloadCurrentFile(); };
+            this.ViewModel.EvtFileChanged += async (fileName) => await LoadFile(fileName);
+            //this.ViewModel.EvtFileToCompileChanged += async () => await ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
+            //this.Activated += (o, e) => { ReloadCurrentFile(); };
 
-            RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex);
-            this.ViewModel.EvtVMStackChanged += (eval, alt, index) => RenderVMStack(eval, alt, index);
-            this.ViewModel.EvtDebugCurrentLineChanged += (isOnBreakpoint, line) => HighlightOnBreakpoint(isOnBreakpoint, line);
-            this.ViewModel.EvtBreakpointStateChanged += (line, addBreakpoint) => UpdateBreakpoint(addBreakpoint, line);
+            Dispatcher.UIThread.InvokeAsync(() => RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex));
+            this.ViewModel.EvtVMStackChanged += async (eval, alt, index) => await RenderVMStack(eval, alt, index);
+            this.ViewModel.EvtDebugCurrentLineChanged += async (isOnBreakpoint, line) => await HighlightOnBreakpoint(isOnBreakpoint, line);
+            this.ViewModel.EvtBreakpointStateChanged += async (line, addBreakpoint) => await UpdateBreakpoint(line);
+
+
+            this.SetHotKeys();
         }
 
         public async Task NewCSharpFile()
         {
+            this.ViewModel.SendLogToPanel("New CSharp File 1");
             var dialog = new SaveFileDialog();
             var filters = new List<FileDialogFilter>();
             var filteredExtensions = new List<string>(new string[] { "cs" });
@@ -69,10 +75,7 @@ namespace NeoDebuggerUI.Views
             filters.Add(filter);
             dialog.Filters = filters;
             var result = await dialog.ShowAsync(this);
-            if (result != null)
-            {
-                this.ViewModel.ResetWithNewFile(result);
-            }
+            await ViewModel.ResetWithNewFile(result);
         }
 
         public async Task NewPythonFile()
@@ -86,17 +89,31 @@ namespace NeoDebuggerUI.Views
             var result = await dialog.ShowAsync(this);
             if (result != null)
             {
-                this.ViewModel.ResetWithNewFile(result);
+                await this.ViewModel.ResetWithNewFile(result);
             }
         }
 
-        private void LoadFile(string filename)
-        {
-            FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-            _textEditor.Load(fs);
-        }
 
-       
+        private async Task LoadFile(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                await Dispatcher.UIThread.InvokeAsync(() => 
+                { 
+
+                    if (filename.EndsWith(".avm"))
+                    {
+                        _textEditor.Text = ViewModel.DisassembleAVMFile(_textEditor.Text);
+                    }
+                    else
+                    {
+                        FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        _textEditor.Load(fs);
+                    }
+                    _textEditor.IsReadOnly = filename.EndsWith(".avm");
+                });
+            }
+        }
 
         public void SetBreakpointState(Point clickPosition)
         {
@@ -114,51 +131,54 @@ namespace NeoDebuggerUI.Views
             ViewModel.SetBreakpoint(lineIndex);
         }
 
-        public void UpdateBreakpoint(bool addBreakpoint, int line)
+        public async Task UpdateBreakpoint(int line)
         {
             // update ui
-            _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints);
+            await Dispatcher.UIThread.InvokeAsync(() => _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints, line));
+
             // fix gui bug when inserting breakpoint in the same line of the caret
-            var offset = _textEditor.Document.GetOffset(line, 0);
-            _textEditor.CaretOffset = offset - 1;
+            if (_textEditor.Document.GetLineByOffset(_textEditor.CaretOffset).LineNumber == line)
+            {
+                var offset = _textEditor.Document.GetOffset(line, 0);
+                _textEditor.CaretOffset = offset < _textEditor.Text.Length ? offset : 0;
+            }
         }
 
-        public void HighlightOnBreakpoint(bool isOnBreakpoint, int currentLine)
+
+        public async Task HighlightOnBreakpoint(bool isOnBreakpoint, int currentLine)
         {
             if (isOnBreakpoint)
             {
                 // highlight the line when stopped on a breakpoint
                 var currentDocumentLine = _textEditor.Document.GetLineByNumber(currentLine);
-                
+
                 var lineText = _textEditor.Document.GetText(currentDocumentLine.Offset, currentDocumentLine.Length);
                 var offset = Regex.Match(lineText, @"\S").Index;
-                var regex = Regex.Match(lineText, @"(?<=^\s*)(\S|\S\s)+(?=\s*$)").Value;
+                var regex = Regex.Match(lineText, @"(?<=^\s*)([^\s\/]|[^\s\/]\s)+(?=\s*$|\s*\/\/)").Value;
 
-                _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints, currentLine, offset, regex.Length);
-
-                // change selection to fix gui bug to update
-                _textEditor.SelectionStart = currentDocumentLine.Offset - 1;
-                _textEditor.SelectionLength = 1; // there must be a selection to update textview
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    _breakpointMargin.UpdateBreakpointView(ViewModel.Breakpoints, currentLine, offset, regex.Length);
+                    // change selection to fix gui bug to update
+                    _textEditor.SelectionStart = currentDocumentLine.NextLine.Offset - 1;
+                    _textEditor.SelectionLength = 1; // there must be a selection to update textview
+                });
 
             }
             else
             {
-                // clear highlight of the last stopped line 
-                _breakpointMargin.UpdateBreakpointMargin(ViewModel.Breakpoints);
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    // clear highlight of the last stopped line 
+                    _breakpointMargin.UpdateBreakpointView(ViewModel.Breakpoints, 0);
 
-                // change selection to fix gui bug to update
-                _textEditor.SelectionStart = _textEditor.CaretOffset;
-                _textEditor.SelectionLength = 1; // there must be a selection to update textview
+                    // change selection to fix gui bug to update
+                    _textEditor.SelectionStart = _textEditor.CaretOffset > 0 ? _textEditor.CaretOffset - 1 : 0;
+                    // there must be a modification to update textview
+                });
+
             }
             _textEditor.IsReadOnly = isOnBreakpoint;
-        }
-
-        private void ReloadCurrentFile() 
-        {
-            if (!string.IsNullOrEmpty(ViewModel.SelectedFile) && File.Exists(ViewModel.SelectedFile))
-            {
-                Task.Run(() => LoadFile(ViewModel.SelectedFile));
-            }
         }
 
         private void InitializeComponent()
@@ -166,7 +186,7 @@ namespace NeoDebuggerUI.Views
             AvaloniaXamlLoader.Load(this);
         }
 
-        private void RenderVMStack(List<string> evalStack, List<string> altStack, int index)
+        private async Task RenderVMStack(List<string> evalStack, List<string> altStack, int index)
         {
             var grid = this.FindControl<Grid>("VMStackGrid");
             grid.Children.Clear();
@@ -195,11 +215,15 @@ namespace NeoDebuggerUI.Views
             Grid.SetColumn(altHeader, 2);
             grid.Children.Add(altHeader);
 
-            for (int i = 0; i <= index; i++)
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                RenderLine(grid, i + 1, index - i, evalStack[i], altStack[i]);
-            }
+                for (int i = 0; i <= index; i++)
+                {
+                    RenderLine(grid, i + 1, index - i, evalStack[i], altStack[i]);
+                }
+            });
         }
+
 
         private void RenderLine(Grid grid, int rowCount, int index, string eval, string alt)
         {
@@ -282,6 +306,37 @@ namespace NeoDebuggerUI.Views
             return lineStr.Substring(start, length);
         }
 
+        public void SetHotKeys()
+        {
+            var keyBindings = this.KeyBindings;
 
+            var runControl = this.FindControl<MenuItem>("RunContract");
+            var runKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: F5
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.R, Avalonia.Input.InputModifiers.Control),
+                Command = runControl.Command,
+                CommandParameter = runControl.CommandParameter
+            };
+            keyBindings.Add(runKeyBinding);
+
+            var stepControl = this.FindControl<MenuItem>("StepContract");
+            var stepKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: F10
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.D, Avalonia.Input.InputModifiers.Control),
+                Command = stepControl.Command,
+                CommandParameter = stepControl.CommandParameter
+            };
+            keyBindings.Add(stepKeyBinding);
+
+            var stopKeyBinding = new Avalonia.Input.KeyBinding()
+            {
+                // hotkey: Shift + F5
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.P, Avalonia.Input.InputModifiers.Control),
+                Command = this.FindControl<MenuItem>("StopContract").Command
+            };
+            keyBindings.Add(stopKeyBinding);
+        }
     }
 }
