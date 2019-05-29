@@ -17,6 +17,7 @@ using NEODebuggerUI.Models;
 using Neo.Emulation.API;
 using System.Numerics;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 
 namespace NEODebuggerUI.Views
 {
@@ -140,8 +141,7 @@ namespace NEODebuggerUI.Views
 
         public async Task DebugPressed(string field1, string field2)
         {
-            ViewModel.DebugParams.ArgList = DebuggerUtils.GetArgsListAsNode(string.Concat(field1, ",", field2));
-            await ViewModel.Run();
+            await Dispatcher.UIThread.InvokeAsync(() => DebuggerStore.instance.DebugParams.ArgList = DebuggerUtils.GetArgsListAsNode(string.Concat(field1, ",", field2)));
         }
         
         public void SaveOptions()
@@ -154,7 +154,7 @@ namespace NEODebuggerUI.Views
             {
                 return;
             }
-            ViewModel.DebugParams.WitnessMode = witnessMode;
+            DebuggerStore.instance.DebugParams.WitnessMode = witnessMode;
 
             //Get the trigger type
             TriggerType type;
@@ -164,15 +164,15 @@ namespace NEODebuggerUI.Views
             {
                 return;
             }
-            ViewModel.DebugParams.TriggerType = type;
+            DebuggerStore.instance.DebugParams.TriggerType = type;
             //Get the timestamp
-            ViewModel.DebugParams.Timestamp = ViewModel.Timestamp;
+            DebuggerStore.instance.DebugParams.Timestamp = ViewModel.Timestamp;
 
             //Get raw script
             var rawScriptText = this.FindControl<TextBox>("RawScriptText");
             var HasRawScript = rawScriptText.Text?.Length > 0;
 
-            ViewModel.DebugParams.RawScript = HasRawScript ? rawScriptText.Text.HexToBytes() : null;
+            DebuggerStore.instance.DebugParams.RawScript = HasRawScript ? rawScriptText.Text.HexToBytes() : null;
         }
 
         public async Task<bool> SaveTransactionInfo()
@@ -191,7 +191,7 @@ namespace NEODebuggerUI.Views
                             amount *= Asset.Decimals; // fix decimals
 
                             //Add the transaction info
-                            ViewModel.DebugParams.Transaction.Add(entry.id, amount);
+                            DebuggerStore.instance.DebugParams.Transaction.Add(entry.id, amount);
                         }
                         else
                         {
@@ -211,7 +211,7 @@ namespace NEODebuggerUI.Views
             {
                 privateKey = "";
             }
-            ViewModel.DebugParams.PrivateKey = privateKey;
+            DebuggerStore.instance.DebugParams.PrivateKey = privateKey;
 
             return true;
         }

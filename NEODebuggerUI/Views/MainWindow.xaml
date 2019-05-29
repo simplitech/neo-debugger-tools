@@ -80,10 +80,11 @@
                                     CommandParameter="false"
                                     Name="RunContract"/>
         <MenuItem Header="Stop (Shift+F5)" Command="{Binding StopDebugging}"
-                                           IsVisible="{Binding IsSteppingOrOnBreakpoint}"
+                                           IsEnabled="{Binding IsSteppingOrOnBreakpoint}"
                                            Name="StopContract"/>
         <MenuItem Header="Step (F10)" Command="{Binding OpenRunDialog}"
                                       CommandParameter="true"
+                                      IsEnabled="{Binding IsSteppingOrOnBreakpoint}"
                                       Name="StepContract"/>
         <MenuItem Header="Reset" IsEnabled="false" />
         <MenuItem Header="Rebuild" Command="{Binding SaveAndRebuild}"/>

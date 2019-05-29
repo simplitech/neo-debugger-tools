@@ -181,14 +181,6 @@ namespace NEODebuggerUI.Views
             _textEditor.IsReadOnly = isOnBreakpoint;
         }
 
-        private void ReloadCurrentFile()
-        {
-            if (!string.IsNullOrEmpty(ViewModel.SelectedFile) && File.Exists(ViewModel.SelectedFile))
-            {
-                Task.Run(() => LoadFile(ViewModel.SelectedFile));
-            }
-        }
-
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
@@ -346,6 +338,5 @@ namespace NEODebuggerUI.Views
             };
             keyBindings.Add(stopKeyBinding);
         }
-
     }
 }

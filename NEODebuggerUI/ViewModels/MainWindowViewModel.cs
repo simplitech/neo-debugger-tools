@@ -101,7 +101,7 @@ namespace NEODebuggerUI.ViewModels
                 }
                 else
                 {
-                    if(_selectedFile.EndsWith("py") || _selectedFile.EndsWith("cs"))
+                    if (_selectedFile.EndsWith("py") || _selectedFile.EndsWith("cs"))
                     {
                         _selectedProjectFile = _selectedFile;
                     }
@@ -293,10 +293,9 @@ namespace NEODebuggerUI.ViewModels
 
         public async Task TryRun()
         {
-            if(DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
                 await RunDebugger();
-                await CheckResults();
             }
             else
             {
@@ -334,22 +333,23 @@ namespace NEODebuggerUI.ViewModels
         {
             var invokeWindow = new InvokeWindow();
             await invokeWindow.ShowDialog(Application.Current.MainWindow);
+            await RunDebugger();
         }
 
         public async Task RunDebugger()
         {
-            await Task.Run(() =>
-            {
-                DebuggerStore.instance.manager.Run();
-            });
 
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            DebuggerStore.instance.manager.ConfigureDebugParameters(DebuggerStore.instance.DebugParams);
+            DebuggerStore.instance.manager.Run();
+            
+            await Dispatcher.UIThread.InvokeAsync(async () =>
             {
                 IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
                 ConsumedGas = DebuggerStore.instance.UsedGasCost;
 
                 UpdateCurrentLineView();
                 UpdateStackPanel();
+                await CheckResults();
             });
         }
 
@@ -454,63 +454,71 @@ namespace NEODebuggerUI.ViewModels
 
         private void UpdateStackPanel()
         {
-            var evalStack = DebuggerStore.instance.manager.Emulator.GetEvaluationStack().ToArray();
-            var altStack = DebuggerStore.instance.manager.Emulator.GetAltStack().ToArray();
+            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint) {
+                var evalStack = DebuggerStore.instance.manager.Emulator.GetEvaluationStack().ToArray();
+                var altStack = DebuggerStore.instance.manager.Emulator.GetAltStack().ToArray();
 
-            EvaluationStack.Clear();
-            AltStack.Clear();
+                EvaluationStack.Clear();
+                AltStack.Clear();
 
-            int index = Math.Max(evalStack.Length, altStack.Length) - 1;
-            StackIndex = index;
+                int index = Math.Max(evalStack.Length, altStack.Length) - 1;
+                StackIndex = index;
 
-            while (index >= 0)
-            {
-                try
+                while (index >= 0)
                 {
-                    EvaluationStack.Add(index < evalStack.Length ? Neo.Emulation.Utils.FormattingUtils.StackItemAsString(evalStack[index]) : "");
-                }
-                catch
-                {
-                    // if some class of the vm throws an exception while trying to get the value of the variable
-                    EvaluationStack.Add("Exception");
-                }
+                    try
+                    {
+                        EvaluationStack.Add(index < evalStack.Length ? Neo.Emulation.Utils.FormattingUtils.StackItemAsString(evalStack[index]) : "");
+                    }
+                    catch
+                    {
+                        // if some class of the vm throws an exception while trying to get the value of the variable
+                        EvaluationStack.Add("Exception");
+                    }
 
-                try
-                {
-                    AltStack.Add(index < altStack.Length ? Neo.Emulation.Utils.FormattingUtils.StackItemAsString(altStack[index]) : "");
-                }
-                catch
-                {
-                    // if some class of the vm throws an exception while trying to get the value of the variable
-                    AltStack.Add("Exception");
-                }
+                    try
+                    {
+                        AltStack.Add(index < altStack.Length ? Neo.Emulation.Utils.FormattingUtils.StackItemAsString(altStack[index]) : "");
+                    }
+                    catch
+                    {
+                        // if some class of the vm throws an exception while trying to get the value of the variable
+                        AltStack.Add("Exception");
+                    }
 
-                index--;
+                    index--;
+                }
             }
+            else
+            {
+                EvaluationStack.Clear();
+                AltStack.Clear();
+                StackIndex = -1;
+            }
+
             EvtVMStackChanged?.Invoke(EvaluationStack, AltStack, StackIndex);
+
         }
 
         public void UpdateCurrentLineView()
         {
-            Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                //  when selected file is .avm needs to you disassembler
-                if (SelectedFile.EndsWith(".avm"))
-                {
-                    var offset = DebuggerStore.instance.manager.Offset;
-                    EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.avmDisassemble.ResolveLine(offset) + 1);
-                }
-                else
-                {
-                    EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.CurrentLine + 1);
-                }
 
-            });
+            if (SelectedFile.EndsWith(".avm"))
+            {
+                var offset = DebuggerStore.instance.manager.Offset;
+                EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.avmDisassemble.ResolveLine(offset) + 1);
+            }
+            else
+            {
+                EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.CurrentLine + 1);
+            }
+
         }
 
         public void UpdateBreakpointView(int line, bool addBreakpoint)
         {
-            Dispatcher.UIThread.InvokeAsync(() => {
+            Dispatcher.UIThread.InvokeAsync(() =>
+            {
                 EvtBreakpointStateChanged?.Invoke(line, addBreakpoint);
                 UpdateCurrentLineView();
             });

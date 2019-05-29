@@ -13,6 +13,7 @@ namespace NEODebuggerUI.Models
     {
         public static readonly DebuggerStore instance;
 
+        public DebugParameters DebugParams { get; set; } = new DebugParameters();
         static DebuggerStore()
         {
             instance = new DebuggerStore();

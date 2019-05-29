@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Resources\ContractTemplate.cs" />
+    <Compile Remove="Resources\ContractTemplate %28copy%29.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="**\*.xaml.cs">

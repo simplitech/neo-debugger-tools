@@ -22,7 +22,7 @@ namespace NEODebuggerUI.ViewModels
         public List<string> AssetItems { get; } = new List<string>();
 
         public DataNode SelectedTestCaseParams => SelectedTestCase != null ? DebuggerStore.instance.Tests.cases[SelectedTestCase].args : null;
-        public DebugParameters DebugParams { get; set; } = new DebugParameters();
+
         public bool Stepping;
         public bool UseOffset;
 
@@ -215,49 +215,49 @@ namespace NEODebuggerUI.ViewModels
         //    await CheckResults();
         //}
 
-        public async Task CheckResults()
-        {
-            if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
-            {
-                Neo.VM.StackItem result = null;
-                string errorMessage = null;
-                try
-                {
-                    result = DebuggerStore.instance.manager.Emulator.GetOutput();
-                }
-                catch (Exception ex)
-                {
-                    errorMessage = ex.Message;
-                }
+        //public async Task CheckResults()
+        //{
+        //    if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+        //    {
+        //        Neo.VM.StackItem result = null;
+        //        string errorMessage = null;
+        //        try
+        //        {
+        //            result = DebuggerStore.instance.manager.Emulator.GetOutput();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            errorMessage = ex.Message;
+        //        }
 
-                if (result != null)
-                {
-                    await OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
-                }
-                else
-                {
-                    await OpenGenericSampleDialog(errorMessage, "Error", "", false);
-                }
-            }
-        }
+        //        if (result != null)
+        //        {
+        //            await OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
+        //        }
+        //        else
+        //        {
+        //            await OpenGenericSampleDialog(errorMessage, "Error", "", false);
+        //        }
+        //    }
+        //}
 
-        public async Task Run()
-        {
-            await Task.Run(() =>
-            {
-                if (SelectedTestSequence == null)
-                {
-                    DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
-                    DebuggerStore.instance.manager.Run();
-                }
-                else
-                {
-                    DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
-                }
-            });
+        //public async Task Run()
+        //{
+        //    await Task.Run(() =>
+        //    {
+        //        if (SelectedTestSequence == null)
+        //        {
+        //            DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
+        //            DebuggerStore.instance.manager.Run();
+        //        }
+        //        else
+        //        {
+        //            DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
+        //        }
+        //    });
 
-            await CheckResults();
-        }
+        //    await CheckResults();
+        //}
 
 
         public void LoadPrivateKeys()
