@@ -22,10 +22,14 @@ namespace NEODebuggerUI.ViewModels
     {
         public ReactiveList<string> ProjectFiles { get; } = new ReactiveList<string>();
 
+
+        private bool _isStopped = false;
         public bool IsStopped
         {
-            get =>  DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint; 
+            get => _isStopped;
+            set => this.RaiseAndSetIfChanged(ref _isStopped, value);
         }
+
 
         public delegate void SelectedFileChanged(string selectedFilename);
         public event SelectedFileChanged EvtFileChanged;
@@ -235,6 +239,19 @@ namespace NEODebuggerUI.ViewModels
             File.WriteAllText(result, sourceCode);
         }
 
+        public async Task Step()
+        {
+            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+            {
+                var previousLine = DebuggerStore.instance.manager.CurrentLine;
+                do
+                {
+                    DebuggerStore.instance.manager.Step();
+                } while (previousLine == DebuggerStore.instance.manager.CurrentLine);
+
+                await CheckResults();
+            }
+        }
 
 
         public void SendLogToPanel(string s)
@@ -310,6 +327,7 @@ namespace NEODebuggerUI.ViewModels
 
             if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
+                IsStopped = false;
                 Neo.VM.StackItem result = null;
                 string errorMessage = null;
                 try
@@ -329,6 +347,10 @@ namespace NEODebuggerUI.ViewModels
                 {
                     await OpenGenericSampleDialog(errorMessage, "Error", "", false);
                 }
+            }
+            else
+            {
+                IsStopped = true;
             }
         }
 

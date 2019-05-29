@@ -30,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NEO-Debugger-UI-UnitTests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NEO-Compiler-UnitTests", "NEO-Compiler-UnitTests\NEO-Compiler-UnitTests.csproj", "{7DF48471-B900-421A-8ECF-F48274C5F8C4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NEO-Compiler-Lib", "NEO-Compiler-Lib\NEO-Compiler-Lib.csproj", "{5DF60A44-42C0-4E64-9290-58F997E609B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NEO-Compiler-Lib", "NEO-Compiler-Lib\NEO-Compiler-Lib.csproj", "{5DF60A44-42C0-4E64-9290-58F997E609B2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Neo.Lux", "neo-lux\Neo.Lux\Neo.Lux.csproj", "{093B45CE-A803-4E10-838F-691216997CAD}"
 EndProject

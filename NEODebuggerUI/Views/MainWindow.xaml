@@ -82,7 +82,7 @@
         <MenuItem Header="Stop (Shift+F5)" Command="{Binding StopDebugging}"
                                            IsEnabled="{Binding IsStopped}"
                                            Name="StopContract"/>
-        <MenuItem Header="Step (F10)" Command="{Binding OpenRunDialog}"
+        <MenuItem Header="Step (F10)" Command="{Binding Step}"
                                       CommandParameter="true"
                                       IsEnabled="{Binding IsStopped}"
                                       Name="StepContract"/>

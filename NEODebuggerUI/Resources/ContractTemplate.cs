@@ -20,41 +20,43 @@ namespace Example
         /// </summary>
         public static object Main(string operation, params object[] args)
         {
-            object returnedValue = null;
-
             if (operation == "name")
             {
-                returnedValue = Name();
+                return Name();
             }
             else if (operation == "symbol")
             {
-                returnedValue = Symbol();
+                return Symbol();
             }
             else if (operation == "decimals")
             {
-                returnedValue = Decimals();
+                return Decimals();
             }else if (operation == "deploy")
             {
-                returnedValue = Deploy();
+                return Deploy();
             }
 
-            return returnedValue;
+            return false;
         }
 
         public static string Deploy()
         {
-            byte[] owner = "Ad83tfsuWxxexhefPzXVpn5vv6oCbLKFEx".ToScriptHash();
-            if (Runtime.CheckWitness(owner))
-            {
-                return "Not Authorized"; 
-            }
+            string testVariable = "Ricardo";
+            //if (Runtime.CheckWitness(ContractOwner))
+            //{
+            //    return "Not Authorized"; 
+            //}
+
             BigInteger totalSupply = Storage.Get(Storage.CurrentContext, KeyTotalSupply).AsBigInteger();
+
             if(totalSupply == 0)
              {
-                
+                Storage.Put(Storage.CurrentContext, KeyTotalSupply, ContractOwner);
              }
-            
-            return "Success";
+
+            totalSupply = Storage.Get(Storage.CurrentContext, KeyTotalSupply).AsBigInteger();
+
+            return "success";
         }
 
         public static string Name()

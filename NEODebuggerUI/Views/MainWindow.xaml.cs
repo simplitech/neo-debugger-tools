@@ -314,7 +314,7 @@ namespace NEODebuggerUI.Views
             var runKeyBinding = new Avalonia.Input.KeyBinding()
             {
                 // hotkey: F5
-                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5),
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.R, Avalonia.Input.InputModifiers.Control),
                 Command = runControl.Command,
                 CommandParameter = runControl.CommandParameter
             };
@@ -324,7 +324,7 @@ namespace NEODebuggerUI.Views
             var stepKeyBinding = new Avalonia.Input.KeyBinding()
             {
                 // hotkey: F10
-                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F10),
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.D, Avalonia.Input.InputModifiers.Control),
                 Command = stepControl.Command,
                 CommandParameter = stepControl.CommandParameter
             };
@@ -333,7 +333,7 @@ namespace NEODebuggerUI.Views
             var stopKeyBinding = new Avalonia.Input.KeyBinding()
             {
                 // hotkey: Shift + F5
-                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.F5, Avalonia.Input.InputModifiers.Shift),
+                Gesture = new Avalonia.Input.KeyGesture(Avalonia.Input.Key.P, Avalonia.Input.InputModifiers.Control),
                 Command = this.FindControl<MenuItem>("StopContract").Command
             };
             keyBindings.Add(stopKeyBinding);

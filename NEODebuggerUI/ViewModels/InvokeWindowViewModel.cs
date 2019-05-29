@@ -196,69 +196,6 @@ namespace NEODebuggerUI.ViewModels
             selectedPrivateKeyChanged.Subscribe(time => UpdatePrivateKeyAddress());
         }
 
-        //public async Task Step()
-        //{
-        //    if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
-        //    {
-        //        if (SelectedTestSequence == null)
-        //        {
-        //            DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
-        //        }
-        //    }
-
-        //    var previousLine = DebuggerStore.instance.manager.CurrentLine;
-        //    do
-        //    {
-        //        DebuggerStore.instance.manager.Step();
-        //    } while (previousLine == DebuggerStore.instance.manager.CurrentLine);
-
-        //    await CheckResults();
-        //}
-
-        //public async Task CheckResults()
-        //{
-        //    if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
-        //    {
-        //        Neo.VM.StackItem result = null;
-        //        string errorMessage = null;
-        //        try
-        //        {
-        //            result = DebuggerStore.instance.manager.Emulator.GetOutput();
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            errorMessage = ex.Message;
-        //        }
-
-        //        if (result != null)
-        //        {
-        //            await OpenGenericSampleDialog("Execution finished.\nGAS cost: " + DebuggerStore.instance.UsedGasCost + "\nResult: " + result.GetString(), "OK", "", false);
-        //        }
-        //        else
-        //        {
-        //            await OpenGenericSampleDialog(errorMessage, "Error", "", false);
-        //        }
-        //    }
-        //}
-
-        //public async Task Run()
-        //{
-        //    await Task.Run(() =>
-        //    {
-        //        if (SelectedTestSequence == null)
-        //        {
-        //            DebuggerStore.instance.manager.ConfigureDebugParameters(DebugParams);
-        //            DebuggerStore.instance.manager.Run();
-        //        }
-        //        else
-        //        {
-        //            DebuggerStore.instance.manager.RunSequence(SelectedTestSequence);
-        //        }
-        //    });
-
-        //    await CheckResults();
-        //}
-
 
         public void LoadPrivateKeys()
         {
