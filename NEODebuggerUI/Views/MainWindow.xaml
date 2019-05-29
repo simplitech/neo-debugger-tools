@@ -80,11 +80,11 @@
                                     CommandParameter="false"
                                     Name="RunContract"/>
         <MenuItem Header="Stop (Shift+F5)" Command="{Binding StopDebugging}"
-                                           IsEnabled="{Binding IsSteppingOrOnBreakpoint}"
+                                           IsEnabled="{Binding IsStopped}"
                                            Name="StopContract"/>
         <MenuItem Header="Step (F10)" Command="{Binding OpenRunDialog}"
                                       CommandParameter="true"
-                                      IsEnabled="{Binding IsSteppingOrOnBreakpoint}"
+                                      IsEnabled="{Binding IsStopped}"
                                       Name="StepContract"/>
         <MenuItem Header="Reset" IsEnabled="false" />
         <MenuItem Header="Rebuild" Command="{Binding SaveAndRebuild}"/>
@@ -147,10 +147,13 @@
           DockPanel.Dock="Top"
           Margin="5, 0, 0, 0"
           Text="Log:"/>
+        <ScrollViewer>
         <TextBlock
           VerticalAlignment="Stretch"
           Background="White"
+                    
           Text="{Binding Log}" />
+        </ScrollViewer>
       </DockPanel>
     </DockPanel>
 

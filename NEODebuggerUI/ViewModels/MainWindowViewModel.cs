@@ -21,6 +21,12 @@ namespace NEODebuggerUI.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         public ReactiveList<string> ProjectFiles { get; } = new ReactiveList<string>();
+
+        public bool IsStopped
+        {
+            get =>  DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint; 
+        }
+
         public delegate void SelectedFileChanged(string selectedFilename);
         public event SelectedFileChanged EvtFileChanged;
 
@@ -61,14 +67,6 @@ namespace NEODebuggerUI.ViewModels
         {
             get => _consumedGas;
             set => this.RaiseAndSetIfChanged(ref _consumedGas, value);
-        }
-
-        // not using getter because the property are updated on another thread and won't update the ui
-        private bool _isSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
-        public bool IsSteppingOrOnBreakpoint
-        {
-            get => _isSteppingOrOnBreakpoint;
-            set => this.RaiseAndSetIfChanged(ref _isSteppingOrOnBreakpoint, value);
         }
 
         public List<string> EvaluationStack { get; set; }
@@ -305,6 +303,11 @@ namespace NEODebuggerUI.ViewModels
 
         public async Task CheckResults()
         {
+            ConsumedGas = DebuggerStore.instance.UsedGasCost;
+
+            UpdateCurrentLineView();
+            UpdateStackPanel();
+
             if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
                 Neo.VM.StackItem result = null;
@@ -338,17 +341,15 @@ namespace NEODebuggerUI.ViewModels
 
         public async Task RunDebugger()
         {
+            if(!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+            {
+                DebuggerStore.instance.manager.ConfigureDebugParameters(DebuggerStore.instance.DebugParams);
+            }
 
-            DebuggerStore.instance.manager.ConfigureDebugParameters(DebuggerStore.instance.DebugParams);
             DebuggerStore.instance.manager.Run();
             
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
-                IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
-                ConsumedGas = DebuggerStore.instance.UsedGasCost;
-
-                UpdateCurrentLineView();
-                UpdateStackPanel();
                 await CheckResults();
             });
         }
@@ -440,14 +441,10 @@ namespace NEODebuggerUI.ViewModels
 
         public void StopDebugging()
         {
-            if (IsSteppingOrOnBreakpoint)
+            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
                 DebuggerStore.instance.manager.Emulator.Stop();
                 DebuggerStore.instance.manager.Run();
-
-                // not using getter because the property are updated on another thread and won't update the ui
-                IsSteppingOrOnBreakpoint = DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint;
-
                 UpdateCurrentLineView();
             }
         }
@@ -506,11 +503,11 @@ namespace NEODebuggerUI.ViewModels
             if (SelectedFile.EndsWith(".avm"))
             {
                 var offset = DebuggerStore.instance.manager.Offset;
-                EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.avmDisassemble.ResolveLine(offset) + 1);
+                EvtDebugCurrentLineChanged?.Invoke(DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.avmDisassemble.ResolveLine(offset) + 1);
             }
             else
             {
-                EvtDebugCurrentLineChanged?.Invoke(IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.CurrentLine + 1);
+                EvtDebugCurrentLineChanged?.Invoke(DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint, DebuggerStore.instance.manager.CurrentLine + 1);
             }
 
         }
