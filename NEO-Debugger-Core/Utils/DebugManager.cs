@@ -149,9 +149,7 @@ namespace Neo.Debugger.Core.Utils
         {
             get
             {
-                return (_state.state == DebuggerState.State.Exception || _state.state == DebuggerState.State.Break
-                    || _map != null && _map.Entries != null ? _map.Entries.Select(x => x.line).Contains(_currentLine + 1) : false) 
-                    && _state.state != DebuggerState.State.Finished;
+                return (_state.state == DebuggerState.State.Exception || _state.state == DebuggerState.State.Break);
             }
         }
 

@@ -76,13 +76,13 @@
         <MenuItem Header="Expand All" />
       </MenuItem>
       <MenuItem Header="Contract">
-        <MenuItem Header="Run (F5)" Command="{Binding TryRun}"
+        <MenuItem Header="Run (Ctrl + R)" Command="{Binding TryRun}"
                                     CommandParameter="false"
                                     Name="RunContract"/>
-        <MenuItem Header="Stop (Shift+F5)" Command="{Binding StopDebugging}"
+        <MenuItem Header="Stop (Ctrl + P)" Command="{Binding StopDebugging}"
                                            IsEnabled="{Binding IsStopped}"
                                            Name="StopContract"/>
-        <MenuItem Header="Step (F10)" Command="{Binding Step}"
+        <MenuItem Header="Step (Ctrl + D)" Command="{Binding Step}"
                                       CommandParameter="true"
                                       IsEnabled="{Binding IsStopped}"
                                       Name="StepContract"/>

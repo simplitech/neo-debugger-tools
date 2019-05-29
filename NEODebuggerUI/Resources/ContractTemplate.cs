@@ -41,7 +41,6 @@ namespace Example
 
         public static string Deploy()
         {
-            string testVariable = "Ricardo";
             //if (Runtime.CheckWitness(ContractOwner))
             //{
             //    return "Not Authorized"; 
