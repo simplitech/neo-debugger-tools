@@ -22,8 +22,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NEO-ICO-UnitTests", "NEO-IC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NEO-Debugger-Core-UnitTests", "NEO-Debugger-Core-UnitTests\NEO-Debugger-Core-UnitTests.csproj", "{8E5DBFD3-FB58-45CE-8754-64184B766E5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neo-Debugger-Winform", "NEO-Debugger-Winform\Neo-Debugger-Winform.csproj", "{69CE0FB9-99CF-4A40-A0AB-E39F5050054E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NEODebuggerUI", "NEODebuggerUI\NEODebuggerUI.csproj", "{6EB27225-8129-4260-AB97-7B01EBC6F506}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NEO-Debugger-UI-UnitTests", "NEO-Debugger-UI-UnitTests\NEO-Debugger-UI-UnitTests.csproj", "{CDF48943-06B3-483C-9DC7-773D521B601F}"
@@ -37,6 +35,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "neo-vm", "neo-official-vm\src\neo-vm\neo-vm.csproj", "{0B8FF51A-0A79-489C-BA61-9319E3CEB48A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NEO-Boa-Proxy-Lib", "NEO-Boa-Proxy-Lib\NEO-Boa-Proxy-Lib.csproj", "{B9F90466-D672-48AD-873C-6DB86226F324}"
+EndProject
+Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Neo-Debugger-Winform", "NEO-Debugger-Winform\Neo-Debugger-Winform.csproj", "{BAEACBB5-8CDD-4280-9A70-2D9A5AB875CB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ci", "ci", "{6607B198-8250-43C3-882F-6A3C01624D48}"
+	ProjectSection(SolutionItems) = preProject
+		pre_build.sh = pre_build.sh
+		build.sh = build.sh
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaEdit", "..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj", "{850A58DA-7017-4301-A045-E4917F188CA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,10 +92,6 @@ Global
 		{8E5DBFD3-FB58-45CE-8754-64184B766E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E5DBFD3-FB58-45CE-8754-64184B766E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E5DBFD3-FB58-45CE-8754-64184B766E5C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69CE0FB9-99CF-4A40-A0AB-E39F5050054E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69CE0FB9-99CF-4A40-A0AB-E39F5050054E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69CE0FB9-99CF-4A40-A0AB-E39F5050054E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69CE0FB9-99CF-4A40-A0AB-E39F5050054E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6EB27225-8129-4260-AB97-7B01EBC6F506}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6EB27225-8129-4260-AB97-7B01EBC6F506}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6EB27225-8129-4260-AB97-7B01EBC6F506}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -116,6 +120,14 @@ Global
 		{B9F90466-D672-48AD-873C-6DB86226F324}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9F90466-D672-48AD-873C-6DB86226F324}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9F90466-D672-48AD-873C-6DB86226F324}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAEACBB5-8CDD-4280-9A70-2D9A5AB875CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAEACBB5-8CDD-4280-9A70-2D9A5AB875CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAEACBB5-8CDD-4280-9A70-2D9A5AB875CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAEACBB5-8CDD-4280-9A70-2D9A5AB875CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{850A58DA-7017-4301-A045-E4917F188CA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{850A58DA-7017-4301-A045-E4917F188CA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{850A58DA-7017-4301-A045-E4917F188CA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{850A58DA-7017-4301-A045-E4917F188CA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
