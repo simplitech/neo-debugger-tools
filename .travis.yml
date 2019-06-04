@@ -8,7 +8,7 @@ install:
 before_script:
 - chmod a+x ./build.sh
 script:
-- dotnet ./build.sh $TRAVIS_TAG
+- ./build.sh $TRAVIS_TAG
 deploy:
   provider: releases
   api_key:
