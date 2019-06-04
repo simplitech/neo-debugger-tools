@@ -17,3 +17,4 @@ deploy:
   on:
     repo: simplitech/neo-debugger-tools
     tag: true
+    all_branches: true
