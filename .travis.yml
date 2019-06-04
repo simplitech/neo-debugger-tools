@@ -16,6 +16,7 @@ deploy:
   file: "/home/travis/build/osx-x64-$TRAVIS_BRANCH.zip"
   file: "/home/travis/build/win-x64-$TRAVIS_BRANCH.zip"
   file: "/home/travis/build/linux-x64-$TRAVIS_BRANCH.zip"
+  overwrite: true
   on:
     repo: simplitech/neo-debugger-tools
     tag: true
