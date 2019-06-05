@@ -10,7 +10,6 @@
   <Window.DataContext>
       <vm:MainWindowViewModel/>
   </Window.DataContext>
-
     <DockPanel LastChildFill="True">
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="File">
@@ -151,12 +150,10 @@
         <TextBlock
           VerticalAlignment="Stretch"
           Background="White"
-                    
           Text="{Binding Log}" />
         </ScrollViewer>
       </DockPanel>
     </DockPanel>
-
     <DockPanel
       LastChildFill="True">
       <ListBox
@@ -172,5 +169,4 @@
         TextBlock.FontSize="12" />
     </DockPanel>
   </DockPanel>
-
 </Window>

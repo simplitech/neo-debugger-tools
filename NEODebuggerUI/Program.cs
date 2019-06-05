@@ -1,7 +1,5 @@
-﻿using System;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Logging.Serilog;
-using NEODebuggerUI.ViewModels;
 using NEODebuggerUI.Views;
 
 namespace NEODebuggerUI

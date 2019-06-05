@@ -209,13 +209,21 @@ namespace NEODebuggerUI.ViewModels
                 await Task.Run(async () =>
                 {
                     SendLogToPanel("Compiling project...");
-                    bool compiled = DebuggerStore.instance.manager.CompileContract(sourceCode, LanguageSupport.DetectLanguage(this.SelectedFile), this.SelectedFile);
-                    if (compiled)
+                    try
                     {
-                        string avmFile = this.SelectedFile.Replace(LanguageSupport.GetExtension(LanguageSupport.DetectLanguage(this.SelectedFile)), ".avm");
-                        SendLogToPanel("Compiled file located at " + avmFile);
-                        await LoadAvm(avmFile);
+                        bool compiled = DebuggerStore.instance.manager.CompileContract(sourceCode, LanguageSupport.DetectLanguage(this.SelectedFile), this.SelectedFile);
+                        if (compiled)
+                        {
+                            string avmFile = this.SelectedFile.Replace(LanguageSupport.GetExtension(LanguageSupport.DetectLanguage(this.SelectedFile)), ".avm");
+                            SendLogToPanel("Compiled file located at " + avmFile);
+                            await LoadAvm(avmFile);
+                        }
                     }
+                    catch(Exception ex)
+                    {
+                        SendLogToPanel("Compiler error: " + ex.Message);
+                    }
+
                 });
             }
         }
