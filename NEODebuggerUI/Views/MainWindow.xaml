@@ -96,7 +96,7 @@
       </MenuItem>
       <MenuItem Header="Tools">
         <MenuItem Header="Compile" Command="{Binding CompileCurrentFile}"/>
-        <MenuItem Header="Key Tool" IsEnabled="false"/>
+        <MenuItem Header="Key Tool" Command="{Binding OpenKeyTool}"/>
         <MenuItem Header="Code Generator" IsEnabled="false">
           <MenuItem Header="Neo Lux"/>
         </MenuItem>

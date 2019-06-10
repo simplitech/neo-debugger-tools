@@ -178,5 +178,15 @@ namespace Neo.Debugger.Core.Utils
             output = $"[{output}]";
             return output;
         }
+
+        public static string ToHexString(byte[] bytes)
+        {
+            return bytes.ToHexString();
+        }
+
+        public static byte[] AddressToScriptHash(string address)
+        {
+            return address.AddressToScriptHash();
+        }
     }
 }
