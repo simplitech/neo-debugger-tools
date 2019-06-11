@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using NEODebuggerUI.ViewModels;
 using NEODebuggerUI.Models;
 using Neo.Debugger.Core.Utils;
+using System;
 
 namespace NEODebuggerUI.Views
 {
@@ -19,9 +20,9 @@ namespace NEODebuggerUI.Views
 #if DEBUG
             this.AttachDevTools();
 #endif
-            RenderKeyDataGrid("");
+            RenderKeyGrid();
 
-            this.ViewModel.EvtPrivateKeyChanged += (privateKey) => RenderKeyDataGrid(ViewModel.PrivateKey);
+            this.ViewModel.EvtPrivateKeyToDecodeChanged += (privateKey) => RenderKeyGrid(privateKey);
 
         }
 
@@ -30,28 +31,39 @@ namespace NEODebuggerUI.Views
             AvaloniaXamlLoader.Load(this);
         }
 
-        private void RenderKeyDataGrid(string key)
+        private void RenderKeyGrid(string key = "")
         {
-            var grid = this.FindControl<Grid>("KeyDataGrid");
+            var grid = this.FindControl<Grid>("KeyGrid");
             grid.Children.Clear();
             grid.RowDefinitions.Clear();
 
             var rowHeader = new RowDefinition { Height = new GridLength(20) };
             grid.RowDefinitions.Add(rowHeader);
 
-            var propertyHeader = new TextBlock { Text = "Property", FontWeight = FontWeight.Bold };
+            var propertyHeader = new TextBlock
+            {
+                Text = "Property",
+                FontWeight = FontWeight.Bold,
+                Margin = Thickness.Parse("5, 0, 0, 0")
+            };
             Grid.SetRow(propertyHeader, 0);
             Grid.SetColumn(propertyHeader, 0);
             grid.Children.Add(propertyHeader);
 
-            var valueHeader = new TextBlock { Text = "Value", FontWeight = FontWeight.Bold };
+            var valueHeader = new TextBlock
+            {
+                Text = "Value",
+                FontWeight = FontWeight.Bold,
+                Margin = Thickness.Parse("5, 0, 0, 0")
+            };
             Grid.SetRow(valueHeader, 0);
             Grid.SetColumn(valueHeader, 1);
             grid.Children.Add(valueHeader);
 
             var keyPair = DebuggerUtils.GetKeyFromString(key);
 
-            if (keyPair != null) {
+            if (keyPair != null)
+            {
 
                 var scriptHash = DebuggerUtils.AddressToScriptHash(keyPair.address);
 
@@ -68,21 +80,30 @@ namespace NEODebuggerUI.Views
 
         private void RenderLine(Grid grid, int rowCount, string v1, string v2)
         {
-            var rowView = new RowDefinition { Height = new GridLength(25) };
+            var rowView = new RowDefinition { Height = new GridLength(30) };
             grid.RowDefinitions.Add(rowView);
 
-            var v1View = new TextBlock {
+            var v1View = new TextBlock
+            {
                 Text = v1,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = Thickness.Parse("5, 0, 0, 0")
             };
             Grid.SetRow(v1View, rowCount);
             Grid.SetColumn(v1View, 0);
             grid.Children.Add(v1View);
 
-            var v2View = new TextBlock {
+            // v2 is a textBox to enable selecting the result - textBlock is not selectable
+            var v2View = new TextBox
+            {
                 Text = v2,
-                VerticalAlignment = VerticalAlignment.Center
+                IsReadOnly = true,
+                TextWrapping = TextWrapping.NoWrap,
+                VerticalAlignment = VerticalAlignment.Center,
+                BorderThickness = Thickness.Parse("0, 0, 0, 0"),
+                Background = Brushes.Transparent
             };
+
             Grid.SetRow(v2View, rowCount);
             Grid.SetColumn(v2View, 1);
             grid.Children.Add(v2View);
