@@ -50,25 +50,7 @@ namespace NEODebuggerUI.Models
             var key = DebuggerUtils.GetKeyFromString(privateKey);
             return key?.address;
         }
-
-        public byte[] GetPublicKeyFromString(string privateKey)
-        {
-            var key = DebuggerUtils.GetKeyFromString(privateKey);
-            return key?.PublicKey;
-        }
-
-        public byte[] GetPrivateKeyFromString(string privateKey)
-        {
-            var key = DebuggerUtils.GetKeyFromString(privateKey);
-            return key?.PrivateKey;
-        }
-
-        public string GetWIFFromString(string privateKey)
-        {
-            var key = DebuggerUtils.GetKeyFromString(privateKey);
-            return key?.WIF;
-        }
-
+        
         public List<string> PrivateKeysList { get; set; }
     }
 }

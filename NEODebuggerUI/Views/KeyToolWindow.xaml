@@ -1,50 +1,43 @@
-﻿
-
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:NEODebuggerUI.ViewModels;assembly=NEODebuggerUI"
         xmlns:AvalonEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
         Icon="resm:NEODebuggerUI.Assets.avalonia-logo.ico"
         Title="NEODebuggerUI"
-		Background="LightGray"
+        Background="LightGray"
         Width="700"
-        Height="270">
+        Height="310">
   <Window.DataContext>
         <vm:KeyToolWindowViewModel/>
   </Window.DataContext>
 
     <DockPanel LastChildFill="True"
                Margin="5, 5, 5, 5" >
-
         <DockPanel LastChildFill="True" DockPanel.Dock="Top" >
-            
             <TextBlock DockPanel.Dock="Top"
                        Text="Private Key"
-				       Margin="0, 0, 0, 5"/>
-
-            <Button Content="Random" 
-				    DockPanel.Dock="Right" 
-				    Margin="5, 0, 5, 0" />
-            
-            <Button Command="{Binding Test}"
+                       Margin="0, 0, 0, 5"/>
+            <Button Command="{Binding GenerateRandomKey}"
+                    Content="Random" 
+                    DockPanel.Dock="Right" 
+                    Margin="5, 0, 5, 0" />
+            <Button Command="{Binding DecodeKey}"
                     Content="Decoder" 
-				    DockPanel.Dock="Right" 
-				    Margin="5, 0, 5, 0" />
-
-            <TextBox Name="KeyBox" 
-				     Margin="5, 0, 5, 0" />
+                    DockPanel.Dock="Right" 
+                    Margin="5, 0, 5, 0" />
+            <TextBox Text="{Binding PrivateKey}"
+                     Name="KeyBox" 
+                     Margin="5, 0, 5, 0" />
         </DockPanel>
-        
         <DockPanel LastChildFill="True"
-                   Margin="10, 5, 10, 5" >
-            
-            <Grid Name="KeyDataGrid" >
+                   Margin="10, 10, 10, 10" >
+            <Grid Name="KeyDataGrid"
+                  Background="White">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="160"/>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
             </Grid>
-            
         </DockPanel>
     </DockPanel>
 </Window>

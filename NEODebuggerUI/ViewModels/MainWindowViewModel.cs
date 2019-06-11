@@ -596,7 +596,6 @@ namespace NEODebuggerUI.ViewModels
         {
             var keyToolWindow = new KeyToolWindow();
             keyToolWindow.ShowDialog(Application.Current.MainWindow);
-            Console.WriteLine("Open Key Decoder Tool");
         }
     }
 }
