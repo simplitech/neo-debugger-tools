@@ -311,7 +311,7 @@ namespace Neo.Emulation
             {
                 engine.StepInto();
 
-                if (engine.State == VMState.NONE)
+                if (engine.State == VMState.NONE || engine.State == VMState.BREAK)
                 {
                     int currentOffset = engine.CurrentContext.InstructionPointer;
 
