@@ -109,7 +109,7 @@ namespace NEODebuggerUI.ViewModels
                     }
                     EvtFileChanged?.Invoke(_selectedFile);
                 }
-                UpdateBreakpointView(1, false);
+                UpdateBreakpointView(0, false);
             }
         }
 
@@ -219,7 +219,7 @@ namespace NEODebuggerUI.ViewModels
                             await LoadAvm(avmFile);
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         SendLogToPanel("Compiler error: " + ex.Message);
                     }
@@ -371,13 +371,13 @@ namespace NEODebuggerUI.ViewModels
 
         public async Task RunDebugger()
         {
-            if(!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+            if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
                 DebuggerStore.instance.manager.ConfigureDebugParameters(DebuggerStore.instance.DebugParams);
             }
 
             DebuggerStore.instance.manager.Run();
-            
+
             await Dispatcher.UIThread.InvokeAsync(async () =>
             {
                 await CheckResults();
@@ -481,7 +481,8 @@ namespace NEODebuggerUI.ViewModels
 
         private void UpdateStackPanel()
         {
-            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint) {
+            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+            {
                 var evalStack = DebuggerStore.instance.manager.Emulator.GetEvaluationStack().ToArray();
                 var altStack = DebuggerStore.instance.manager.Emulator.GetAltStack().ToArray();
 
@@ -544,11 +545,14 @@ namespace NEODebuggerUI.ViewModels
 
         public void UpdateBreakpointView(int line, bool addBreakpoint)
         {
-            Dispatcher.UIThread.InvokeAsync(() =>
+            if (line > 0)
             {
-                EvtBreakpointStateChanged?.Invoke(line, addBreakpoint);
-                UpdateCurrentLineView();
-            });
+                Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    EvtBreakpointStateChanged?.Invoke(line, addBreakpoint);
+                    UpdateCurrentLineView();
+                });
+            }
         }
 
         public async Task LoadBlockchain()
