@@ -591,5 +591,11 @@ namespace NEODebuggerUI.ViewModels
 
             SendLogToPanel("Reset to virtual blockchain at path: " + DebuggerStore.instance.manager.Blockchain.fileName);
         }
+
+        public void OpenKeyTool()
+        {
+            var keyToolWindow = new KeyToolWindow();
+            keyToolWindow.ShowDialog(Application.Current.MainWindow);
+        }
     }
 }
