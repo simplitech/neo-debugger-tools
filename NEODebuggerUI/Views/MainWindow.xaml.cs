@@ -37,9 +37,11 @@ namespace NEODebuggerUI.Views
             _textEditor.PointerHover += (o, e) => SetTip(e.GetPosition(_textEditor));
             _textEditor.PointerHoverStopped += (o, e) => ToolTip.SetIsOpen(_textEditor, false);
             _textEditor.TextChanged += (object sender, EventArgs e) => { ViewModel.EditorFileContent = _textEditor.Text; };
+
             _breakpointMargin = new BreakpointMargin();
             _breakpointMargin.Width = 20;
-            _breakpointMargin.PointerPressed += (o, e) => SetBreakpointState(e.GetPosition(_textEditor));
+            _breakpointMargin.Tapped += (o, e) => SetBreakpointState();
+
             _textEditor.TextArea.LeftMargins.Insert(0, _breakpointMargin);
 
             MenuItem newCSharp = this.FindControl<MenuItem>("MenuItemNewCSharp");
@@ -98,8 +100,8 @@ namespace NEODebuggerUI.Views
         {
             if (File.Exists(filename))
             {
-                await Dispatcher.UIThread.InvokeAsync(() => 
-                { 
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
 
                     if (filename.EndsWith(".avm"))
                     {
@@ -115,20 +117,33 @@ namespace NEODebuggerUI.Views
             }
         }
 
-        public void SetBreakpointState(Point clickPosition)
+        public void SetBreakpointState()
         {
             int lineIndex;
 
-            var textPosition = _textEditor.GetPositionFromPoint(clickPosition);
-            var maxLine = _textEditor.Document.LineCount;
-            if (textPosition?.Line == null || textPosition?.Line > maxLine)
-            {
-                //click was not in a valid line
-                return;
-            }
-            lineIndex = textPosition?.Line ?? 0;
+            var caret = _textEditor.CaretOffset;
 
-            ViewModel.SetBreakpoint(lineIndex);
+            // when clicking on the margin, is selecting the whole line + 1 character of the next line
+            // this is to get the correct clicked line
+            if (_textEditor.SelectionLength > 0)
+            {
+                caret -= 1;
+            }
+
+            try
+            {
+                var documentLine = _textEditor.Document.GetLineByOffset(caret);
+                lineIndex = documentLine.LineNumber;
+
+                _textEditor.Select(documentLine.Offset, 0);
+
+                ViewModel.SetBreakpoint(lineIndex);
+            }
+            catch (Exception e)
+            {
+                // if there are no documents open, ocurrs NullPointerException
+                Console.WriteLine(e.Message);
+            }
         }
 
         public async Task UpdateBreakpoint(int line)
@@ -147,6 +162,11 @@ namespace NEODebuggerUI.Views
 
         public async Task HighlightOnBreakpoint(bool isOnBreakpoint, int currentLine)
         {
+            if (currentLine <= 0 || currentLine > _textEditor.LineCount)
+            {
+                return;
+            }
+
             if (isOnBreakpoint)
             {
                 // highlight the line when stopped on a breakpoint
