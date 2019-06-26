@@ -33,7 +33,7 @@ namespace NEODebuggerUI.Views
 
         private void RenderKeyGrid(string key = "")
         {
-            var grid = this.FindControl<Grid>("KeyGrid");
+            var grid = this.FindControl<Grid>("KeyDataGrid");
             grid.Children.Clear();
             grid.RowDefinitions.Clear();
 
