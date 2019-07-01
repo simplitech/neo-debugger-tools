@@ -46,6 +46,9 @@ namespace NEODebuggerUI.ViewModels
         public delegate void BreakpointStateChanged(int line, bool addBreakpoint);
         public event BreakpointStateChanged EvtBreakpointStateChanged;
 
+        public delegate void VariablesChanged(List<string> name, List<string> value, List<string> type);
+        public event VariablesChanged EvtVariablesChanged;
+
         public String EditorFileContent;
 
         public HashSet<int> Breakpoints { get => GetBreakpointHashSet(); }
@@ -77,6 +80,10 @@ namespace NEODebuggerUI.ViewModels
         public List<string> AltStack { get; set; }
         public int StackIndex { get; set; } = -1;
 
+        public List<string> VariableNames { get; set; }
+        public List<string> VariableValues { get; set; }
+        public List<string> VariableTypes { get; set; }
+
         private string _fileFolder;
         private DateTime _lastModificationDate;
 
@@ -91,6 +98,10 @@ namespace NEODebuggerUI.ViewModels
 
             EvaluationStack = new List<string>();
             AltStack = new List<string>();
+
+            VariableNames = new List<string>();
+            VariableValues = new List<string>();
+            VariableTypes = new List<string>();
         }
 
         private void LoadSelectedFile()
@@ -331,7 +342,7 @@ namespace NEODebuggerUI.ViewModels
             ConsumedGas = DebuggerStore.instance.UsedGasCost;
 
             UpdateCurrentLineView();
-            UpdateStackPanel();
+            UpdateInfoPanel();
 
             if (!DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
             {
@@ -479,6 +490,12 @@ namespace NEODebuggerUI.ViewModels
             }
         }
 
+        private void UpdateInfoPanel()
+        {
+            UpdateStackPanel();
+            UpdateVariablesPanel();
+        }
+
         private void UpdateStackPanel()
         {
             if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
@@ -526,6 +543,26 @@ namespace NEODebuggerUI.ViewModels
 
             EvtVMStackChanged?.Invoke(EvaluationStack, AltStack, StackIndex);
 
+        }
+
+        private void UpdateVariablesPanel()
+        {
+            if (DebuggerStore.instance.manager.IsSteppingOrOnBreakpoint)
+            {
+                var variables = DebuggerStore.instance.manager.Emulator.Variables;
+                
+                VariableNames = variables.Select(x => x.name).ToList();
+                VariableTypes = variables.Select(x => x.type.ToString()).ToList();
+                VariableValues = variables.Select(x => Neo.Emulation.Utils.FormattingUtils.StackItemAsString(x.value)).ToList();
+            }
+            else
+            {
+                VariableNames.Clear();
+                VariableValues.Clear();
+                VariableTypes.Clear();
+            }
+
+            EvtVariablesChanged?.Invoke(VariableNames, VariableValues, VariableTypes);
         }
 
         public void UpdateCurrentLineView()

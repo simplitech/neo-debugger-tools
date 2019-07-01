@@ -7,166 +7,193 @@
             Background="LightGray"
         Width="950"
         Height="600">
-  <Window.DataContext>
-      <vm:MainWindowViewModel/>
-  </Window.DataContext>
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+
     <DockPanel LastChildFill="True">
-    <Menu DockPanel.Dock="Top">
-      <MenuItem Header="File">
-        <MenuItem Header="New" >
-          <MenuItem Header="C#" Name="MenuItemNewCSharp"/>
-          <MenuItem Header="Python"  Name="MenuItemNewPython"/>
-        </MenuItem>
-        <MenuItem Header="New from Template" IsEnabled="false">
-          <MenuItem Header="C#">
-            <MenuItem Header="Agency Transaction"/>
-            <MenuItem Header="Domain"/>
-            <MenuItem Header="Hello World"/>
-            <MenuItem Header="ICO Template"/>
-            <MenuItem Header="Lock"/>
-            <MenuItem Header="Struct Example"/>
-          </MenuItem>
-          <MenuItem Header="Python">
-            <MenuItem Header="NEP5"  Name="MenuItemNewNEP5"/>
-          </MenuItem>
-          </MenuItem>
-        <MenuItem Header="Open..." Command="{Binding Open}" />
-        <Separator />
-        <MenuItem Header="Exit" />
-      </MenuItem>
-      <MenuItem Header="Search" IsEnabled="false">
-        <MenuItem Header="Quick Find... (Ctrl+F)" />
-        <MenuItem Header="Find... (Ctrl+Alt+F)" />
-        <MenuItem Header="Find And Replace..." />
-        <Separator />
-        <MenuItem Header="Go To Line... (Ctrl+G)" />
-      </MenuItem>
-      <MenuItem Header="View" IsEnabled="false">
-        <MenuItem Header="Word Wrap">
-          <MenuItem.Icon>
-            <CheckBox BorderThickness="0"
-                      IsHitTestVisible="False"
-                      Command="{Binding WordWrap}">
-            </CheckBox>
-          </MenuItem.Icon>
-        </MenuItem>
-        <MenuItem Header="Show Ident Guidelines">
-          <MenuItem.Icon>
-            <CheckBox BorderThickness="0"
-                      IsHitTestVisible="False"
-                      Command="{Binding IdentGuidelines}">
-            </CheckBox>
-          </MenuItem.Icon>
-        </MenuItem>
-        <MenuItem Header="Show Whitespace">
-          <MenuItem.Icon>
-            <CheckBox BorderThickness="0"
-                      IsHitTestVisible="False"
-                      Command="{Binding ShowWhitespace}">
-            </CheckBox>
-          </MenuItem.Icon>
-        </MenuItem>
-        <Separator />
-        <MenuItem Header="Zoom In (Ctrl+Plus)" />
-        <MenuItem Header="Zoom Out (Ctrl+Minus)" />
-        <MenuItem Header="Zoom 100% (Ctrl+0)" />
-        <Separator />
-        <MenuItem Header="Collapse All" />
-        <MenuItem Header="Expand All" />
-      </MenuItem>
-      <MenuItem Header="Contract">
-        <MenuItem Header="Run (Ctrl + R)" Command="{Binding TryRun}"
-                                    CommandParameter="false"
-                                    Name="RunContract"/>
-        <MenuItem Header="Stop (Ctrl + P)" Command="{Binding StopDebugging}"
-                                           IsEnabled="{Binding IsStopped}"
-                                           Name="StopContract"/>
-        <MenuItem Header="Step (Ctrl + D)" Command="{Binding Step}"
-                                      CommandParameter="true"
-                                      IsEnabled="{Binding IsStopped}"
-                                      Name="StepContract"/>
-        <MenuItem Header="Reset" IsEnabled="false" />
-        <MenuItem Header="Rebuild" Command="{Binding SaveAndRebuild}"/>
-        <MenuItem Header="Storage (F6)" IsEnabled="false" />
-      </MenuItem>
-      <MenuItem Header="Blockchain">
-        <MenuItem Header="View" IsEnabled="false"/>
-        <MenuItem Header="Load" Command="{Binding LoadBlockchain}" />
-        <MenuItem Header="Reset" Command="{Binding ResetBlockchain}"/>
-      </MenuItem>
-      <MenuItem Header="Tools">
-        <MenuItem Header="Compile" Command="{Binding CompileCurrentFile}"/>
-        <MenuItem Header="Key Tool" Command="{Binding OpenKeyTool}"/>
-        <MenuItem Header="Code Generator" IsEnabled="false">
-          <MenuItem Header="Neo Lux"/>
-        </MenuItem>
-      </MenuItem>
-    </Menu>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="New" >
+                    <MenuItem Header="C#" Name="MenuItemNewCSharp"/>
+                    <MenuItem Header="Python"  Name="MenuItemNewPython"/>
+                </MenuItem>
+                <MenuItem Header="New from Template" IsEnabled="false">
+                    <MenuItem Header="C#">
+                        <MenuItem Header="Agency Transaction"/>
+                        <MenuItem Header="Domain"/>
+                        <MenuItem Header="Hello World"/>
+                        <MenuItem Header="ICO Template"/>
+                        <MenuItem Header="Lock"/>
+                        <MenuItem Header="Struct Example"/>
+                    </MenuItem>
+                    <MenuItem Header="Python">
+                        <MenuItem Header="NEP5"  Name="MenuItemNewNEP5"/>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Open..." Command="{Binding Open}" />
+                <Separator />
+                <MenuItem Header="Exit" />
+            </MenuItem>
+            <MenuItem Header="Search" IsEnabled="false">
+                <MenuItem Header="Quick Find... (Ctrl+F)" />
+                <MenuItem Header="Find... (Ctrl+Alt+F)" />
+                <MenuItem Header="Find And Replace..." />
+                <Separator />
+                <MenuItem Header="Go To Line... (Ctrl+G)" />
+            </MenuItem>
+            <MenuItem Header="View" IsEnabled="false">
+                <MenuItem Header="Word Wrap">
+                    <MenuItem.Icon>
+                        <CheckBox BorderThickness="0"
+                                  IsHitTestVisible="False"
+                                  Command="{Binding WordWrap}">
+                        </CheckBox>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Show Ident Guidelines">
+                    <MenuItem.Icon>
+                        <CheckBox BorderThickness="0"
+                                  IsHitTestVisible="False"
+                                  Command="{Binding IdentGuidelines}">
+                        </CheckBox>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Show Whitespace">
+                    <MenuItem.Icon>
+                        <CheckBox BorderThickness="0"
+                                  IsHitTestVisible="False"
+                                  Command="{Binding ShowWhitespace}">
+                        </CheckBox>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Zoom In (Ctrl+Plus)" />
+                <MenuItem Header="Zoom Out (Ctrl+Minus)" />
+                <MenuItem Header="Zoom 100% (Ctrl+0)" />
+                <Separator />
+                <MenuItem Header="Collapse All" />
+                <MenuItem Header="Expand All" />
+            </MenuItem>
+            <MenuItem Header="Contract">
+                <MenuItem Header="Run (Ctrl + R)" Command="{Binding TryRun}"
+                                                  CommandParameter="false"
+                                                  Name="RunContract"/>
+                <MenuItem Header="Stop (Ctrl + P)" Command="{Binding StopDebugging}"
+                                                   IsEnabled="{Binding IsStopped}"
+                                                   Name="StopContract"/>
+                <MenuItem Header="Step (Ctrl + D)" Command="{Binding Step}"
+                                                   CommandParameter="true"
+                                                   IsEnabled="{Binding IsStopped}"
+                                                   Name="StepContract"/>
+                <MenuItem Header="Reset" IsEnabled="false" />
+                <MenuItem Header="Rebuild" Command="{Binding SaveAndRebuild}"/>
+                <MenuItem Header="Storage (F6)" IsEnabled="false" />
+            </MenuItem>
+            <MenuItem Header="Blockchain">
+                <MenuItem Header="View" IsEnabled="false"/>
+                <MenuItem Header="Load" Command="{Binding LoadBlockchain}" />
+                <MenuItem Header="Reset" Command="{Binding ResetBlockchain}"/>
+            </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem Header="Compile" Command="{Binding CompileCurrentFile}"/>
+                <MenuItem Header="Key Tool" Command="{Binding OpenKeyTool}"/>
+                <MenuItem Header="Code Generator" IsEnabled="false">
+                    <MenuItem Header="Neo Lux"/>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
 
-    <DockPanel
-      DockPanel.Dock="Top"
-      LastChildFill="True">
-      <TextBlock
-        DockPanel.Dock="Right"
-        Margin="5"
-        Text="{Binding ConsumedGas}"/>
-      <TextBlock
-        DockPanel.Dock="Right"
-        Margin="5"
-        Text="GAS used:"/>
-      <TextBlock
-        Margin="5"
-        Text="{Binding SelectedFile}"/>
-    </DockPanel>
+        <DockPanel
+            DockPanel.Dock="Top"
+            LastChildFill="True">
+            <TextBlock
+                DockPanel.Dock="Right"
+                Margin="5"
+                Text="{Binding ConsumedGas}"/>
+            <TextBlock
+                DockPanel.Dock="Right"
+                Margin="5"
+                Text="GAS used:"/>
+            <TextBlock
+                Margin="5"
+                Text="{Binding SelectedFile}"/>
+        </DockPanel>
 
-  <DockPanel
-      DockPanel.Dock="Bottom"
-      Height="145"
-      Margin="0, 5"
-      LastChildFill="True">
-      <DockPanel
-        DockPanel.Dock="Right"
-        Width="300"
-        LastChildFill="True">
-        <TextBlock
-          DockPanel.Dock="Top"
-          Text="VM Stack:"/>
-        <Grid Name="VMStackGrid" Background="White">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-          </Grid.ColumnDefinitions>
-        </Grid>
-      </DockPanel>
-      <DockPanel
-        Margin="0, 0, 5, 0"
-        LastChildFill="True">
-        <TextBlock
-          DockPanel.Dock="Top"
-          Margin="5, 0, 0, 0"
-          Text="Log:"/>
-        <ScrollViewer>
-        <TextBlock
-          VerticalAlignment="Stretch"
-          Background="White"
-          Text="{Binding Log}" />
-        </ScrollViewer>
-      </DockPanel>
+        <DockPanel
+            DockPanel.Dock="Bottom"
+            Margin="5, 5, 5, 5"
+            Height="142"
+            LastChildFill="True">
+
+            <DockPanel
+                DockPanel.Dock="Left"
+                Width="300"
+                Margin="0, 5, 5, 0"
+                LastChildFill="True">
+                <TextBlock
+                    DockPanel.Dock="Top"
+                    Margin="5, 0, 0, 0"
+                    Text="Log:"/>
+                <ScrollViewer>
+                    <TextBlock
+                        VerticalAlignment="Stretch"
+                        Background="White"
+                        Text="{Binding Log}" />
+                </ScrollViewer>
+            </DockPanel>
+
+            <DockPanel
+                DockPanel.Dock="Left"
+                Width="300"
+                Margin="0, 5, 5, 0"
+                LastChildFill="True">
+                <TextBlock
+                    DockPanel.Dock="Top"
+                    Text="Variables:"/>
+                <ScrollViewer>
+                    <Grid Name="VariablesGrid" Background="White">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ScrollViewer>
+            </DockPanel>
+            
+            <DockPanel
+                Margin="0, 5, 0, 0"
+                LastChildFill="True">
+                <TextBlock
+                    DockPanel.Dock="Top"
+                    Text="VM Stack:"/>
+                <ScrollViewer>
+                    <Grid Name="VMStackGrid" Background="White">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ScrollViewer>
+            </DockPanel>
+            
+        </DockPanel>
+        
+        <DockPanel
+            LastChildFill="True">
+            <ListBox
+                DockPanel.Dock="Left"
+                Width="180"
+                Margin="0, 0, 5, 0"
+                Items="{Binding ProjectFiles}"
+                SelectedItem="{Binding SelectedFile}" />
+            <AvalonEdit:TextEditor
+                Name="Editor"
+                HorizontalScrollBarVisibility="Auto"
+                VerticalScrollBarVisibility="Auto"
+                TextBlock.FontSize="12" />
+        </DockPanel>
     </DockPanel>
-    <DockPanel
-      LastChildFill="True">
-      <ListBox
-        DockPanel.Dock="Left"
-        Width="180"
-        Margin="0, 0, 5, 0"
-        Items="{Binding ProjectFiles}"
-        SelectedItem="{Binding SelectedFile}" />
-      <AvalonEdit:TextEditor
-        Name="Editor"
-        HorizontalScrollBarVisibility="Auto"
-        VerticalScrollBarVisibility="Auto"
-        TextBlock.FontSize="12" />
-    </DockPanel>
-  </DockPanel>
 </Window>
