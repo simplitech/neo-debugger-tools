@@ -168,14 +168,27 @@ namespace Neo.Debugger.Electron
 
             server.Post("/switch", (request) =>
             {
-                var code = request.args["code"];
-                projectFiles[this.activeDocumentID].content = code;
+                try
+                {
+                    var code = request.args["code"];
+                    var id = request.args["id"];
 
-                this.activeDocumentID = request.args["id"];
+                    projectFiles[this.activeDocumentID].content = code;
+                    this.activeDocumentID = id;
 
-                var context = GetContext();
-
-                return "ok";
+                    var context = GetContext();
+                    
+                    return "ok";
+                }
+                catch (KeyNotFoundException)
+                {
+                    // params were not passed
+                    return "fail - missing params";
+                }
+                catch (Exception)
+                {
+                    return "fail";
+                }
             });
 
             server.Get("/content", (request) =>
@@ -198,87 +211,141 @@ namespace Neo.Debugger.Electron
 
             server.Post("/breakpoint/add", (request) =>
             {
-                int line = int.Parse(request.args["line"]);
-
-                var file = projectFiles[activeDocumentID];
-                if (_debugger.AddBreakpoint(line, file.path))
+                try
                 {
-                    var breakpoints = file.breakpoints;
-                    breakpoints.Add(line);
+                    int line = int.Parse(request.args["line"]);
 
-                    return "ok";
+                    var file = projectFiles[activeDocumentID];
+                    if (_debugger.AddBreakpoint(line, file.path))
+                    {
+                        var breakpoints = file.breakpoints;
+                        breakpoints.Add(line);
+
+                        return "ok";
+                    }
+
+                    return "fail";
                 }
-
-                return "fail";
+                catch (KeyNotFoundException)
+                {
+                    // param was not passed
+                    return "fail - missing params";
+                }
+                catch (Exception)
+                {
+                    return "fail";
+                }
             });
 
             server.Post("/breakpoint/remove", (request) =>
             {
-                int line = int.Parse(request.args["line"]);
+                try
+                {
+                    int line = int.Parse(request.args["line"]);
 
-                var file = projectFiles[activeDocumentID];
-                var breakpoints = file.breakpoints;
+                    var file = projectFiles[activeDocumentID];
+                    var breakpoints = file.breakpoints;
 
-                breakpoints.Remove(line);
+                    breakpoints.Remove(line);
 
-                _debugger.RemoveBreakpoint(line, file.path);
+                    _debugger.RemoveBreakpoint(line, file.path);
 
-                return "ok";
+                    return "ok";
+                }
+                catch (KeyNotFoundException)
+                {
+                    // param was not passed
+                    return "fail - missing params";
+                }
+                catch (Exception)
+                {
+                    return "fail";
+                }
             });
 
             server.Post("/compile", (request) =>
             {
-                var code = request.args["code"];
-                request.session.SetString("code", code);
-
-                if (Compile(serverSettings, code))
+                try
                 {
-                    return "OK";
-                }
+                    var code = request.args["code"];
+                    request.session.SetString("code", code);
 
-                return "FAIL";
+                    // always return false - not implemented
+                    if (Compile(serverSettings, code))
+                    {
+                        return "OK";
+                    }
+
+                    return "FAIL";
+                }
+                catch (KeyNotFoundException)
+                {
+                    // param was not passed
+                    return "FAIL - MISSING PARAMS";
+                }
+                catch (Exception)
+                {
+                    return "FAIL";
+                }
             });
 
             server.Post("/shell", (request) =>
             {
-                var input = request.args["input"];
-                var output = DataNode.CreateObject();
-
-                var lines = DataNode.CreateArray("lines");
-                output.AddNode(lines);
-
-                if (!_shell.Execute(input, (type, text) =>
+                try
                 {
-                    lines.AddValue(text);
-                }))
-                {
-                    output.AddValue("Invalid command");
+                    var input = request.args["input"];
+                    var output = DataNode.CreateObject();
+
+                    var lines = DataNode.CreateArray("lines");
+                    output.AddNode(lines);
+
+                    if (!_shell.Execute(input, (type, text) =>
+                    {
+                        lines.AddValue(text);
+                    }))
+                    {
+                        output.AddValue("Invalid command");
+                    }
+
+                    string filePath;
+                    var curLine = _shell.Debugger.ResolveLine(_shell.Debugger.State.offset, true, out filePath);
+
+                    output.AddField("state", _shell.Debugger.State.state);
+                    output.AddField("offset", _shell.Debugger.State.offset);
+                    output.AddField("line", curLine);
+                    output.AddField("path", filePath);
+
+                    if (_shell.Debugger.State.state == Emulation.DebuggerState.State.Finished)
+                    {
+                        var val = _debugger.Emulator.GetOutput();
+
+                        _debugger.Blockchain.Save();
+
+                        var methodName = _debugger.Emulator.currentMethod;
+                        var hintType = !string.IsNullOrEmpty(methodName) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(methodName) ? _debugger.ABI.functions[methodName].returnType : Emulator.Type.Unknown;
+
+                        var temp = FormattingUtils.StackItemAsString(val, false, hintType);
+                        output.AddField("result", temp);
+                        output.AddField("gas", _debugger.Emulator.usedGas);
+                    }
+
+                    var json = JSONWriter.WriteToString(output);
+                    return json;
                 }
-
-                string filePath;
-                var curLine = _shell.Debugger.ResolveLine(_shell.Debugger.State.offset, true, out filePath);
-
-                output.AddField("state", _shell.Debugger.State.state);
-                output.AddField("offset", _shell.Debugger.State.offset);
-                output.AddField("line", curLine);
-                output.AddField("path", filePath);
-
-                if (_shell.Debugger.State.state == Emulation.DebuggerState.State.Finished)
+                catch (KeyNotFoundException)
                 {
-                    var val = _debugger.Emulator.GetOutput();
-
-                    _debugger.Blockchain.Save();
-
-                    var methodName = _debugger.Emulator.currentMethod;
-                    var hintType = !string.IsNullOrEmpty(methodName) && _debugger.ABI != null && _debugger.ABI.functions.ContainsKey(methodName) ? _debugger.ABI.functions[methodName].returnType : Emulator.Type.Unknown;
-
-                    var temp = FormattingUtils.StackItemAsString(val, false, hintType);
-                    output.AddField("result", temp);
-                    output.AddField("gas", _debugger.Emulator.usedGas);
+                    // params were not passed
+                    return "FAIL - MISSING PARAMS";
                 }
-
-                var json = JSONWriter.WriteToString(output);
-                return json;
+                catch (IndexOutOfRangeException)
+                {
+                    // args of the param were not passed correctly
+                    return "FAIL - MISSING ARGS";
+                }
+                catch (Exception)
+                {
+                    return "FAIL";
+                }
             });
 
             server.Run();
