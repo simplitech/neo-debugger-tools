@@ -58,8 +58,12 @@ namespace NEODebuggerUI.Views
             //this.ViewModel.EvtFileToCompileChanged += async () => await ViewModel.SaveCurrentFileWithContent(_textEditor.Text);
             //this.Activated += (o, e) => { ReloadCurrentFile(); };
 
-            Dispatcher.UIThread.InvokeAsync(() => RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex));
+            Dispatcher.UIThread.InvokeAsync(async () => {
+                await RenderVMStack(ViewModel.EvaluationStack, ViewModel.AltStack, ViewModel.StackIndex);
+                await RenderVariableStack(ViewModel.VariableNames, ViewModel.VariableValues, ViewModel.VariableTypes);
+            });
             this.ViewModel.EvtVMStackChanged += async (eval, alt, index) => await RenderVMStack(eval, alt, index);
+            this.ViewModel.EvtVariablesChanged += async (name, value, type) => await RenderVariableStack(name, value, type);
             this.ViewModel.EvtDebugCurrentLineChanged += async (isOnBreakpoint, line) => await HighlightOnBreakpoint(isOnBreakpoint, line);
             this.ViewModel.EvtBreakpointStateChanged += async (line, addBreakpoint) => await UpdateBreakpoint(line);
 
@@ -206,6 +210,39 @@ namespace NEODebuggerUI.Views
             AvaloniaXamlLoader.Load(this);
         }
 
+        private async Task RenderVariableStack(List<string> name, List<string> value, List<string> type)
+        {
+            var grid = this.FindControl<Grid>("VariablesGrid");
+            grid.Children.Clear();
+            grid.RowDefinitions.Clear();
+
+            var rowHeader = new RowDefinition { Height = new GridLength(20) };
+            grid.RowDefinitions.Add(rowHeader);
+
+            var nameHeader = new TextBlock { Text = "Name", FontWeight = FontWeight.Bold };
+            Grid.SetRow(nameHeader, 0);
+            Grid.SetColumn(nameHeader, 0);
+            grid.Children.Add(nameHeader);
+
+            var valueHeader = new TextBlock { Text = "Value", FontWeight = FontWeight.Bold, Margin = Thickness.Parse("5, 0, 0, 0") };
+            Grid.SetRow(valueHeader, 0);
+            Grid.SetColumn(valueHeader, 1);
+            grid.Children.Add(valueHeader);
+
+            var typeHeader = new TextBlock { Text = "Type", FontWeight = FontWeight.Bold, Margin = Thickness.Parse("5, 0, 0, 0") };
+            Grid.SetRow(typeHeader, 0);
+            Grid.SetColumn(typeHeader, 2);
+            grid.Children.Add(typeHeader);
+
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                for (int i = 0; i < name.Count; i++)
+                {
+                    RenderLine(grid, i + 1, name[i], value[i], type[i]);
+                }
+            });
+        }
+
         private async Task RenderVMStack(List<string> evalStack, List<string> altStack, int index)
         {
             var grid = this.FindControl<Grid>("VMStackGrid");
@@ -215,22 +252,17 @@ namespace NEODebuggerUI.Views
             var rowHeader = new RowDefinition { Height = new GridLength(20) };
             grid.RowDefinitions.Add(rowHeader);
 
-            var indexHeader = new TextBlock
-            {
-                Text = "Index",
-                FontWeight = FontWeight.Bold,
-                Margin = Thickness.Parse("0, 0, 5, 0")
-            };
+            var indexHeader = new TextBlock { Text = "Index", FontWeight = FontWeight.Bold };
             Grid.SetRow(indexHeader, 0);
             Grid.SetColumn(indexHeader, 0);
             grid.Children.Add(indexHeader);
 
-            var evalHeader = new TextBlock { Text = "Eval", FontWeight = FontWeight.Bold };
+            var evalHeader = new TextBlock { Text = "Eval", FontWeight = FontWeight.Bold, Margin = Thickness.Parse("5, 0, 0, 0") };
             Grid.SetRow(evalHeader, 0);
             Grid.SetColumn(evalHeader, 1);
             grid.Children.Add(evalHeader);
 
-            var altHeader = new TextBlock { Text = "Alt", FontWeight = FontWeight.Bold };
+            var altHeader = new TextBlock { Text = "Alt", FontWeight = FontWeight.Bold, Margin = Thickness.Parse("5, 0, 0, 0") };
             Grid.SetRow(altHeader, 0);
             Grid.SetColumn(altHeader, 2);
             grid.Children.Add(altHeader);
@@ -239,28 +271,27 @@ namespace NEODebuggerUI.Views
             {
                 for (int i = 0; i <= index; i++)
                 {
-                    RenderLine(grid, i + 1, index - i, evalStack[i], altStack[i]);
+                    RenderLine(grid, i + 1, (index - i).ToString(), evalStack[i], altStack[i]);
                 }
             });
         }
 
-
-        private void RenderLine(Grid grid, int rowCount, int index, string eval, string alt)
+        private void RenderLine(Grid grid, int rowCount, string row0, string row1, string row2)
         {
             var rowView = new RowDefinition { Height = GridLength.Auto };
             grid.RowDefinitions.Add(rowView);
 
-            var indexView = new TextBlock { Text = index.ToString() };
+            var indexView = new TextBlock { Text = row0 };
             Grid.SetRow(indexView, rowCount);
             Grid.SetColumn(indexView, 0);
             grid.Children.Add(indexView);
 
-            var evalView = new TextBlock { Text = eval };
+            var evalView = new TextBlock { Text = row1, Margin = Thickness.Parse("5, 0, 0, 0") };
             Grid.SetRow(evalView, rowCount);
             Grid.SetColumn(evalView, 1);
             grid.Children.Add(evalView);
 
-            var altView = new TextBlock { Text = alt };
+            var altView = new TextBlock { Text = row2, Margin = Thickness.Parse("5, 0, 0, 0") };
             Grid.SetRow(altView, rowCount);
             Grid.SetColumn(altView, 2);
             grid.Children.Add(altView);
